@@ -12,6 +12,18 @@ Additionally, to keep an overview of even **large trials** (\>500 patients), int
 
 As a complete alternative to the patient-by-patient 'circle view', an aggregated "**barplot view**" is implemented which displays the **aggregated numbers of subjects with adverse events**, which can be especially helpful in case the numbers are too great to be easily counted.
 
+## Getting Started
+
+The package AdePro is available on CRAN as well as on Github and may be installed using
+install.packages("adepro")
+or
+install_github("Bayer-Group/BIC-AdEPro")
+respectively.
+After installation AdePRO can be started using
+library("adepro")
+launch_adepro()
+The application will start showing the data upload page. For detailed information on how to upload data see section [Input Data](#Input-Data).
+
 ## Surface
 
 Via the "Change View" button, the display can be switched from "circle view" to "barplot view" and back.
