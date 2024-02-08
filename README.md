@@ -15,14 +15,22 @@ As a complete alternative to the patient-by-patient 'circle view', an aggregated
 ## Getting Started
 
 The package AdePro is available on CRAN as well as on Github and may be installed using
+
 install.packages("adepro")
+
 or
+
 install_github("Bayer-Group/BIC-AdEPro")
+
 respectively.
+
 After installation AdePRO can be started using
+
 library("adepro")
+
 launch_adepro()
-The application will start showing the data upload page. For detailed information on how to upload data see section [Input Data](#Input-Data).
+
+The application will start showing the data upload page. For detailed information on how to upload data see section [Functionality](#Functionality).
 
 ## Surface
 
@@ -50,7 +58,7 @@ The top bar of the app includes several other options which are further explaine
 
 ## Functionality
 
-Select adverse event and subject level data on the left-hand side of the **Upload Data** page (start page) and '**submit**.' For more information on the required data structure see *Input data*.
+Select adverse event and subject level data on the left-hand side of the **Upload Data** page (start page) and '**submit**.' For more information on the required data structure see [Input Data](#Input-Data).
 
 <img src="www/adepro_upload_2.png"/>
 
