@@ -1,6 +1,6 @@
 # AdEPro <img src="www/adepro_logo.png" align="right" height="139"/>
 
-AdEPro (Animation of Adverse Event Profiles) is a Shiny application for the (audio-)visualization of adverse events during clinical trials. AdEPro allows the user to upload the clinical trial data using the typical Analysis Data Model (**ADaM**) in Clinical Data Interchange Standards (**CDISC**). For this, just upload the adverse event dataset (**ADAE**) to AdEPro by means of the Upload Data panel, either as a sas7bdat file or as comma-separated values (csv). For more information click the buttons below.
+AdEPro (Animation of Adverse Event Profiles) is a Shiny application for the (audio-)visualization of adverse events during clinical trials. AdEPro allows the user to upload the clinical trial data using the typical Analysis Data Model (**ADaM**) in Clinical Data Interchange Standards (**CDISC**). For this, just upload the adverse event dataset (**ADAE**) to AdEPro by means of the Upload Data panel, either as a sas7bdat file or as comma-separated values (csv).
 
 ## Description
 
@@ -11,6 +11,26 @@ The AdEPro Shiny app depicts the **temporal progress of all adverse events in ev
 Additionally, to keep an overview of even **large trials** (\>500 patients), intelligent sorting algorithms under the name of '**AdEPro AI**' (based on seriation techniques from the seriation package by Hahsler) allow to sort the patients in a way that **patients with similar adverse event profiles are close to one another** and relevant differences between the treatment groups regarding the displayed adverse events remain recognizable at first sight.
 
 As a complete alternative to the patient-by-patient 'circle view', an aggregated "**barplot view**" is implemented which displays the **aggregated numbers of subjects with adverse events**, which can be especially helpful in case the numbers are too great to be easily counted.
+
+## Getting Started
+
+The package AdePro is available on CRAN as well as on Github and may be installed using
+
+install.packages("adepro")
+
+or
+
+install_github("Bayer-Group/BIC-AdEPro")
+
+respectively.
+
+After installation AdePRO can be started using
+
+library("adepro")
+
+launch_adepro()
+
+The application will start showing the data upload page. For detailed information on how to upload data see section [Functionality](#Functionality).
 
 ## Surface
 
@@ -38,7 +58,7 @@ The top bar of the app includes several other options which are further explaine
 
 ## Functionality
 
-Select adverse event and subject level data on the left-hand side of the **Upload Data** page (start page) and '**submit**.' For more information on the required data structure see *Input data*.
+Select adverse event and subject level data on the left-hand side of the **Upload Data** page (start page) and '**submit**.' For more information on the required data structure see [Input Data](#Input-Data).
 
 <img src="www/adepro_upload_2.png"/>
 
