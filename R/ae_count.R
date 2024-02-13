@@ -6,7 +6,7 @@
 #' group.
 #'
 #' @param ae_data adverse event dataset
-#' @param patients patient dataset
+#' @param patient patient dataset
 #'
 #' @keywords internal
 

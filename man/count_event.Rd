@@ -2,7 +2,7 @@
 % Please edit documentation in R/count_event.R
 \name{count_event}
 \alias{count_event}
-\title{count_event  Count the event number for every AE at spefified timepoint}
+\title{count_event  Count the event number for every AE at specified timepoint}
 \usage{
 count_event(total = tot, day = 1)
 }
@@ -12,6 +12,6 @@ count_event(total = tot, day = 1)
 \item{day}{The study day of interest}
 }
 \description{
-Count the event number for every AE at spefified timepoint
+Count the event number for every AE at specified timepoint
 }
 \keyword{internal}

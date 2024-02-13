@@ -44,7 +44,7 @@ prepare_data <- function(
   adsl_data = NULL
 ) {
 
-  cols <- treat <- ps <- new_AESEVN <- patient <- day_start <- day_end <- output <- message <- NULL
+  cols <- treat <- death <-  ps <- new_AESEVN <- patient <- day_start <- day_end <- output <- message <- NULL
 
   var_list <- c("ps", "treat", "end", "death")
   # create variables ps, treat, end and death

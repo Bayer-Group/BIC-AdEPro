@@ -55,7 +55,7 @@
 #' ## launching the application.
 #' }
 #'
-#' @importFrom graphics barplot legend symbols matplot text polygon par rect
+#' @importFrom graphics barplot legend symbols matplot text polygon par rect grconvertX grconvertY lines
 #' @import utils
 #' @import shiny
 #' @import V8
@@ -64,7 +64,6 @@
 #' @importFrom shinyjs useShinyjs extendShinyjs inlineCSS click delay disable enable reset
 #' @importFrom MASS eqscplot
 #' @importFrom audio play audioSample
-#' @importFrom TeachingDemos my.symbols
 #' @importFrom shape plotcircle
 #' @importFrom seriation seriate get_order
 #' @import Cairo
@@ -76,6 +75,7 @@
 #' @import tidyr
 #' @importFrom haven read_sas
 #' @importFrom stats aggregate na.omit
+#' @importFrom grDevices xy.coords
 #' @return A shiny app
 #'
 
