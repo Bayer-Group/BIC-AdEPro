@@ -163,7 +163,7 @@ adepro_slice_plot <- function(
 
 
           if(length(ae_list) > 1) {
-          TeachingDemos::my.symbols(
+          my.symbols(
             x = tmp$X,
             y = tmp$Y,
             symb = poly_t,

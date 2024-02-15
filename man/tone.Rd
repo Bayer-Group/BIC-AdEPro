@@ -2,7 +2,7 @@
 % Please edit documentation in R/tone.R
 \name{tone}
 \alias{tone}
-\title{tone - Function that plays two different sounds for AEs}
+\title{tone - Function that plays two different sounds for adverse events}
 \usage{
 tone(no1 = 0, no2 = 0, d = 0.7)
 }
@@ -16,6 +16,6 @@ tone(no1 = 0, no2 = 0, d = 0.7)
 \item{d}{Duration of the sounds (numeric, in seconds)}
 }
 \description{
-Plays two different sounds (after one another) for treatment group comparison for a specific AE
+Plays two different sounds (after one another) for treatment group comparison for a specific adverse event
 }
 \keyword{internal}

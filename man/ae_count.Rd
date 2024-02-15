@@ -4,7 +4,7 @@
 \alias{ae_count}
 \title{ae_count - provides adverse event count dataset}
 \usage{
-ae_count(ae_data, patient)
+ae_count(ae_data, patients)
 }
 \arguments{
 \item{ae_data}{adverse event dataset}
