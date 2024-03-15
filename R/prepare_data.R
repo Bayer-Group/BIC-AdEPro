@@ -49,6 +49,8 @@ prepare_data <- function(
   var_list <- c("ps", "treat", "end", "death")
   # create variables ps, treat, end and death
   pat_data <- dat %>%
+    # Fri Mar  1 12:17:03 2024 ------------------------------
+    dplyr::filter(!!rlang::sym(SAFFN) == 1 | !!rlang::sym(SAFFN) == "Y" | !!rlang::sym(SAFFN) == "Yes" | !!rlang::sym(SAFFN) == "YES" | !!rlang::sym(SAFFN) == "yes" | !!rlang::sym(SAFFN) == "y") %>%
     dplyr::mutate(
         ps = as.numeric(!!rlang::sym(SUBJIDN)),
         treat = as.factor(!!rlang::sym(TRT01A)),
