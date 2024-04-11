@@ -1,7 +1,5 @@
 #' Server part of the AdEPro application
 #'
-#'@param id,input,output,session Internal parameters for {shiny}.
-#'
 #'@return No return value. Server part of the app, used in launch_adepro-function.
 #'
 #'@keywords internal

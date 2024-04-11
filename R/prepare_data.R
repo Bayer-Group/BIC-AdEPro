@@ -18,7 +18,6 @@
 #' @param AERELN Adverse Event Related Flag as numeric (optional)
 #' @param AERELPRN Adverse Event      Flag as numeric (optional)
 #' @param AEACNN Adverse Event        Flag as numeric (optional)
-#' @param optional_vars List optional Variables for the patient data set.
 #' @param adsl_data Subject Level data set (optional)
 #'
 #' @keywords internal

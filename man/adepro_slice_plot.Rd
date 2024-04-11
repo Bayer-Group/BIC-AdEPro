@@ -43,13 +43,13 @@ adepro_slice_plot(
 
 \item{title}{graph title}
 
+\item{subgroup}{selected subgroup}
+
 \item{slider}{day}
 
 \item{subjidn}{subjidn variable}
 
 \item{adepro_colors}{colors used in adepro (max 12)}
-
-\item{subroup}{selected subgroup}
 }
 \description{
 Create pie chart graph for app adepro

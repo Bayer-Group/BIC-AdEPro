@@ -58,8 +58,6 @@ prepare_data(
 \item{AEACNN}{Adverse Event        Flag as numeric (optional)}
 
 \item{adsl_data}{Subject Level data set (optional)}
-
-\item{optional_vars}{List optional Variables for the patient data set.}
 }
 \description{
 Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application

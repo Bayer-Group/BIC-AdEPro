@@ -3,9 +3,6 @@
 #' @description
 #' Creates legend object for base R plots
 #'
-#' @param aes chosen adverse events to display (character)
-#' @param colors Colors for slices (this should be maximally 8) (character)
-#'
 #' @keywords internal
 
 circle_legend <- function() {
