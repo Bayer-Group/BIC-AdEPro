@@ -3,3 +3,7 @@
 ^adepro\.Rproj$
 ^data-raw$
 ^data$
+^CODEOWNERS$
+^CODE_OF_CONDUCT.md$
+^CONTRIBUTING.md$
+^MAINTAINERS.md$
