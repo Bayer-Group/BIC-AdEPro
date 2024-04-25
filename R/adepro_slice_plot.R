@@ -13,7 +13,7 @@
 #' @param ylines lines position y
 #' @param xval label x-axis
 #' @param title graph title
-#' @param subroup selected subgroup
+#' @param subgroup selected subgroup
 #' @param slider day
 #' @param subjidn subjidn variable
 #' @param adepro_colors colors used in adepro (max 12)

@@ -87,10 +87,15 @@ launch_adepro <- function(host = "127.0.0.1", port = NULL, browser = NULL) {
   #Shiny options for maximal upload size
   options(shiny.maxRequestSize = 110*1024^2)
 
-  shiny::addResourcePath("sbs", system.file("www", package = "shinyBS"))
+  #shiny::addResourcePath("sbs", system.file("www", package = "shinyBS"))
 
   #### Run Shiny App ####
-  adepro_app <- shiny::shinyApp(ui = ui, server = server)
-    if (!is.null(browser)) options(browser = browser)
-    shiny::runApp(adepro_app, host = host, port = port)
+  # adepro_app <- shiny::shinyApp(
+  #   ui = ui,
+  #   server = server
+  # )
+  adepro_app <- system.file("app", package = "adepro")
+
+  if (!is.null(browser)) options(browser = browser)
+  shiny::runApp(adepro_app, host = host, port = port)
 }

@@ -6,11 +6,6 @@
 \usage{
 circle_legend()
 }
-\arguments{
-\item{aes}{chosen adverse events to display (character)}
-
-\item{colors}{Colors for slices (this should be maximally 8) (character)}
-}
 \description{
 Creates legend object for base R plots
 }

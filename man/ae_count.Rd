@@ -4,12 +4,12 @@
 \alias{ae_count}
 \title{ae_count - provides adverse event count dataset}
 \usage{
-ae_count(ae_data, patients)
+ae_count(ae_data, patient)
 }
 \arguments{
 \item{ae_data}{adverse event dataset}
 
-\item{patients}{patient dataset}
+\item{patient}{patient dataset}
 }
 \description{
 Provides data set with one adverse event by day and by treatment groups with variable 'freq', giving a
