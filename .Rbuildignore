@@ -3,3 +3,8 @@
 ^adepro\.Rproj$
 ^data-raw$
 ^data$
+^CODEOWNERS
+^CODE_OF_CONDUCT
+^CONTRIBUTING
+^MAINTAINERS
+^www
