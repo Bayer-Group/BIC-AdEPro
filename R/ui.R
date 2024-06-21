@@ -335,7 +335,7 @@ ui <- shiny::shinyUI(
           shiny::column(2,
             adeproLogo(height = 120, width = 120, align = "right"),
             shiny::tags$div(style="text-align:center",
-              shiny::HTML('<span style="color: white"> v.4.1.1 </span>')
+              shiny::HTML(paste0("<span style='color: white'> v.", utils::packageVersion("adepro"), " </span>"))
             )
           )
         ),
@@ -804,7 +804,7 @@ ui <- shiny::shinyUI(
                     shiny::wellPanel(
                       id = "table_ae_Panel",
                       style = "color:black; overflow-y:scroll; max-height: 600px",
-                      shiny::dataTableOutput('table_ae')
+                      DT::DTOutput('table_ae')
                     )
                   ),
                   multiple = TRUE,
@@ -813,7 +813,7 @@ ui <- shiny::shinyUI(
                   shinyBS::bsCollapsePanel(
                     shiny::HTML('<p style="color:white; font-size:100%;"> adsl data (click to open/close table): </p>'),
                     shiny::wellPanel(id = "table_ae_Panel",style = "color:black; overflow-y:scroll; max-height: 600px",
-                      shiny::dataTableOutput('table_pat')
+                      DT::DTOutput('table_pat')
                     )
                   )
                 )

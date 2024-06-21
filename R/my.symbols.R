@@ -76,6 +76,7 @@
 #'
 #' @author Greg Snow
 #'
+#' @keywords internal
 
 
 my.symbols <- function(x, y=NULL, symb, inches=1, xsize, ysize,

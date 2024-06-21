@@ -1,5 +1,5 @@
 #' Adverse event data set included in AdEPro
 #'
 #'@name adae_data
-#'@keywords data
+#'@keywords internal
 NULL
