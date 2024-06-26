@@ -3116,8 +3116,8 @@ shiny::observeEvent(c(adae_data_reac2(), input$sel_aeacnn), {
     }
   })
 
-  output$table_ae <- renderDataTable(adae_data_reac(), options = list(autoWidth = FALSE))
-  output$table_pat <- renderDataTable(adsl_data_reac(), options = list(autoWidth = FALSE))
+  output$table_ae <- DT::renderDataTable(adae_data_reac(), options = list(autoWidth = FALSE))
+  output$table_pat <- DT::renderDataTable(adsl_data_reac(), options = list(autoWidth = FALSE))
 
 })
 

@@ -6,4 +6,4 @@
 \description{
 Adverse event data set included in AdEPro
 }
-\keyword{data}
+\keyword{internal}
