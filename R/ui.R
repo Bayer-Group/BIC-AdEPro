@@ -1,5 +1,7 @@
 #' User Interface of the AdEPro application
 #'
+#' @param id Internal parameters for {shiny}.
+#'
 #' @return No return value. User interface part of the app, used in launch_adepro-function.
 #'
 #' @keywords internal
@@ -18,7 +20,7 @@ ui <- shiny::shinyUI(
         )
       )
     ),
-    shiny::tags$style(type = "text/css", "body { overflow-y: scroll; }",
+    shiny::tags$style(type = "text/css",# "body { overflow-y: scroll; }",
       paste0(".recalculating {opacity: 1.0;}
         .irs-bar {width: 100%; height: 25px; background: #377eb8; border-top: 1px solid #377eb8; border-bottom: 1px solid #377eb8;}
         .irs-bar-edge {background: #377eb8; border: 1px solid #377eb8; height: 25px; border-radius: 5px; width: 20px;}
@@ -36,12 +38,12 @@ ui <- shiny::shinyUI(
         .panel.panel-default{background-color:#383838; color:#ffffff;border-color:#6b6b6b}
         .panel-heading{color:#ffffff;padding:0;}
         .panel-title{background:#383838; color:#ffffff;margin-top:10px;margin-bottom:10px;padding-left:5px}
-        body {background-color: #424242; color: #6b6b6b}
+        body {background-color: #424242; color: #6b6b6b;}
         .panel-group.sbs-panel-group {position: absolute; width: 100%;}
         .panel.panel-default {background-color: #383838; color: #ffffff; border-color: #6b6b6b}
         .panel-heading {color: #ffffff; padding: 0;}
         .panel-title {background: #383838;color: #ffffff; margin-top: 10px; margin-bottom: 10px; padding-left: 5px}
-        .myRow1 {background-color: #383838; height: 150px;}
+        .myRow1 {background-color: #383838; height: 150px; }
         .myRow3 {background-color: #424242;}
         #plot_hoverinfo {background-color: #424242; color: #ffffff; border-color: #383838; font-size: 14px;}
         #overall_info{background-color: #424242; color: #ffffff; border-color: #383838; font-size: 14px;}
@@ -49,7 +51,7 @@ ui <- shiny::shinyUI(
       )
     ),
     # Main panel
-    shiny::mainPanel(
+    shiny::mainPanel(style = "padding-right: 0px; padding-left: 0px;", #class = "myRow1",
       shiny::fluidRow(class = "myRow1",
         shiny::column(2,
           shiny::br(),
@@ -335,7 +337,7 @@ ui <- shiny::shinyUI(
           shiny::column(2,
             adeproLogo(height = 120, width = 120, align = "right"),
             shiny::tags$div(style="text-align:center",
-              shiny::HTML(paste0("<span style='color: white'> v.", utils::packageVersion("adepro"), " </span>"))
+              shiny::HTML('<span style="color: white"> v.4.2.1 </span>')
             )
           )
         ),
@@ -813,7 +815,7 @@ ui <- shiny::shinyUI(
                   shinyBS::bsCollapsePanel(
                     shiny::HTML('<p style="color:white; font-size:100%;"> adsl data (click to open/close table): </p>'),
                     shiny::wellPanel(id = "table_ae_Panel",style = "color:black; overflow-y:scroll; max-height: 600px",
-                        shiny::dataTableOutput('table_pat')
+                      shiny::dataTableOutput('table_pat')
                     )
                   )
                 )
@@ -825,7 +827,7 @@ ui <- shiny::shinyUI(
           conditionalPanel(condition = "input.sortTreatments.length > 0",
           shiny::uiOutput('ae_summary_box')
           ),
-          #shiny::plotOutput(outputId = "legend", width = "100%", height = "45px"),
+          #shiny::plotOutput(outputId = "legend", width = "100%"),#, height = "45px"),
           shiny::conditionalPanel(condition = "input.view == 'pie'",
             shiny::uiOutput('patientpanel'),
 
@@ -833,7 +835,7 @@ ui <- shiny::shinyUI(
             shiny::conditionalPanel(condition = "input.sortTreatments.length == 0",
               shiny::HTML('<p style="text-align:center;color:white;"> Please select at least one treatment in the "Modify data"-Panel! </p>')
             ),
-              shiny::fluidRow(
+            shiny::fluidRow(
               splitLayout(
                 cellArgs = list(style='white-space: normal; resize: horizontal;'),
                 cellWidths = c("9%", "82%","9%"),
