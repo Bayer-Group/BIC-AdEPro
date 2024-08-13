@@ -100,6 +100,23 @@ server <- shiny::shinyServer(function(input, output, session) {
     )
   })
 
+  output$circle_legend<- shiny::renderUI({
+    if(!is.null(input$heightSlider)) {
+     shiny::plotOutput(
+       outputId = "legend",
+       height =paste0(input$heightSlider,"px")
+      )
+    }
+  })
+
+  output$circle_legend2<- shiny::renderUI({
+    if(!is.null(input$heightSlider)) {
+     shiny::plotOutput(
+       outputId = "legend2",
+       height =paste0(input$heightSlider,"px")
+      )
+    }
+  })
   # create a legend with function 'pie_legend'
   output$legend <- shiny::renderPlot({
     session$clientData$output_slicePlots_width
