@@ -804,7 +804,7 @@ ui <- shiny::shinyUI(
                     shiny::wellPanel(
                       id = "table_ae_Panel",
                       style = "color:black; overflow-y:scroll; max-height: 600px",
-                      DT::DTOutput('table_ae')
+                      shiny::dataTableOutput('table_ae')
                     )
                   ),
                   multiple = TRUE,
@@ -813,7 +813,7 @@ ui <- shiny::shinyUI(
                   shinyBS::bsCollapsePanel(
                     shiny::HTML('<p style="color:white; font-size:100%;"> adsl data (click to open/close table): </p>'),
                     shiny::wellPanel(id = "table_ae_Panel",style = "color:black; overflow-y:scroll; max-height: 600px",
-                      DT::DTOutput('table_pat')
+                        shiny::dataTableOutput('table_pat')
                     )
                   )
                 )
