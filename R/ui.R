@@ -337,7 +337,7 @@ ui <- shiny::shinyUI(
           shiny::column(2,
             adeproLogo(height = 120, width = 120, align = "right"),
             shiny::tags$div(style="text-align:center",
-              shiny::HTML('<span style="color: white"> v.4.2.1 </span>')
+              shiny::HTML(paste0("<span style='color: white'> v.",packageVersion("adepro"),"</span>"))
             )
           )
         ),

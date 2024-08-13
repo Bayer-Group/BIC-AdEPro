@@ -2313,7 +2313,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
   },ignoreNULL = FALSE, ignoreInit = TRUE)
 
-  #### DEATH DATE - DTHDT ####
+   #### DEATH DATE - DTHDT ####
   output$sel_dthdt <- shiny::renderUI({
     shiny::req(adae_data_reac2())
 
@@ -2322,9 +2322,16 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices <- sort(names(which(apply(apply(adae,2,function(x){is.na(x)}),2,all))))
+    choices <- c(choices,sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any))))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- sort(names(which(apply(apply(adsl,2,function(x){is.na(x)}),2,all))))
+    #   choices2 <- c(choices2,sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any))))))
+    #   choices <- sort(c(choices, choices2))
+    # }
     if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2 <- sort(names(which(apply(apply(adsl,2,function(x){is.na(x)}),2,all))))
+      choices2 <- c(choices2,sort(c(names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any))))))
       choices <- sort(c(choices, choices2))
     }
 
@@ -2690,7 +2697,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
-  #### ADVERSE EVENT SEVERITY FLAG - AESEVN ####
+   #### ADVERSE EVENT SEVERITY FLAG - AESEVN ####
   output$sel_aesevn <- shiny::renderUI({
     shiny::req(adae_data_reac2())
 
@@ -2698,7 +2705,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     adsl <- adsl_data_reac()
 
     is.convertible.to.sev <- function(x) {
-      as.character(x) %in% c("1","2","3","MILD","MODERATE","SEVERE","mild","moderate","severe","Mild","Moderate","Severe","",".")
+      as.character(x) %in% c(" 1", " 2", " 3","1","2","3","MILD","MODERATE","SEVERE","mild","moderate","severe","Mild","Moderate","Severe","",".",NA)
     }
 
     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.sev(x)}),2,all)))))
@@ -2706,13 +2713,12 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.sev(x)}),2,all)))
       choices <- sort(c(choices, choices2))
     }
-
     choices <- c(unique(choices), "Nothing selected")
-    if (!any(c("AESEVN", "AESEV") %in% choices)) {
+    if (!any(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)) {
       #choices <- c("Nothing selected", choices)
       selected <- "Nothing selected"
     } else {
-      selected <- c("AESEVN", "AESEV")[which(c("AESEVN", "AESEV") %in% choices)[1]]
+      selected <- c("AESEVN", "AESEV", "ASEVN", "AESEV")[which(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)[1]]
     }
 
     shinyWidgets::pickerInput(
@@ -2754,12 +2760,12 @@ server <- shiny::shinyServer(function(input, output, session) {
       } else {
         aesevn <- adae_data_reac2()[[input$sel_aesevn]]
 
-        if (!input$sel_aesevn %in% c("AESEVN", "AESEV") & (is.numeric(aesevn) | all(aesevn %in% c("MILD", "MODERATE", "SEVERE", NA, "NA", "")))) {
+        if (!input$sel_aesevn %in% c("AESEVN", "AESEV", "AESEV", "ASEVN") & (is.numeric(aesevn) | all(aesevn %in% c("MILD", "MODERATE", "SEVERE", NA, "NA", "")))) {
           aesevn_check_flag$val <- TRUE
           output$sel_aesevn_check <- shiny::renderUI({
             shiny::HTML(paste0('<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>  Variable AESEVN is not available or selected. </span>'))
           })
-        } else if (is.numeric(aesevn) & input$sel_aesevn == "AESEVN") {
+        } else if (is.numeric(aesevn) & input$sel_aesevn %in% c("AESEVN","ASEVN")) {
           aesevn_check_flag$val <- TRUE
           output$sel_aesevn_check <- shiny::renderUI({
             shiny::HTML(paste0('<span style = "color: #16de5f"> <i class="fa-solid fa-check"></i></span>'))
