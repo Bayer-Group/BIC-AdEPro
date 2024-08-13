@@ -825,7 +825,7 @@ ui <- shiny::shinyUI(
           conditionalPanel(condition = "input.sortTreatments.length > 0",
           shiny::uiOutput('ae_summary_box')
           ),
-          shiny::plotOutput(outputId = "legend", width = "100%", height = "45px"),
+          #shiny::plotOutput(outputId = "legend", width = "100%", height = "45px"),
           shiny::conditionalPanel(condition = "input.view == 'pie'",
             shiny::uiOutput('patientpanel'),
 
@@ -833,11 +833,22 @@ ui <- shiny::shinyUI(
             shiny::conditionalPanel(condition = "input.sortTreatments.length == 0",
               shiny::HTML('<p style="text-align:center;color:white;"> Please select at least one treatment in the "Modify data"-Panel! </p>')
             ),
-              shiny::plotOutput(outputId = "legend2", width = "100%",height ="25px"),
-              shiny::plotOutput(
-                outputId = "slicePlots",
-                hover = hoverOpts(id ="plot_hover")
+              shiny::fluidRow(
+              splitLayout(
+                cellArgs = list(style='white-space: normal; resize: horizontal;'),
+                cellWidths = c("9%", "82%","9%"),
+                shiny::uiOutput("circle_legend"),
+                shiny::plotOutput(
+                  outputId = "slicePlots",
+                  hover = hoverOpts(id ="plot_hover"),
+                  height = "100%"
+                ),
+                shiny::uiOutput("circle_legend2")
               )
+            ),
+            shiny::fluidRow(
+
+            )
           ),
           shiny::conditionalPanel(condition = "input.view == 'chart'",
             shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
