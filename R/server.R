@@ -103,20 +103,30 @@ server <- shiny::shinyServer(function(input, output, session) {
   # create a legend with function 'pie_legend'
   output$legend <- shiny::renderPlot({
     session$clientData$output_slicePlots_width
+    session$clientData$output_legend_width
+    session$clientData$output_circle_legend_width
+    session$clientData$output_circle_legend2_width
+    input$heightSlider
+    ## input$zoom
     ##
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(pie_legend(aes = input_var()))
+      return(pie_legend2(aes = input_var()))
     }
   }, bg = "#424242")
 
   # create a legend with function 'pie_circle'
   output$legend2 <- shiny::renderPlot({
+    session$clientData$output_slicePlots_width
+    session$clientData$output_legend_width
+    session$clientData$output_circle_legend_width
+    session$clientData$output_circle_legend2_width
+    input$heightSlider
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(circle_legend())
+      return(circle_legend2(aes = input_var()))
     }
   }, bg = "#424242")
 
