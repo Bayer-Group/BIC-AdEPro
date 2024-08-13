@@ -18,7 +18,6 @@
 #' @param AERELN Adverse Event Related Flag as numeric (optional)
 #' @param AERELPRN Adverse Event      Flag as numeric (optional)
 #' @param AEACNN Adverse Event        Flag as numeric (optional)
-#' @param optional_vars List optional Variables for the patient data set.
 #' @param adsl_data Subject Level data set (optional)
 #'
 #' @keywords internal
@@ -44,12 +43,13 @@ prepare_data <- function(
   adsl_data = NULL
 ) {
 
-  cols <- treat <- ps <- new_AESEVN <- patient <- day_start <- day_end <- output <- message <- NULL
+  cols <- treat <- death <-  ps <- new_AESEVN <- patient <- day_start <- day_end <- output <- message <- NULL
 
   var_list <- c("ps", "treat", "end", "death")
   # create variables ps, treat, end and death
-  pat_data <- dat  %>%
-        dplyr::filter(!!rlang::sym(SAFFN) == 1 | !!rlang::sym(SAFFN) == "Y" | !!rlang::sym(SAFFN) == "Yes" | !!rlang::sym(SAFFN) == "YES" | !!rlang::sym(SAFFN) == "yes" | !!rlang::sym(SAFFN) == "y") %>%
+  pat_data <- dat %>%
+    # Fri Mar  1 12:17:03 2024 ------------------------------
+    dplyr::filter(!!rlang::sym(SAFFN) == 1 | !!rlang::sym(SAFFN) == "Y" | !!rlang::sym(SAFFN) == "Yes" | !!rlang::sym(SAFFN) == "YES" | !!rlang::sym(SAFFN) == "yes" | !!rlang::sym(SAFFN) == "y") %>%
     dplyr::mutate(
         ps = as.numeric(!!rlang::sym(SUBJIDN)),
         treat = as.factor(!!rlang::sym(TRT01A)),
