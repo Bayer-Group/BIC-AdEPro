@@ -42,7 +42,7 @@ Via the "Change View" button, the display can be switched from "circle view" to 
 In the "circle view", every circle represents one subject. Each **slice** inside a circle represents a different **adverse event**, color-coded according to the legend on the hand side. As indicated in the legend on the right side, the **size of the slices indicates the intensity** of the respective adverse event. **Framed unfilled slices** indicate adverse events which the patient experienced at a previous time in the study, but are no longer ongoing.
 The background color of the circles shows the subject's status:  
 
-| <img width="10%" height="1"> | <img width="90%" height="1"> |
+| <!-- --> |<!-- --> |
 |------------------------------------:|:------------------------------------|
 | <img src="www/Legend_Status_Ongoing_1.png" align="right" width=55/> | A circle with **dark grey** background represents an enrolled subject |
 | <img src="www/Legend_Status_Dropout_1.png" align="right" width=55/> | A circle with **light grey** background indicates discontinuation |
