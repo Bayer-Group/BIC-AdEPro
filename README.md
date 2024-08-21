@@ -43,10 +43,11 @@ In the "circle view", every circle represents one subject. Each **slice** inside
 The background color of the circles shows the subject's status:  
 
 | <!-- --> |<!-- --> |
-|------------------------------------:|:------------------------------------|
-| <img src="www/Legend_Status_Ongoing_1.png" align="right" width=55/> | A circle with **dark grey** background represents an enrolled subject |
-| <img src="www/Legend_Status_Dropout_1.png" align="right" width=55/> | A circle with **light grey** background indicates discontinuation |
-| <img src="www/Legend_Status_Death_1.png" align="right" width=55/> | A circle with **black** background indicates death |
+|:------------------------------------:|:------------------------------------|
+| <img src="www/Legend_Status_Ongoing_1.png" align="center" width=55/> | A circle with **dark grey** background represents an enrolled subject |
+| <img src="www/Legend_Status_Dropout_1.png" align="center" width=55/> | A circle with **light grey** background indicates discontinuation |
+| <img src="www/Legend_Status_Death_1.png" align="center" width=55/> | A circle with **black** background indicates death |
+| <!-- --> |<!-- --> |
 
 The '**barplot view**' displays the aggregated numbers for the selected adverse events
 
@@ -63,10 +64,12 @@ Select adverse event and subject level data on the left-hand side of the **Uploa
 <img align="right" src="www/buttons_height_rows.png" width = 75/>
 
 Should the plot size of the app not fit the screen size, the appearance of the app can be altered. The plot height can be changed using the '**Choose Plot height (in pixel)**'-option in the '**Modify data**' panel on the left-hand side or by clicking the '+' or '-' buttons of the '**Change Plot height**'-panel on the right-hand side. Similarly, the number of rows can be either changed in the '**Modify data**' panel ('**Number of Rows**') or using the '**Number of rows'-panel**. 
-The  '**Modify data**' panel also includes options to '**Select type of Adverse Event**' (such as serious or study drug-related), '**Sort patients by**' a variable of your choosing and '**Sort treatments**'.\
+The  '**Modify data**' panel also includes options to '**Select type of Adverse Event**' (such as serious or study drug-related), '**Sort patients by**' a variable of your choosing and '**Sort treatments**'.
 If the button '**Add AdEPro AI**' is selected, additional intelligent sorting algorithms are offered for use. For more information on this, please see [AdEPro AI](#adepro-ai).
 
 The **timeline slider** in the top bar indicates the day of the study that is currently displayed. It can be moved manually or played automatically by using the navigation buttons underneath. The number of days by which the slider is moved by using the forward or backward button can be adjusted by changing the number in between. To the left of the timeline slider is a circular slider to set the '**Animation speed (sec.)**'.
+
+<img src="www/adepro_timeline.png" width="50%" align="center"/>
 
 The '**Adverse Events for animation**' panel on the lower left offers additional setting options. Per default, the eight events with most patient days are displayed. Other events can be selected using the '**Choose Adverse Events for display (max. 12)**' option or the '**frequency**' option can be used to display the eight most frequent events.
 
