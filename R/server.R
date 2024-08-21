@@ -104,7 +104,8 @@ server <- shiny::shinyServer(function(input, output, session) {
     if(!is.null(input$heightSlider)) {
      shiny::plotOutput(
        outputId = "legend",
-       height =paste0(input$heightSlider,"px")
+       height =paste0(input$heightSlider,"px"),
+       click = clickOpts(id = "legend_click"),
       )
     }
   })
@@ -117,6 +118,12 @@ server <- shiny::shinyServer(function(input, output, session) {
       )
     }
   })
+
+  legend_click <- shiny::reactiveValues(val = NULL)
+
+  shiny::observeEvent(input$legend_click,{
+    legend_click$val <- input$legend_click
+  })
   # create a legend with function 'pie_legend'
   output$legend <- shiny::renderPlot({
     session$clientData$output_slicePlots_width
@@ -125,13 +132,81 @@ server <- shiny::shinyServer(function(input, output, session) {
     session$clientData$output_circle_legend2_width
     input$heightSlider
     ## input$zoom
-    ##
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(pie_legend2(aes = input_var()))
+      pre_value_legend_ae <- shiny::isolate(legend_ae$val)
+
+      if (length(input_var()) > 0) {
+        colors = c(
+          "#e43157", "#377eb8", "#4daf4a", "#984ea3",
+          "#ff7f00", "#ffff33", "#a65628", "#f781bf",
+          "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
+        )
+        #create dummy data set to draw legend
+        tmp <- data.frame(
+          "day_start"=rep(1, 12),
+          "day_end" = rep(3, 12),
+          "patient" = 1:12,
+          "ae" = c(input_var(),rep(NA, 12 - length(input_var()))),
+          "sev" = rep(3, 12),
+          "r" = rep(1, 12),
+          "d" = rep(NA, 12),
+          "Y" = rev(seq(1, 12 * 3, by = 3)),
+          "X" = rep(1, 12),
+           "cont" = "#424242",
+          "cont_bg" = c(rep("#383838", length(input_var())), rep("#383838", 12 - length(input_var()))),
+          "col" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var()))),
+          "num" = c(1:length(input_var()), rep(NA, 12 - length(input_var()))),
+          "bg" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var())))
+        )
+        #get information about nearest ae clicked
+        info <- shiny::nearPoints(
+          tmp,
+          legend_click$val,
+          threshold = 30,
+          maxpoints = 1,
+          xvar = "X",
+          yvar = "Y"
+        )
+      } else {
+        info <- NULL
+      }
+
+      #compare ae clicked before to remove an ae after second click
+      post_value_legend_ae <- info$ae
+
+      if (is.null(post_value_legend_ae)) {
+        legend_ae$val <- NULL
+        info <- NULL
+      } else if (length(post_value_legend_ae) == 0) {
+        legend_ae$val <- NULL
+        info <- NULL
+      }   else if (is.na(post_value_legend_ae)) {
+        legend_ae$val <- NULL
+        info <- NULL
+      } else if (is.null(pre_value_legend_ae)) {
+         plot_click$val <- NULL
+        legend_ae$val <-  post_value_legend_ae
+
+      } else if (post_value_legend_ae == pre_value_legend_ae){
+         legend_ae$val <- NULL
+         info <- NULL
+      } else {
+        plot_click$val <- NULL
+        legend_ae$val <- post_value_legend_ae
+      }
+      #draw legend
+      tmp <- pie_legend2(
+        tmp = tmp,
+        aes = input_var(),
+        legend_click = legend_click$val,
+        info = info
+      )
     }
   }, bg = "#424242")
+
+  legend_ae <- shiny::reactiveValues(val = NULL)
 
   # create a legend with function 'pie_circle'
   output$legend2 <- shiny::renderPlot({
@@ -148,19 +223,19 @@ server <- shiny::shinyServer(function(input, output, session) {
   }, bg = "#424242")
 
 
-  # create a legend with function 'pie_circle'
-  output$legend2 <- shiny::renderPlot({
-    session$clientData$output_slicePlots_width
-    session$clientData$output_legend_width
-    session$clientData$output_circle_legend_width
-    session$clientData$output_circle_legend2_width
-    input$heightSlider
-    if (is.null(input_var())) {
-      return(NULL)
-    } else {
-      return(circle_legend2(aes = input_var()))
-    }
-  }, bg = "#424242")
+  # # create a legend with function 'pie_circle'
+  # output$legend2 <- shiny::renderPlot({
+  #   session$clientData$output_slicePlots_width
+  #   session$clientData$output_legend_width
+  #   session$clientData$output_circle_legend_width
+  #   session$clientData$output_circle_legend2_width
+  #   input$heightSlider
+  #   if (is.null(input_var())) {
+  #     return(NULL)
+  #   } else {
+  #     return(circle_legend2(aes = input_var()))
+  #   }
+  # }, bg = "#424242")
 
   # CSS style information of the output$dayinfo - see below (actual day number of the slider)
   output$dynamic_css <- shiny::renderUI({
@@ -368,6 +443,49 @@ server <- shiny::shinyServer(function(input, output, session) {
     )
   })
 
+  plot_click <- shiny::reactiveValues(val = NULL)
+
+  shiny::observeEvent(c(input$plot_click, input$subgroup), {
+    if (is.null(input$subgroup)) {
+      legend_ae$val <- NULL
+      plot_click$val <- input$plot_click
+    } else {
+      legend_ae$val <- NULL
+      plot_click$val <- NULL
+    }
+  })
+
+  prev_clicked_subject <- shiny::reactiveValues(val = NULL)
+
+  reac_info_click <- eventReactive(c(plot_click$val), {
+    info <- shiny::nearPoints(
+      patients(),
+      plot_click$val,
+      threshold = 30,
+      maxpoints = 1,
+      xvar = "X",
+      yvar = "Y"
+    )
+    if (dim(info)[1] == 1) {
+      if (!is.null(shiny::isolate(prev_clicked_subject$val))) {
+        if (info$X == shiny::isolate(prev_clicked_subject$val$X) & info$Y == shiny::isolate(prev_clicked_subject$val$Y)) {
+           prev_clicked_subject$val <- NULL
+           info <- NULL
+           legend_click$val <- NULL
+        } else {
+          prev_clicked_subject$val <- info
+          legend_click$val <- NULL
+        }
+      } else {
+        prev_clicked_subject$val <- info
+        legend_click$val <- NULL
+      }
+    }# else {
+    #  legend_ae$val <- NULL
+    #}
+    info
+  }, ignoreNULL = FALSE)
+
   #### Piecharts ####
   output$slicePlots <- shiny::renderPlot({
     total_data_reac2()
@@ -383,10 +501,13 @@ server <- shiny::shinyServer(function(input, output, session) {
     input$heightSlider
     input$plus_zoom
     input$minus_zoom
+
     input$type
     shiny::req(input$type)
     shiny::req(data_type())
     shiny::req(global_params())
+
+    info <- reac_info_click()
 
     adepro_slice_plot(
       data = data(),
@@ -401,7 +522,9 @@ server <- shiny::shinyServer(function(input, output, session) {
       title = as.character(unique(patients()$treat)),
       subgroup = input$subgroup,
       subjidn = input$sel_subjidn,
-      slider = input$slider
+      slider = input$slider,
+      info = info,
+      legend_ae = legend_ae$val
     )
 
     #sound

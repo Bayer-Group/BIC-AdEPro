@@ -1,7 +1,7 @@
 #' pie_legend2 - Creates Legend for adverse events slices in AdEPro (version 2)
 #'
 #' @description
-#' Drawing legends for symbols in app
+#' Drawing legends for adverse event symbols in app
 #'
 #' @param aes list of selected adverse events
 #' @param colors color vector for adverse events
@@ -9,12 +9,15 @@
 #' @keywords internal
 
 pie_legend2 <- function(
+    tmp,
     aes,
     colors = c(
       "#e43157", "#377eb8", "#4daf4a", "#984ea3",
       "#ff7f00", "#ffff33", "#a65628", "#f781bf",
       "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
-    )
+    ),
+    legend_click = NULL,
+    info
 ) {
   on_ex <- par("oma", "mar", "font")
   on.exit(par(on_ex))
@@ -28,22 +31,6 @@ pie_legend2 <- function(
   }
 
   if (length(aes) > 0) {
-    tmp <- data.frame(
-      "day_start"=rep(1, 12),
-      "day_end" = rep(3, 12),
-      "patient" = 1:12,
-      "ae" = c(aes,rep(NA, 12 - length(aes))),
-      "sev" = rep(3, 12),
-      "r" = rep(1, 12),
-      "d" = rep(NA, 12),
-      "Y" = rev(seq(1, 12 * 3, by = 3)),
-      "X" = rep(1, 12),
-       "cont" = "#424242",
-      "cont_bg" = c(rep("#383838", length(aes)), rep("#383838", 12 - length(aes))),
-      "col" = c(colors[1:length(aes)], rep(NA, 12 - length(aes))),
-      "num" = c(1:length(aes), rep(NA, 12 - length(aes))),
-      "bg" = c(colors[1:length(aes)], rep(NA, 12 - length(aes)))
-    )
 
     tmp <- tmp %>%
       dplyr::mutate(
@@ -101,7 +88,26 @@ pie_legend2 <- function(
         lwd = 1
       )
     }
+
+    if (!is.null(info)) {
+      if (dim(info)[1] > 0) {
+       graphics::symbols(
+          info$X,
+          info$Y,
+          squares = cbind(rep(2, length(info$Y))),
+          inches = FALSE,
+          add = TRUE,
+          fg = "#ffffff10",
+          bg = "#ffffff10",
+          lwd = 3,
+          xlab = "",
+          ylab = "",
+          main = "",
+        )
+      }
+    }
   }
+  return(info)
 }
 
 

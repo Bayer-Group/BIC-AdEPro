@@ -454,12 +454,18 @@ ui <- shiny::shinyUI(
           						</p>
           						<p>
           							The '<b>barplot view</b>' displays the aggregated numbers
-          							for the selected adverse events
+          							for the selected adverse events.
           						</p>
           						<p>
           							The top bar of the app includes several other options which
           							are further explained under 'Functionality'.
           						</p>
+          						<p>
+            						By clicking a single circle in the plot, the subject will be displayed as highlighted.
+                        It is also possible to highlight all subjects with a specific adverse events by selecting the event
+                        in the legend on the left side.
+                        To remove the selection simply re-click adverse event or subject selected.
+                      </p>
                       ")
                     ),
                     circle = TRUE,
@@ -843,6 +849,7 @@ ui <- shiny::shinyUI(
                 shiny::plotOutput(
                   outputId = "slicePlots",
                   hover = hoverOpts(id ="plot_hover"),
+                  click = clickOpts(id = "plot_click"),
                   height = "100%"
                 ),
                 shiny::uiOutput("circle_legend2")

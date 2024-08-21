@@ -40,6 +40,11 @@ Via the "Change View" button, the display can be switched from "circle view" to 
 <img src="www/adepro_change_view.png"/>
 
 In the "circle view", every circle represents one subject. Each **slice** inside a circle represents a different **adverse event**, color-coded according to the legend on the hand side. As indicated in the legend on the right side, the **size of the slices indicates the intensity** of the respective adverse event. **Framed unfilled slices** indicate adverse events which the patient experienced at a previous time in the study, but are no longer ongoing.
+By clicking a single circle in the plot, the subject will be displayed as highlighted.
+It is also possible to highlight all subjects with a specific adverse events by selecting the event
+in the legend on the left side.
+To remove the selection simply re-click adverse event or subject selected.
+
 The background color of the circles shows the subject's status:  
 
 | <!-- --> |<!-- --> |
