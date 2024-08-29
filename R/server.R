@@ -956,7 +956,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           if (path_ending == "csv") {
             adae <- suppressWarnings(readr::read_csv(inFile, col_types = readr::cols("SEX" = "c"), na = c(".", "NA")))
             colnames(adae) <- toupper(colnames(adae))
-            adae[adae == "."] <- NA
+            #adae[adae == "."] <- NA
           } else if (path_ending == "sas7bdat" | path_ending == "sas7cdat") {
           adae <- haven::read_sas(inFile)
           adae <- adae %>%
@@ -1017,7 +1017,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           if (path_ending == "csv") {
             adsl <- suppressWarnings(readr::read_csv(inFile2, col_types = readr::cols("SEX" = "c"), na = c(".", "NA")))
             colnames(adsl) <- toupper(colnames(adsl))
-            adsl[adsl == "."] <- NA
+            #adsl[adsl == "."] <- NA
           } else if (path_ending == "sas7bdat" | path_ending == "sas7cdat") {
             adsl <- haven::read_sas(inFile2)
             adsl <- adsl %>%
@@ -2156,13 +2156,18 @@ server <- shiny::shinyServer(function(input, output, session) {
     adsl <- adsl_data_reac()
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+
 
     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
     if(!is.null(adsl)) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
       choices <- sort(c(choices, choices2))
+      choices_int <- sort(c(choices_int, choices2_int))
     }
-
+    choices <- sort(c(choices,choices_int))
     choices <- c(unique(choices), "Nothing selected")
 
     if(!"TRTSDT" %in% choices) {
@@ -2199,6 +2204,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       trtsdt_check_flag$val <- FALSE
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       if (input$sel_trtsdt == "Nothing selected") {
         output$sel_trtsdt_check <- renderUI({
          shiny::HTML(
@@ -2211,17 +2217,18 @@ server <- shiny::shinyServer(function(input, output, session) {
         })
       } else {
         trtsdt <- adae_data_reac2()[[input$sel_trtsdt]]
+      ##back ##
 
-        if (!any(sapply(trtsdt, is.convertible.to.date))) {
+        if (!any(sapply(trtsdt, is.convertible.to.date)) & !any(sapply(trtsdt, is.convertible.to.integer))) {
          trtsdt_check_flag$val <- FALSE
          output$sel_trtsdt_check <- shiny::renderUI({
            shiny::HTML(
              paste0(
-               '<p style = "color:#E43157"> <i class="fa-solid fa-times"></i> Treatment start date variable needs to be in date format. </p>'
+               '<p style = "color:#E43157"> <i class="fa-solid fa-times"></i> Treatment start date variable needs to be in date or integer format. </p>'
               )
             )
           })
-        } else if (any(sapply(trtsdt, is.convertible.to.date)) & input$sel_trtsdt != "TRTSDT") {
+        } else if ((any(sapply(trtsdt, is.convertible.to.date))| any(sapply(trtsdt, is.convertible.to.integer))) & input$sel_trtsdt != "TRTSDT") {
           trtsdt_check_flag$val <- TRUE
           output$sel_trtsdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2231,7 +2238,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if (any(sapply(trtsdt, is.convertible.to.date)) & input$sel_trtsdt == "TRTSDT") {
+        } else if ((any(sapply(trtsdt, is.convertible.to.date)) | any(sapply(trtsdt, is.convertible.to.integer))) & input$sel_trtsdt == "TRTSDT") {
           trtsdt_check_flag$val <- TRUE
           output$sel_trtsdt_check <- renderUI({
             shiny::HTML(
@@ -2254,14 +2261,28 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
 
+
+    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
     if(!is.null(adsl)) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
       choices <- sort(c(choices, choices2))
+      choices_int <- sort(c(choices_int, choices2_int))
     }
-
+    choices <- sort(c(choices,choices_int))
     choices <- c(unique(choices), "Nothing selected")
+
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    #
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+    #   choices <- sort(c(choices, choices2))
+    # }
+
+    # choices <- c(unique(choices), "Nothing selected")
 
     if (!"LVDT" %in% choices) {
       selected <- "Nothing selected"
@@ -2298,7 +2319,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       lvdt_check_flag$val <- FALSE
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-
+       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       if (input$sel_lvdt == "Nothing selected") {
         output$sel_lvdt_check <- shiny::renderUI({
           shiny::HTML(
@@ -2312,7 +2333,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         })
       } else {
         lvdt <- adae_data_reac2()[[input$sel_lvdt]]
-        if (!any(sapply(lvdt, is.convertible.to.date))) {
+        if (!any(sapply(lvdt, is.convertible.to.date)) & !any(sapply(lvdt, is.convertible.to.integer))) {
           lvdt_check_flag$val <- FALSE
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2321,7 +2342,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if (any(sapply(lvdt, is.convertible.to.date)) & input$sel_lvdt != "LVDT") {
+        } else if ((any(sapply(lvdt, is.convertible.to.date))| any(sapply(lvdt, is.convertible.to.integer)))  & input$sel_lvdt != "LVDT") {
           lvdt_check_flag$val <- TRUE
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2330,7 +2351,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if (any(sapply(lvdt, is.convertible.to.date)) & input$sel_lvdt == "LVDT") {
+        } else if ((any(sapply(lvdt, is.convertible.to.date))| any(sapply(lvdt, is.convertible.to.integer)))  & input$sel_lvdt == "LVDT") {
           lvdt_check_flag$val <- TRUE
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2444,19 +2465,18 @@ server <- shiny::shinyServer(function(input, output, session) {
     adsl <- adsl_data_reac()
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
 
-    choices <- sort(names(which(apply(apply(adae,2,function(x){is.na(x)}),2,all))))
-    choices <- c(choices,sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any))))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- sort(names(which(apply(apply(adsl,2,function(x){is.na(x)}),2,all))))
-    #   choices2 <- c(choices2,sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any))))))
-    #   choices <- sort(c(choices, choices2))
-    # }
+
+    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
     if(!is.null(adsl)) {
-      choices2 <- sort(names(which(apply(apply(adsl,2,function(x){is.na(x)}),2,all))))
-      choices2 <- c(choices2,sort(c(names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any))))))
+      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
       choices <- sort(c(choices, choices2))
+      choices_int <- sort(c(choices_int, choices2_int))
     }
+    choices <- sort(c(choices,choices_int))
 
     choices <- c(unique(choices),"NA", "Nothing selected")
 
@@ -2496,6 +2516,8 @@ server <- shiny::shinyServer(function(input, output, session) {
       dthdt_check_flag$val <- FALSE
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+      ## back##
       if (input$sel_dthdt == "Nothing selected") {
         output$sel_dthdt_check <- renderUI({
           shiny::HTML(
@@ -2516,7 +2538,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       } else {
         dthdt <- adae_data_reac2()[[input$sel_dthdt]]
 
-        if (!any(sapply(dthdt, is.convertible.to.date)) & !all(is.na(dthdt))) {
+        if (!any(sapply(dthdt, is.convertible.to.date)) & !all(is.na(dthdt)) & !any(sapply(dthdt, is.convertible.to.integer))) {
           dthdt_check_flag$val <- FALSE
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2525,7 +2547,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if ((any(sapply(dthdt, is.convertible.to.date)) | all(is.na(dthdt))) & input$sel_dthdt != "DTHDT") {
+        } else if (((any(sapply(dthdt, is.convertible.to.date)) | any(sapply(dthdt, is.convertible.to.integer))) | all(is.na(dthdt))) & input$sel_dthdt != "DTHDT") {
           dthdt_check_flag$val <- TRUE
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2534,7 +2556,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if ((any(sapply(dthdt, is.convertible.to.date)) | all(is.na(dthdt))) & input$sel_dthdt == "DTHDT") {
+        } else if (((any(sapply(dthdt, is.convertible.to.date)) | any(sapply(dthdt, is.convertible.to.integer))) | all(is.na(dthdt))) & input$sel_dthdt == "DTHDT") {
           dthdt_check_flag$val <- TRUE
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(

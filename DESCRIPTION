@@ -1,7 +1,7 @@
 Package: adepro
 Type: Package
 Title: A 'shiny' Application for the (Audio-)Visualization of Adverse Event Profiles
-Version: 4.2.4
+Version: 4.2.5
 Author: Nicole Rethemeier, Christoph Tasto, Steffen Jeske
 Maintainer: Bodo Kirsch <bodo.kirsch@bayer.com>
 Description: Contains a 'shiny' application called AdEPro (Animation of Adverse Event Profiles) which (audio-)visualizes adverse events occurring in clinical trials. As this data is usually considered sensitive, this tool is provided as a stand-alone application that can be launched from any local machine on which the data is stored.
