@@ -16,11 +16,11 @@ The AdEPro Shiny app depicts the **temporal progress of all adverse events in ev
 
 Additionally, to keep an overview of even **large trials** (\>500 patients), intelligent sorting algorithms under the name of '**AdEPro AI**' (based on seriation techniques from the seriation package by Hahsler [[1]](#lit1)) allow to sort the patients in a way that **patients with similar adverse event profiles are close to one another** and relevant differences between the treatment groups regarding the displayed adverse events remain recognizable at first sight.
 
-As a complete alternative to the patient-by-patient 'circle view', an aggregated "**barplot view**" is implemented which displays the **aggregated numbers of subjects with adverse events**, which can be especially helpful in case the numbers are too great to be easily counted.
+As an alternative to the patient-by-patient 'circle view', an aggregated "**barplot view**" is implemented which displays the **aggregated numbers of subjects with adverse events**. This can be especially helpful in case the numbers are too great to be easily counted.
 
 ## Getting Started
 
-The package AdePro is available on CRAN as well as on Github and may be installed using
+The R-package AdEPro is available on CRAN as well as on Github and may be installed using
 
     install.packages("adepro")
 
@@ -35,7 +35,7 @@ After installation AdePro can be started using
     library("adepro")
     launch_adepro()
 
-The application will start showing the data upload page. For detailed information on how to upload data see section [Functionality](#Functionality).
+The application will start showing the data upload page. For detailed information on how to upload data, see section [Functionality](#Functionality).
 
 ## Surface
 
@@ -49,7 +49,10 @@ In the "circle view", every circle represents one subject. Each **slice** inside
 By clicking a single circle in the plot, the subject will be displayed as highlighted.
 It is also possible to highlight all subjects with a specific adverse events by selecting the event
 in the legend on the left side.
-To remove the selection simply re-click adverse event or subject selected.
+To remove the selection simply click the adverse event or subject selected again.
+
+<img src="www/adepro_highlight.png"/>
+
 
 The background color of the circles shows the subject's status:  
 
