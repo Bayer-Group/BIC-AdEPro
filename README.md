@@ -1,5 +1,11 @@
 # AdEPro <img src="www/adepro_logo.png" align="right" height="139"/>
 
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/adepro)](https://cran.r-project.org/package=adepro)
+[![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/adepro)](https://cranlogs.r-pkg.org/badges/grand-total/adepro)
+[![status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+<!-- badges: end -->
+
 AdEPro (Animation of Adverse Event Profiles) is a Shiny application for the (audio-)visualization of adverse events during clinical trials. AdEPro allows the user to upload the clinical trial data using the typical Analysis Data Model (**ADaM**) in Clinical Data Interchange Standards (**CDISC**). For this, just upload the adverse event dataset (**ADAE**) to AdEPro by means of the Upload Data panel, either as a sas7bdat file or as comma-separated values (csv).
 
 ## Description
