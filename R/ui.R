@@ -215,7 +215,13 @@ ui <- shiny::shinyUI(
                     shiny::uiOutput("ae_audio"),
                     shiny::uiOutput("ae_sound1"),
                     shiny::uiOutput("ae_sound2")
-                  )
+                  ),
+                  shinyWidgets::materialSwitch(
+                    inputId = "show_imputations",
+                    label = "Mark adverse events with imputed start or/and end date",
+                    value = FALSE
+                  ),
+                  shiny::uiOutput("text_imputations")
                 ),
                 shinyBS::bsCollapsePanel(
                   shiny::HTML('<p style="color:white; font-size:100%;"> Subgroup setting </p>'),

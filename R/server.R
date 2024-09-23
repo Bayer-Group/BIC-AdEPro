@@ -506,9 +506,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     shiny::req(input$type)
     shiny::req(data_type())
     shiny::req(global_params())
-
     info <- reac_info_click()
-
     adepro_slice_plot(
       data = data(),
       patients = patients(),
@@ -524,7 +522,9 @@ server <- shiny::shinyServer(function(input, output, session) {
       subjidn = input$sel_subjidn,
       slider = input$slider,
       info = info,
-      legend_ae = legend_ae$val
+      legend_ae = legend_ae$val,
+      arrow_data = total_data_reac2()$ae_data,
+      show_arrows = input$show_imputations
     )
 
     #sound
@@ -1263,7 +1263,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       aeendy_check_flag$val &&
       aesevn_check_flag$val
     ) {
-
     tmp <- prepare_data(
       dat = data,
       SUBJIDN = input$sel_subjidn,
@@ -1283,7 +1282,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       AEACNN = input$sel_aeacnn,
       adsl_data = adsl_data
     )
-
     if (dim(tmp$ae_data)[1] == 0) {
       return(NULL)
     }
@@ -1310,6 +1308,19 @@ server <- shiny::shinyServer(function(input, output, session) {
     # Adverse Event Start Day Missing (corrected)
     value_ae_start_missing <- tmp$ae_data %>% dplyr::filter(is.na(day_start))%>% nrow()
 
+      tmp$ae_data <- tmp$ae_data %>%
+        dplyr::mutate(
+          replace_ae_start = dplyr::case_when(
+            is.na(day_start) ~ 1,
+            !is.na(day_start) ~ 0
+          ),
+          replace_ae_end = dplyr::case_when(
+            is.na(day_end) ~ 1,
+            !is.na(day_end) ~ 0
+          )
+        )
+
+
     if (value_ae_start_missing > 0) {
 
 
@@ -1323,6 +1334,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           )
         )
       })
+
       tmp$ae_data <- tmp$ae_data %>%
         dplyr::mutate(
           day_start = dplyr::case_when(is.na(day_start) ~ 1, TRUE ~ day_start)
@@ -3274,6 +3286,16 @@ shiny::observeEvent(c(adae_data_reac2(), input$sel_aeacnn), {
       Please upload adverse event data set!
       After the upload check all required variables and press 'Submit'.
       For more information use the help buttons on top. </b>"))
+  })
+
+  output$text_imputations <- shiny::renderUI({
+    HTML(paste0(
+      "<p> Note: </p>",
+      "<p> &#8656; Start day imputed </p>",
+      "<p> &#8658; End day imputed </p>",
+      "<p> &#8660; : Start and end day imputed</p>"
+      )
+    )
   })
 
   shiny::observeEvent(
