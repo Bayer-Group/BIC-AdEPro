@@ -65,7 +65,7 @@ pie_legend2 <- function(
     )
 
     if (length(aes) > 1) {
-      TeachingDemos::my.symbols(
+      my.symbols(
         x = tmp$X[1:length(aes)],
         y = tmp$Y[1:length(aes)],
         symb = poly_t,

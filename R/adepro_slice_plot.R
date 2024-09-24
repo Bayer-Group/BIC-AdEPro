@@ -47,7 +47,7 @@ adepro_slice_plot <- function(
   arrow_data = NULL,
   show_arrows = FALSE
 ) {
-  ae <- day_start <- ps <- X <- Y <- patient <- r <- NULL
+  ae <- day_start <- ps <- X <- Y <- patient <- r <- day_end <- replace_ae_start <- replace_ae_end <- NULL
 
   on_ex <- par("oma","mar","plt")
   on.exit(par(on_ex))
@@ -196,21 +196,24 @@ adepro_slice_plot <- function(
             add = TRUE
           )
             if (show_arrows) {
-              if(!is.null(arrow_tmp)){
-              if(!dim(arrow_tmp)[1] == 0){
-              for(i in 1:dim(arrow_tmp)[1]){
-                coord <- poly_t2(arrow_tmp[i,]$num,1,num_aes = length(ae_list))
-                if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
-                  text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col ="#bababa",cex=1.5)
+              if(!is.null(arrow_tmp)) {
+                if(!dim(arrow_tmp)[1] == 0) {
+                  for(i in 1:dim(arrow_tmp)[1]) {
+                    coord <- poly_t2(arrow_tmp[i,]$num,1,num_aes = length(ae_list))
+                    if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col ="black",cex=1.55)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col ="#bababa",cex=1.5)
+                    }
+                    if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col ="black",cex=1.55)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col ="#bababa",cex =1.5)
+                    }
+                    if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col ="black",cex=1.55)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col ="#bababa",cex=1.5)
+                    }
+                  }
                 }
-                if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
-                  text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col ="#bababa",cex =1.5)
-                }
-                if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
-                  text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col ="#bababa",cex=1.5)
-                }
-              }
-              }
               }
             }
           } else if (length(ae_list) == 1) {
@@ -225,22 +228,26 @@ adepro_slice_plot <- function(
               lwd = 1
             )
             if (show_arrows){
-              if(!is.null(arrow_tmp)){
-              if(!dim(arrow_tmp)[1] == 0){
-              for(i in 1:dim(arrow_tmp)[1]){
-                if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
-                  text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col ="#bababa",cex=1.5)
-                }
-                if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
-                  text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col ="#bababa",cex=1.5)
-                }
-                if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
-                  text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col ="#bababa",cex=1.5)
+              if (!is.null(arrow_tmp)){
+                if (!dim(arrow_tmp)[1] == 0) {
+                  for(i in 1:dim(arrow_tmp)[1]){
+                    if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col ="black",cex=1.55)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col ="#bababa",cex=1.5)
+                    }
+                    if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col ="black",cex=1.55)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col ="#bababa",cex=1.5)
+                    }
+                    if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col ="black",cex=1.55)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col ="#bababa",cex=1.5)
+                    }
+                  }
                 }
               }
             }
-              }
-            }}
+          }
         }
       }
       #draw arrows

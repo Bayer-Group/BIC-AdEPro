@@ -101,22 +101,22 @@ server <- shiny::shinyServer(function(input, output, session) {
   })
 
    output$circle_legend<- shiny::renderUI({
-    if(!is.null(input$heightSlider)) {
+    # if(!is.null(input$heightSlider)) {
      shiny::plotOutput(
        outputId = "legend",
-       height =paste0(input$heightSlider,"px"),
+       height = "800px",
        click = clickOpts(id = "legend_click"),
       )
-    }
+    # }
   })
 
   output$circle_legend2<- shiny::renderUI({
-    if(!is.null(input$heightSlider)) {
+    # if(!is.null(input$heightSlider)) {
      shiny::plotOutput(
        outputId = "legend2",
-       height =paste0(input$heightSlider,"px")
+       height = "800px"
       )
-    }
+    # }
   })
 
   legend_click <- shiny::reactiveValues(val = NULL)

@@ -19,7 +19,11 @@ adepro_slice_plot(
   slider,
   subjidn,
   adepro_colors = c("#e43157", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33",
-    "#a65628", "#f781bf", "#21d4de", "#91d95b", "#b8805f", "#cbbeeb")
+    "#a65628", "#f781bf", "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"),
+  info = NULL,
+  legend_ae = NULL,
+  arrow_data = NULL,
+  show_arrows = FALSE
 )
 }
 \arguments{
@@ -50,6 +54,10 @@ adepro_slice_plot(
 \item{subjidn}{subjidn variable}
 
 \item{adepro_colors}{colors used in adepro (max 12)}
+
+\item{arrow_data}{data.frame with information which start/end date are imputed}
+
+\item{show_arrows}{logical value if arrows should be displayed for imputed data}
 }
 \description{
 Create pie chart graph for app adepro
