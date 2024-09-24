@@ -1,3 +1,5 @@
+utils::globalVariables(c("ae","day_start","ps", "X", "Y","patient","r", "day_end", "replace_ae_start", "replace_ae_end"))
+
 #' adepro_slice_plot - function to create pie chart graph
 #'
 #' @description
@@ -47,7 +49,6 @@ adepro_slice_plot <- function(
   arrow_data = NULL,
   show_arrows = FALSE
 ) {
-  ae <- day_start <- ps <- X <- Y <- patient <- r <- day_end <- replace_ae_start <- replace_ae_end <- NULL
 
   on_ex <- par("oma","mar","plt")
   on.exit(par(on_ex))

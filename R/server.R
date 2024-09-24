@@ -1,3 +1,5 @@
+utils::globalVariables(c("day_end", "day_start", "r", "ps", "treat", "N", ".", "end", "death", "SEQUENCING"))
+
 #' Server part of the AdEPro application
 #'
 #'@return No return value. Server part of the app, used in launch_adepro-function.
@@ -5,9 +7,6 @@
 #'@keywords internal
 
 server <- shiny::shinyServer(function(input, output, session) {
-
-  #### Global ####
-  day_end <- day_start <- r <- ps <- treat <- N <- . <- end <- death <- SEQUENCING <- NULL
 
   #Shiny options for maximal upload size
   options(shiny.maxRequestSize = 110*1024^2)
