@@ -1,0 +1,13 @@
+DT 0.29
+data.table 1.14.8
+stringr 1.5.0
+labelled 2.12.0
+vtable 1.4.6
+Hmisc 5.1-1
+shinyswipr 0.1.0
+tibble 3.2.1
+dplyr 1.1.3
+officer 0.6.6
+flextable 0.9.6
+webshot 0.5.5
+png 0.1-8
