@@ -8,7 +8,7 @@ RUN apt-get update && apt upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get i
       && rm -rf /var/lib/apt/lists/*
 
 RUN R -e "install.packages('devtools')"
-RUN R -e "devtools::install_github('Bayer-Group/BIC-AdEPro')"
+RUN R -e "devtools::install_github('Bayer-Group/BIC-AdEPro', ref = 'api')"
 
 ENTRYPOINT ["R", "-e"]
 CMD ["library('adepro'); launch_adepro(host = '0.0.0.0',port=3838)"]
