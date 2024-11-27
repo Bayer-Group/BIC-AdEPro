@@ -34,7 +34,7 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v1
       with:
-        registry: https://dockerregistryspa.azurecr.io/
+        registry: ${{ secrets.DOCKER_REGISTRY }} 
         username: PushToken
         password: ${{ secrets.DOCKER_REGISTRY_SERVER_PASSWORD }} 
 
@@ -49,7 +49,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         push: true
-        tags: dockerregistryspa.azurecr.io/dockerregistryspa/${{ env.repo_name }}:${{ github.sha }}  # Use Git commit SHA as the tag
+        tags: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.sha }}  # Use Git commit SHA as the tag
         context: ./  # The build context is the root of the repository
 
   # Job 2: Deploy to the development environment
