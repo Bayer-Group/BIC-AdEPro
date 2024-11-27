@@ -45,8 +45,8 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ github.event.repository.name }}
-        slot-name: 'production'
-        publish-profile: ${{ secrets.PUBLISH_PROFILE }}
+        slot-name: 'staging'
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_DEV }}
         images: dockerregistryspa.azurecr.io/dockerregistryspa/${{ github.event.repository.name }}:${{ github.sha }}
       
   deploy-prod:
