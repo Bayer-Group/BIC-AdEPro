@@ -2,10 +2,6 @@
 # Define build arguments for the Rocker version, repository, and runtime settings
 # R Version
 ARG ROCKER_VERSION=4.3.2
-# GitHub repository and branch
-ARG REPO_URL="Bayer-Group/BIC-AdEPro"
-ARG REPO_REF="api"
-
 
 # Use the configurable Rocker version
 FROM rocker/shiny:${ROCKER_VERSION}
@@ -22,7 +18,7 @@ RUN apt-get update && apt upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get i
 RUN R -e "install.packages('devtools')"
 
 # Install the specified package from the given GitHub repository
-RUN R -e "devtools::install_github('${REPO_URL}', ref = '${REPO_REF}')"
+RUN R -e "devtools::install_github('Bayer-Group/BIC-AdEPro', ref = 'api')"
 
 # Set entrypoint and pass runtime arguments to the CMD
 ENTRYPOINT ["R", "-e"]
