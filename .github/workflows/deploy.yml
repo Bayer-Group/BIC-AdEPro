@@ -45,6 +45,10 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+    - name: Convert repo name to lowercase
+      id: lowercase_repo_name
+      run: echo "repo_name=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
     - name: Deploy to Azure Web App
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
@@ -62,6 +66,10 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+    - name: Convert repo name to lowercase
+      id: lowercase_repo_name
+      run: echo "repo_name=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
     - name: Deploy to Azure Web App
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
