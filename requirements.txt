@@ -11,3 +11,4 @@ officer 0.6.6
 flextable 0.9.6
 webshot 0.5.5
 png 0.1-8
+
