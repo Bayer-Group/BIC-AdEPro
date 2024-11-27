@@ -2,8 +2,8 @@ name: Build and deploy container app to Azure Web App
 
 on:
   push:
-#    branches:
-#      - main
+    branches:
+      - api
     tags:
         - '*'
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
