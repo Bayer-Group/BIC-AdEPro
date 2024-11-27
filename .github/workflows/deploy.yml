@@ -48,11 +48,19 @@ jobs:
     # 5. Build the Docker image and push it to the Azure Container Registry
     - name: Build and push container without tag
       uses: docker/build-push-action@v4
+      if: ${{ github.sha }} != ""
       with:
         push: true
         tags: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.sha }}  # Use Git commit SHA as the tag
         context: ./  # The build context is the root of the repository
-
+          
+    - name: Build and push container with tag
+      uses: docker/build-push-action@v2
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        push: true
+        tags: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.ref_name }}
+        file: ./
   # Job 2: Deploy to the development environment
   deploy-dev:
     # Runs on the latest Ubuntu host
@@ -79,11 +87,20 @@ jobs:
         slot-name: 'dev'  # Specify the development slot
         publish-profile: ${{ secrets.PUBLISH_PROFILE_DEV }}  # Publish profile for the development environment
         images: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.sha }}  # Use the image from the ACR with the Git commit SHA
-        
+
+    - name: Deploy to Azure Web App (tag)
+      uses: azure/webapps-deploy@v2
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        app-name: ${{ env.repo_name }}
+        slot-name: 'dev'
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_DEV }}
+        images: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{  github.ref_name }}        
   # Job 3: Deploy to the production environment
   deploy-prod:
     # Runs on the latest Ubuntu host
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')  # Only run this job for tags that start with 'v'
     # This job depends on the "deploy-dev" job and will run after it completes successfully
     needs: deploy-dev
     # Define the deployment environment as "production"
