@@ -50,7 +50,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.repo_name }}
-        slot-name: 'staging'
+        slot-name: 'dev'
         publish-profile: ${{ secrets.PUBLISH_PROFILE_DEV }}
         images: dockerregistryspa.azurecr.io/dockerregistryspa/${{ env.repo_name }}:${{ github.sha }}
       
