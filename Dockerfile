@@ -4,8 +4,7 @@ ARG ROCKER_VERSION=4.3.2
 # GitHub repository and branch
 ARG REPO_URL="Bayer-Group/BIC-AdEPro"
 ARG REPO_REF="api"
-# Startup command
-ARG STARTUP_CMD="library('adepro'); launch_adepro(host = '0.0.0.0', port = 3838)"
+
 
 # Use the configurable Rocker version
 FROM rocker/shiny:${ROCKER_VERSION}
@@ -26,4 +25,4 @@ RUN R -e "devtools::install_github('${REPO_URL}', ref = '${REPO_REF}')"
 
 # Set entrypoint and pass runtime arguments to the CMD
 ENTRYPOINT ["R", "-e"]
-CMD [${STARTUP_CMD}]
+CMD ["library('adepro'); launch_adepro(host = '0.0.0.0', port = 3838)"]
