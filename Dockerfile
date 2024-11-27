@@ -1,9 +1,9 @@
+FROM rocker/shiny:4.3.2
 
-FROM dockerregistryspa.azurecr.io/dockerregistryspa/spa-rshiny-base:4.3.2-v1.0.7
-
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y -q curl iputils-ping \
+RUN apt-get update && apt upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y -q libssl-dev libxml2-dev libharfbuzz-dev \
+      libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev curl iputils-ping \  
       && apt-get clean \
-      && rm -rf /tmp/* /var/tmp/* \
+      && rm -rf /tmp/* /var/tmp/* /srv/shiny-server/* \
       && rm -rf /var/lib/apt/lists/*
 
 RUN R -e "install.packages('devtools')"
