@@ -95,7 +95,7 @@ jobs:
         app-name: ${{ env.repo_name }}
         slot-name: 'dev'
         publish-profile: ${{ secrets.PUBLISH_PROFILE_DEV }}
-        images: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{  github.ref_name }}        
+        images: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.ref_name }}        
   # Job 3: Deploy to the production environment
   deploy-prod:
     # Runs on the latest Ubuntu host
