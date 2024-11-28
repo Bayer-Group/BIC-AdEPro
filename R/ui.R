@@ -676,7 +676,7 @@ ui <- shiny::shinyUI(
                 shiny::column(12,
                   shiny::fileInput(
                     inputId = 'tot_dat',
-                    label = shiny::HTML('<p style = "color: #ffffff"> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
+                    label = shiny::HTML('<p style = "color: #ffffff"> Uploadx adverse event data <span style = "color:#E43157">(required)</span> </p>')
                   ),
                   shiny::uiOutput("wrong_adae_format_text"),
                   shiny::br()
