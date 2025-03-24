@@ -10,6 +10,9 @@ An object of class \code{shiny.tag.list} (inherits from \code{list}) of length 4
 \usage{
 ui
 }
+\arguments{
+\item{id}{Internal parameters for {shiny}.}
+}
 \value{
 No return value. User interface part of the app, used in launch_adepro-function.
 }

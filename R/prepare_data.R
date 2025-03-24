@@ -1,3 +1,5 @@
+ utils::globalVariables(c("death", "cols", "treat", "ps", "new_AESEVN", "patient", "day_start", "day_end", "output", "message"))
+
 #' prepare_data - read SAS or CSV raw data and prepare the data sets
 #' @description
 #' Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application
@@ -18,6 +20,7 @@
 #' @param AERELN Adverse Event Related Flag as numeric (optional)
 #' @param AERELPRN Adverse Event      Flag as numeric (optional)
 #' @param AEACNN Adverse Event        Flag as numeric (optional)
+#' @param optional_vars List optional Variables for the patient data set.
 #' @param adsl_data Subject Level data set (optional)
 #'
 #' @keywords internal
@@ -43,13 +46,10 @@ prepare_data <- function(
   adsl_data = NULL
 ) {
 
-  cols <- treat <- death <-  ps <- new_AESEVN <- patient <- day_start <- day_end <- output <- message <- NULL
-
   var_list <- c("ps", "treat", "end", "death")
   # create variables ps, treat, end and death
-  pat_data <- dat %>%
-    # Fri Mar  1 12:17:03 2024 ------------------------------
-    dplyr::filter(!!rlang::sym(SAFFN) == 1 | !!rlang::sym(SAFFN) == "Y" | !!rlang::sym(SAFFN) == "Yes" | !!rlang::sym(SAFFN) == "YES" | !!rlang::sym(SAFFN) == "yes" | !!rlang::sym(SAFFN) == "y") %>%
+  pat_data <- dat  %>%
+        dplyr::filter(!!rlang::sym(SAFFN) == 1 | !!rlang::sym(SAFFN) == "Y" | !!rlang::sym(SAFFN) == "Yes" | !!rlang::sym(SAFFN) == "YES" | !!rlang::sym(SAFFN) == "yes" | !!rlang::sym(SAFFN) == "y") %>%
     dplyr::mutate(
         ps = as.numeric(!!rlang::sym(SUBJIDN)),
         treat = as.factor(!!rlang::sym(TRT01A)),
@@ -233,7 +233,7 @@ prepare_data <- function(
     pat_data <- pat_data %>%
       dplyr::relocate(c(ps,treat,end,death))
 
-  if(is.null(output)) {
+  # if(is.null(output)) {
 
   return(
     list(
@@ -243,15 +243,15 @@ prepare_data <- function(
     )
   )
 
-  } else {
-
-    return(
-      list(
-        "ae_data" = as.data.frame(NULL, stringsAsFactors = FALSE),
-        "pat_data" = as.data.frame(NULL, stringsAsFactors = FALSE),
-        "message" = as.data.frame(message, stringsAsFactors = FALSE)
-      )
-    )
-  }
+  # } else {
+  #
+  #   return(
+  #     list(
+  #       "ae_data" = as.data.frame(NULL, stringsAsFactors = FALSE),
+  #       "pat_data" = as.data.frame(NULL, stringsAsFactors = FALSE),
+  #       "message" = as.data.frame(message, stringsAsFactors = FALSE)
+  #     )
+  #   )
+  # }
 }
 

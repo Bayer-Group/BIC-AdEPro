@@ -1,3 +1,5 @@
+utils::globalVariables(c("ae", "day_slider", "vars", "day_mx", "count_mx", "ps", "treat", "summarise", "n", ".", "N"))
+
 #' bar_chart - creates barchart of AEs for all patient
 #' @description
 #' Creates bar charts daily and total for all patients separately according to treatment (R Package required: 'dplyr')
@@ -23,7 +25,6 @@ bar_chart <- function(
   cex.n = 2
 ){
 
-  ae <- day_slider <- vars <- day_mx <- count_mx <- ps <- treat <- summarise <- n <- . <- N <- NULL
   #app colors
   colors <- c(
     "#e43157", "#377eb8", "#4daf4a", "#984ea3",

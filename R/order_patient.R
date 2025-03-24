@@ -1,3 +1,6 @@
+utils::globalVariables(c("patient_d", "input", "day_end", "day_start", "sev", "patient", "ae", "val", "death", "ps", "end", "ae_frequency"))
+
+
 #' order_patient - Arranges patients by sequencing technique
 #' @description
 #' Arranges patients by sequencing technique (R Package required: 'dplyr', 'reshape2, 'seriation')
@@ -17,8 +20,6 @@ order_patient <- function(
     method_dist = 'euclidean',
     method_seriate = input$methSeq
 ){
-
-  patient_d <- input <- day_end <- day_start <- sev <- patient <- ae <- val <- death <- ps <- end <- ae_frequency <- NULL
 
   # add column ae_count which includes the number of days between day_start and day_end
   tmp <- ae_data %>%

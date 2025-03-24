@@ -1,3 +1,5 @@
+utils::globalVariables(c("day_end", "day_start", "r", "ps", "treat", "N", ".", "end", "death", "SEQUENCING"))
+
 #' Server part of the AdEPro application
 #'
 #'@return No return value. Server part of the app, used in launch_adepro-function.
@@ -5,9 +7,6 @@
 #'@keywords internal
 
 server <- shiny::shinyServer(function(input, output, session) {
-
-  #### Global ####
-  day_end <- day_start <- r <- ps <- treat <- N <- . <- end <- death <- SEQUENCING <- NULL
 
   #Shiny options for maximal upload size
   options(shiny.maxRequestSize = 110*1024^2)
@@ -100,25 +99,142 @@ server <- shiny::shinyServer(function(input, output, session) {
     )
   })
 
+   output$circle_legend<- shiny::renderUI({
+    # if(!is.null(input$heightSlider)) {
+     shiny::plotOutput(
+       outputId = "legend",
+       height = "800px",
+       click = clickOpts(id = "legend_click"),
+      )
+    # }
+  })
+
+  output$circle_legend2<- shiny::renderUI({
+    # if(!is.null(input$heightSlider)) {
+     shiny::plotOutput(
+       outputId = "legend2",
+       height = "800px"
+      )
+    # }
+  })
+
+  legend_click <- shiny::reactiveValues(val = NULL)
+
+  shiny::observeEvent(input$legend_click,{
+    legend_click$val <- input$legend_click
+  })
   # create a legend with function 'pie_legend'
   output$legend <- shiny::renderPlot({
     session$clientData$output_slicePlots_width
-    ##
+    session$clientData$output_legend_width
+    session$clientData$output_circle_legend_width
+    session$clientData$output_circle_legend2_width
+    input$heightSlider
+    ## input$zoom
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(pie_legend(aes = input_var()))
+      pre_value_legend_ae <- shiny::isolate(legend_ae$val)
+
+      if (length(input_var()) > 0) {
+        colors = c(
+          "#e43157", "#377eb8", "#4daf4a", "#984ea3",
+          "#ff7f00", "#ffff33", "#a65628", "#f781bf",
+          "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
+        )
+        #create dummy data set to draw legend
+        tmp <- data.frame(
+          "day_start"=rep(1, 12),
+          "day_end" = rep(3, 12),
+          "patient" = 1:12,
+          "ae" = c(input_var(),rep(NA, 12 - length(input_var()))),
+          "sev" = rep(3, 12),
+          "r" = rep(1, 12),
+          "d" = rep(NA, 12),
+          "Y" = rev(seq(1, 12 * 3, by = 3)),
+          "X" = rep(1, 12),
+           "cont" = "#424242",
+          "cont_bg" = c(rep("#383838", length(input_var())), rep("#383838", 12 - length(input_var()))),
+          "col" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var()))),
+          "num" = c(1:length(input_var()), rep(NA, 12 - length(input_var()))),
+          "bg" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var())))
+        )
+        #get information about nearest ae clicked
+        info <- shiny::nearPoints(
+          tmp,
+          legend_click$val,
+          threshold = 30,
+          maxpoints = 1,
+          xvar = "X",
+          yvar = "Y"
+        )
+      } else {
+        info <- NULL
+      }
+
+      #compare ae clicked before to remove an ae after second click
+      post_value_legend_ae <- info$ae
+
+      if (is.null(post_value_legend_ae)) {
+        legend_ae$val <- NULL
+        info <- NULL
+      } else if (length(post_value_legend_ae) == 0) {
+        legend_ae$val <- NULL
+        info <- NULL
+      }   else if (is.na(post_value_legend_ae)) {
+        legend_ae$val <- NULL
+        info <- NULL
+      } else if (is.null(pre_value_legend_ae)) {
+         plot_click$val <- NULL
+        legend_ae$val <-  post_value_legend_ae
+
+      } else if (post_value_legend_ae == pre_value_legend_ae){
+         legend_ae$val <- NULL
+         info <- NULL
+      } else {
+        plot_click$val <- NULL
+        legend_ae$val <- post_value_legend_ae
+      }
+      #draw legend
+      tmp <- pie_legend2(
+        tmp = tmp,
+        aes = input_var(),
+        legend_click = legend_click$val,
+        info = info
+      )
     }
   }, bg = "#424242")
 
+  legend_ae <- shiny::reactiveValues(val = NULL)
+
   # create a legend with function 'pie_circle'
   output$legend2 <- shiny::renderPlot({
+    session$clientData$output_slicePlots_width
+    session$clientData$output_legend_width
+    session$clientData$output_circle_legend_width
+    session$clientData$output_circle_legend2_width
+    input$heightSlider
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(circle_legend())
+      return(circle_legend2(aes = input_var()))
     }
   }, bg = "#424242")
+
+
+  # # create a legend with function 'pie_circle'
+  # output$legend2 <- shiny::renderPlot({
+  #   session$clientData$output_slicePlots_width
+  #   session$clientData$output_legend_width
+  #   session$clientData$output_circle_legend_width
+  #   session$clientData$output_circle_legend2_width
+  #   input$heightSlider
+  #   if (is.null(input_var())) {
+  #     return(NULL)
+  #   } else {
+  #     return(circle_legend2(aes = input_var()))
+  #   }
+  # }, bg = "#424242")
 
   # CSS style information of the output$dayinfo - see below (actual day number of the slider)
   output$dynamic_css <- shiny::renderUI({
@@ -326,6 +442,49 @@ server <- shiny::shinyServer(function(input, output, session) {
     )
   })
 
+  plot_click <- shiny::reactiveValues(val = NULL)
+
+  shiny::observeEvent(c(input$plot_click, input$subgroup), {
+    if (is.null(input$subgroup)) {
+      legend_ae$val <- NULL
+      plot_click$val <- input$plot_click
+    } else {
+      legend_ae$val <- NULL
+      plot_click$val <- NULL
+    }
+  })
+
+  prev_clicked_subject <- shiny::reactiveValues(val = NULL)
+
+  reac_info_click <- eventReactive(c(plot_click$val), {
+    info <- shiny::nearPoints(
+      patients(),
+      plot_click$val,
+      threshold = 30,
+      maxpoints = 1,
+      xvar = "X",
+      yvar = "Y"
+    )
+    if (dim(info)[1] == 1) {
+      if (!is.null(shiny::isolate(prev_clicked_subject$val))) {
+        if (info$X == shiny::isolate(prev_clicked_subject$val$X) & info$Y == shiny::isolate(prev_clicked_subject$val$Y)) {
+           prev_clicked_subject$val <- NULL
+           info <- NULL
+           legend_click$val <- NULL
+        } else {
+          prev_clicked_subject$val <- info
+          legend_click$val <- NULL
+        }
+      } else {
+        prev_clicked_subject$val <- info
+        legend_click$val <- NULL
+      }
+    }# else {
+    #  legend_ae$val <- NULL
+    #}
+    info
+  }, ignoreNULL = FALSE)
+
   #### Piecharts ####
   output$slicePlots <- shiny::renderPlot({
     total_data_reac2()
@@ -341,11 +500,12 @@ server <- shiny::shinyServer(function(input, output, session) {
     input$heightSlider
     input$plus_zoom
     input$minus_zoom
+
     input$type
     shiny::req(input$type)
     shiny::req(data_type())
     shiny::req(global_params())
-
+    info <- reac_info_click()
     adepro_slice_plot(
       data = data(),
       patients = patients(),
@@ -359,7 +519,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       title = as.character(unique(patients()$treat)),
       subgroup = input$subgroup,
       subjidn = input$sel_subjidn,
-      slider = input$slider
+      slider = input$slider,
+      info = info,
+      legend_ae = legend_ae$val,
+      arrow_data = total_data_reac2()$ae_data,
+      show_arrows = input$show_imputations
     )
 
     #sound
@@ -791,7 +955,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           if (path_ending == "csv") {
             adae <- suppressWarnings(readr::read_csv(inFile, col_types = readr::cols("SEX" = "c"), na = c(".", "NA")))
             colnames(adae) <- toupper(colnames(adae))
-            adae[adae == "."] <- NA
+            #adae[adae == "."] <- NA
           } else if (path_ending == "sas7bdat" | path_ending == "sas7cdat") {
           adae <- haven::read_sas(inFile)
           adae <- adae %>%
@@ -852,7 +1016,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           if (path_ending == "csv") {
             adsl <- suppressWarnings(readr::read_csv(inFile2, col_types = readr::cols("SEX" = "c"), na = c(".", "NA")))
             colnames(adsl) <- toupper(colnames(adsl))
-            adsl[adsl == "."] <- NA
+            #adsl[adsl == "."] <- NA
           } else if (path_ending == "sas7bdat" | path_ending == "sas7cdat") {
             adsl <- haven::read_sas(inFile2)
             adsl <- adsl %>%
@@ -1098,7 +1262,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       aeendy_check_flag$val &&
       aesevn_check_flag$val
     ) {
-
     tmp <- prepare_data(
       dat = data,
       SUBJIDN = input$sel_subjidn,
@@ -1118,7 +1281,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       AEACNN = input$sel_aeacnn,
       adsl_data = adsl_data
     )
-
     if (dim(tmp$ae_data)[1] == 0) {
       return(NULL)
     }
@@ -1145,6 +1307,19 @@ server <- shiny::shinyServer(function(input, output, session) {
     # Adverse Event Start Day Missing (corrected)
     value_ae_start_missing <- tmp$ae_data %>% dplyr::filter(is.na(day_start))%>% nrow()
 
+      tmp$ae_data <- tmp$ae_data %>%
+        dplyr::mutate(
+          replace_ae_start = dplyr::case_when(
+            is.na(day_start) ~ 1,
+            !is.na(day_start) ~ 0
+          ),
+          replace_ae_end = dplyr::case_when(
+            is.na(day_end) ~ 1,
+            !is.na(day_end) ~ 0
+          )
+        )
+
+
     if (value_ae_start_missing > 0) {
 
 
@@ -1158,6 +1333,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           )
         )
       })
+
       tmp$ae_data <- tmp$ae_data %>%
         dplyr::mutate(
           day_start = dplyr::case_when(is.na(day_start) ~ 1, TRUE ~ day_start)
@@ -1991,13 +2167,18 @@ server <- shiny::shinyServer(function(input, output, session) {
     adsl <- adsl_data_reac()
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+
 
     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
     if(!is.null(adsl)) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
       choices <- sort(c(choices, choices2))
+      choices_int <- sort(c(choices_int, choices2_int))
     }
-
+    choices <- sort(c(choices,choices_int))
     choices <- c(unique(choices), "Nothing selected")
 
     if(!"TRTSDT" %in% choices) {
@@ -2034,6 +2215,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       trtsdt_check_flag$val <- FALSE
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       if (input$sel_trtsdt == "Nothing selected") {
         output$sel_trtsdt_check <- renderUI({
          shiny::HTML(
@@ -2046,17 +2228,18 @@ server <- shiny::shinyServer(function(input, output, session) {
         })
       } else {
         trtsdt <- adae_data_reac2()[[input$sel_trtsdt]]
+      ##back ##
 
-        if (!any(sapply(trtsdt, is.convertible.to.date))) {
+        if (!any(sapply(trtsdt, is.convertible.to.date)) & !any(sapply(trtsdt, is.convertible.to.integer))) {
          trtsdt_check_flag$val <- FALSE
          output$sel_trtsdt_check <- shiny::renderUI({
            shiny::HTML(
              paste0(
-               '<p style = "color:#E43157"> <i class="fa-solid fa-times"></i> Treatment start date variable needs to be in date format. </p>'
+               '<p style = "color:#E43157"> <i class="fa-solid fa-times"></i> Treatment start date variable needs to be in date or integer format. </p>'
               )
             )
           })
-        } else if (any(sapply(trtsdt, is.convertible.to.date)) & input$sel_trtsdt != "TRTSDT") {
+        } else if ((any(sapply(trtsdt, is.convertible.to.date))| any(sapply(trtsdt, is.convertible.to.integer))) & input$sel_trtsdt != "TRTSDT") {
           trtsdt_check_flag$val <- TRUE
           output$sel_trtsdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2066,7 +2249,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if (any(sapply(trtsdt, is.convertible.to.date)) & input$sel_trtsdt == "TRTSDT") {
+        } else if ((any(sapply(trtsdt, is.convertible.to.date)) | any(sapply(trtsdt, is.convertible.to.integer))) & input$sel_trtsdt == "TRTSDT") {
           trtsdt_check_flag$val <- TRUE
           output$sel_trtsdt_check <- renderUI({
             shiny::HTML(
@@ -2089,14 +2272,28 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
 
+
+    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
     if(!is.null(adsl)) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
       choices <- sort(c(choices, choices2))
+      choices_int <- sort(c(choices_int, choices2_int))
     }
-
+    choices <- sort(c(choices,choices_int))
     choices <- c(unique(choices), "Nothing selected")
+
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    #
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+    #   choices <- sort(c(choices, choices2))
+    # }
+
+    # choices <- c(unique(choices), "Nothing selected")
 
     if (!"LVDT" %in% choices) {
       selected <- "Nothing selected"
@@ -2133,7 +2330,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       lvdt_check_flag$val <- FALSE
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-
+       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       if (input$sel_lvdt == "Nothing selected") {
         output$sel_lvdt_check <- shiny::renderUI({
           shiny::HTML(
@@ -2147,7 +2344,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         })
       } else {
         lvdt <- adae_data_reac2()[[input$sel_lvdt]]
-        if (!any(sapply(lvdt, is.convertible.to.date))) {
+        if (!any(sapply(lvdt, is.convertible.to.date)) & !any(sapply(lvdt, is.convertible.to.integer))) {
           lvdt_check_flag$val <- FALSE
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2156,7 +2353,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if (any(sapply(lvdt, is.convertible.to.date)) & input$sel_lvdt != "LVDT") {
+        } else if ((any(sapply(lvdt, is.convertible.to.date))| any(sapply(lvdt, is.convertible.to.integer)))  & input$sel_lvdt != "LVDT") {
           lvdt_check_flag$val <- TRUE
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2165,7 +2362,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if (any(sapply(lvdt, is.convertible.to.date)) & input$sel_lvdt == "LVDT") {
+        } else if ((any(sapply(lvdt, is.convertible.to.date))| any(sapply(lvdt, is.convertible.to.integer)))  & input$sel_lvdt == "LVDT") {
           lvdt_check_flag$val <- TRUE
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2271,7 +2468,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
   },ignoreNULL = FALSE, ignoreInit = TRUE)
 
-  #### DEATH DATE - DTHDT ####
+   #### DEATH DATE - DTHDT ####
   output$sel_dthdt <- shiny::renderUI({
     shiny::req(adae_data_reac2())
 
@@ -2279,12 +2476,18 @@ server <- shiny::shinyServer(function(input, output, session) {
     adsl <- adsl_data_reac()
 
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+
 
     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
     if(!is.null(adsl)) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
       choices <- sort(c(choices, choices2))
+      choices_int <- sort(c(choices_int, choices2_int))
     }
+    choices <- sort(c(choices,choices_int))
 
     choices <- c(unique(choices),"NA", "Nothing selected")
 
@@ -2324,6 +2527,8 @@ server <- shiny::shinyServer(function(input, output, session) {
       dthdt_check_flag$val <- FALSE
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+      ## back##
       if (input$sel_dthdt == "Nothing selected") {
         output$sel_dthdt_check <- renderUI({
           shiny::HTML(
@@ -2344,7 +2549,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       } else {
         dthdt <- adae_data_reac2()[[input$sel_dthdt]]
 
-        if (!any(sapply(dthdt, is.convertible.to.date)) & !all(is.na(dthdt))) {
+        if (!any(sapply(dthdt, is.convertible.to.date)) & !all(is.na(dthdt)) & !any(sapply(dthdt, is.convertible.to.integer))) {
           dthdt_check_flag$val <- FALSE
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2353,7 +2558,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if ((any(sapply(dthdt, is.convertible.to.date)) | all(is.na(dthdt))) & input$sel_dthdt != "DTHDT") {
+        } else if (((any(sapply(dthdt, is.convertible.to.date)) | any(sapply(dthdt, is.convertible.to.integer))) | all(is.na(dthdt))) & input$sel_dthdt != "DTHDT") {
           dthdt_check_flag$val <- TRUE
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2362,7 +2567,7 @@ server <- shiny::shinyServer(function(input, output, session) {
               )
             )
           })
-        } else if ((any(sapply(dthdt, is.convertible.to.date)) | all(is.na(dthdt))) & input$sel_dthdt == "DTHDT") {
+        } else if (((any(sapply(dthdt, is.convertible.to.date)) | any(sapply(dthdt, is.convertible.to.integer))) | all(is.na(dthdt))) & input$sel_dthdt == "DTHDT") {
           dthdt_check_flag$val <- TRUE
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(
@@ -2648,7 +2853,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
-  #### ADVERSE EVENT SEVERITY FLAG - AESEVN ####
+   #### ADVERSE EVENT SEVERITY FLAG - AESEVN ####
   output$sel_aesevn <- shiny::renderUI({
     shiny::req(adae_data_reac2())
 
@@ -2656,7 +2861,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     adsl <- adsl_data_reac()
 
     is.convertible.to.sev <- function(x) {
-      as.character(x) %in% c("1","2","3","MILD","MODERATE","SEVERE","mild","moderate","severe","Mild","Moderate","Severe","",".")
+      as.character(x) %in% c(" 1", " 2", " 3","1","2","3","MILD","MODERATE","SEVERE","mild","moderate","severe","Mild","Moderate","Severe","",".",NA)
     }
 
     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.sev(x)}),2,all)))))
@@ -2664,13 +2869,12 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.sev(x)}),2,all)))
       choices <- sort(c(choices, choices2))
     }
-
     choices <- c(unique(choices), "Nothing selected")
-    if (!any(c("AESEVN", "AESEV") %in% choices)) {
+    if (!any(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)) {
       #choices <- c("Nothing selected", choices)
       selected <- "Nothing selected"
     } else {
-      selected <- c("AESEVN", "AESEV")[which(c("AESEVN", "AESEV") %in% choices)[1]]
+      selected <- c("AESEVN", "AESEV", "ASEVN", "AESEV")[which(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)[1]]
     }
 
     shinyWidgets::pickerInput(
@@ -2712,12 +2916,12 @@ server <- shiny::shinyServer(function(input, output, session) {
       } else {
         aesevn <- adae_data_reac2()[[input$sel_aesevn]]
 
-        if (!input$sel_aesevn %in% c("AESEVN", "AESEV") & (is.numeric(aesevn) | all(aesevn %in% c("MILD", "MODERATE", "SEVERE", NA, "NA", "")))) {
+        if (!input$sel_aesevn %in% c("AESEVN", "AESEV", "AESEV", "ASEVN") & (is.numeric(aesevn) | all(aesevn %in% c("MILD", "MODERATE", "SEVERE", NA, "NA", "")))) {
           aesevn_check_flag$val <- TRUE
           output$sel_aesevn_check <- shiny::renderUI({
             shiny::HTML(paste0('<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>  Variable AESEVN is not available or selected. </span>'))
           })
-        } else if (is.numeric(aesevn) & input$sel_aesevn == "AESEVN") {
+        } else if (is.numeric(aesevn) & input$sel_aesevn %in% c("AESEVN","ASEVN")) {
           aesevn_check_flag$val <- TRUE
           output$sel_aesevn_check <- shiny::renderUI({
             shiny::HTML(paste0('<span style = "color: #16de5f"> <i class="fa-solid fa-check"></i></span>'))
@@ -3081,6 +3285,16 @@ shiny::observeEvent(c(adae_data_reac2(), input$sel_aeacnn), {
       Please upload adverse event data set!
       After the upload check all required variables and press 'Submit'.
       For more information use the help buttons on top. </b>"))
+  })
+
+  output$text_imputations <- shiny::renderUI({
+    HTML(paste0(
+      "<p> Note: </p>",
+      "<p> &#8656; Start day imputed </p>",
+      "<p> &#8658; End day imputed </p>",
+      "<p> &#8660; : Start and end day imputed</p>"
+      )
+    )
   })
 
   shiny::observeEvent(
