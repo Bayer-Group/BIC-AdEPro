@@ -15,7 +15,7 @@ check_data <- function(ae_data, patients) {
   if(!all(is.element(unique(ae_data$patient), unique(patients$ps)))) {stop("Patient IDs do not match!")}
   if (any(colnames(ae_data)[1:5] != c("day_start", "day_end", "patient", "ae", "sev"))) stop("columns in ae_data are not named correctly")
   if (any(!(colnames(ae_data)[-c(1:5)] %in%
-            c("trtem", "ser", "nonser", "studrel", "studrelser", "relprot", "resdisc", "studrelresdisc")))) stop("columns in ae_data are not named correctly")
+            c("trtem", "ser", "nonser", "studrel", "studrelser", "relprot", "resdisc", "studrelresdisc","replace_ae_start","replace_ae_end")))) stop("columns in ae_data are not named correctly")
   if (any(colnames(patients)[1:4] != c("ps", "treat", "end", "death"))) stop("columns in patients are not named correctly")
   if (!is.factor(ae_data[,4])) stop("ae_data$ae has to be of type of factor")
   if (!all(c(apply(ae_data[, -4], 2, is.numeric), apply(patients[,c(1, 3, 4)], 2, is.numeric)))) stop("all variables expect 'ae', 'treat' and sorting variables have to be of type numeric")

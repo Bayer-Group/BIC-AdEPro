@@ -60,7 +60,7 @@
 #' @import shiny
 #' @import V8
 #' @importFrom shinyBS updateCollapse bsCollapse bsCollapsePanel
-#' @importFrom shinyWidgets knobInput pickerInput circleButton radioGroupButtons
+#' @importFrom shinyWidgets knobInput pickerInput circleButton radioGroupButtons materialSwitch
 #' @importFrom shinyjs useShinyjs extendShinyjs inlineCSS click delay disable enable reset
 #' @importFrom MASS eqscplot
 #' @importFrom audio play audioSample
