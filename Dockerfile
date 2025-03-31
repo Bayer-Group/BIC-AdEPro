@@ -3,4 +3,4 @@ COPY . /app
 RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_local('/app')"
 # Set entrypoint and pass runtime arguments to the CMD
-RUN echo 'library(adepro); adepro::run_app()' > /srv/shiny-server/app.R
+RUN echo 'library(adepro); adepro::launch_adepro()' > /srv/shiny-server/app.R
