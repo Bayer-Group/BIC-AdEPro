@@ -12,12 +12,20 @@ RUN apt-get update && apt upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get i
     && rm -rf /tmp/* /var/tmp/* /srv/shiny-server/* \
     && rm -rf /var/lib/apt/lists/*
 # Install R package devtools
+COPY . /app
+WORKDIR /app
 RUN R -e "install.packages('devtools')"
 # Install the specified package from the given GitHub repository
 # Modify this to match your repo
-RUN R -e "devtools::install_github('Bayer-Group/BIC-AdEPro', ref = 'api')"
+RUN R -e "devtools::install_local('/app')"
 # Set entrypoint and pass runtime arguments to the CMD
-ENTRYPOINT ["R", "-e"]
-# Modifiy this line to match your startup command
-CMD ["library('adepro'); options(shiny.trace=TRUE);options(httpuv.use.ws = FALSE);launch_adepro(host = '0.0.0.0', port = 3838)"]
-# END DOCKERFILE
+RUN mkdir -p /srv/shiny-server/app
+RUN echo 'library(adepro); adepro::run_app()' > /srv/shiny-server/app/app.R
+
+# 6. Setze Berechtigungen
+RUN chown -R shiny:shiny /srv/shiny-server
+
+# 7. Exponiere Port & starte Shiny Server
+EXPOSE 3838
+
+CMD ["/usr/bin/shiny-server"]
