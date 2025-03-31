@@ -13,13 +13,11 @@ RUN apt-get update && apt upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get i
     && rm -rf /var/lib/apt/lists/*
 # Install R package devtools
 COPY . /app
-WORKDIR /app
 RUN R -e "install.packages('devtools')"
 # Install the specified package from the given GitHub repository
 # Modify this to match your repo
 RUN R -e "devtools::install_local('/app')"
 # Set entrypoint and pass runtime arguments to the CMD
-RUN mkdir -p /srv/shiny-server/app
 RUN echo 'library(adepro); adepro::run_app()' > /srv/shiny-server/app.R
 
 # 6. Setze Berechtigungen
