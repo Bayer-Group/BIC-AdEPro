@@ -20,7 +20,7 @@ RUN R -e "install.packages('devtools')"
 RUN R -e "devtools::install_local('/app')"
 # Set entrypoint and pass runtime arguments to the CMD
 RUN mkdir -p /srv/shiny-server/app
-RUN echo 'library(adepro); adepro::run_app()' > /srv/shiny-server/app/app.R
+RUN echo 'library(adepro); adepro::run_app()' > /srv/shiny-server/app.R
 
 # 6. Setze Berechtigungen
 RUN chown -R shiny:shiny /srv/shiny-server
