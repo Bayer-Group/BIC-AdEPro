@@ -3199,9 +3199,9 @@ output$sel_aeacnn <- shiny::renderUI({
 
     is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    choices <- sort(c(names(adae)))
     if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
+      choices2 <- names(adsl)
       choices <- sort(c(choices, choices2))
     }
 
