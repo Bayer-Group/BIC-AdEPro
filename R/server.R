@@ -974,6 +974,7 @@ server <- shiny::shinyServer(function(input, output, session) {
             adae <- NULL
           }
       } else if (input$use_demo_data == TRUE) {
+        load("data//adae_data.rdata")
         adae <- adae_data
          output$wrong_adae_format_text <- shiny::renderUI({
               HTML(paste0(""))
@@ -1035,6 +1036,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           adsl <- NULL
       }
     } else if (input$use_demo_data) {
+      load("data/adsl_data.Rdata")
       adsl <- adsl_data
       output$wrong_adsl_format_text <- shiny::renderUI({
             HTML(paste0(""))
@@ -1822,7 +1824,7 @@ server <- shiny::shinyServer(function(input, output, session) {
   })
 
   shiny::observe({
-    demo_exists_reac$val <- file.exists(here::here("data", "adae_data.rda")) & file.exists(here::here("data", "adsl_data.rda"))
+    demo_exists_reac$val <- file.exists(here::here("data", "adae_data.rdata")) & file.exists(here::here("data", "adsl_data.rdata"))
   })
 
   shiny::outputOptions(output, "demo_data_exists", suspendWhenHidden = FALSE)
