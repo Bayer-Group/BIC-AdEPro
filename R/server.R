@@ -224,7 +224,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(circle_legend2(aes = input_var()))
+      return(circle_legend2(aes = input_var(),grading=ifelse(input$severity_grading_flag=="Severity",FALSE,TRUE)))
     }
   }, bg = "#424242")
 
@@ -1183,10 +1183,14 @@ server <- shiny::shinyServer(function(input, output, session) {
 
 
     if (is.character(data[[shiny::req(input$sel_aesevn)]])) {
-
-      number_severe_missing <- sum(!data[[input$sel_aesevn]] %in% c("MILD","MODERATE","SEVERE",NA))
+      number_severe_missing <- ifelse(input$severity_grading_flag=="Severity",
+                                      sum(!data[[input$sel_aesevn]] %in% c("MILD","MODERATE","SEVERE",NA)),
+                                      sum(!data[[input$sel_aesevn]] %in% c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH",NA)))
       if (number_severe_missing > 0) {
-        data[[input$sel_aesevn]][!data[[input$sel_aesevn]] %in% c("MILD","MODERATE","SEVERE",NA)] <- "SEVERE"
+        ifelse(input$severity_grading_flag=="Severity",
+               data[[input$sel_aesevn]][!data[[input$sel_aesevn]] %in% c("MILD","MODERATE","SEVERE",NA)] <- "SEVERE",
+               data[[input$sel_aesevn]][!data[[input$sel_aesevn]] %in% c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH",NA)] <- "SEVERE")
+
         output$sel_aesevn_check2 <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -1202,9 +1206,13 @@ server <- shiny::shinyServer(function(input, output, session) {
         })
       }
     } else if (is.numeric(data[[input$sel_aesevn]])) {
-      number_severe_missing <- sum(!data[[input$sel_aesevn]] %in% c(1,2,3,NA))
+      number_severe_missing <- ifelse(input$severity_grading_flag=="Severity",
+                                      sum(!data[[input$sel_aesevn]] %in% c(1,2,3,NA)),
+                                          sum(!data[[input$sel_aesevn]] %in% c(1,2,3,4,5,NA)))
       if (number_severe_missing > 0) {
-        data[[input$sel_aesevn]][!data[[input$sel_aesevn]] %in% c(1,2,3,NA)] <- 3
+        ifelse(input$severity_grading_flag=="Severity",
+               data[[input$sel_aesevn]][!data[[input$sel_aesevn]] %in% c(1,2,3,NA)] <- 3,
+               data[[input$sel_aesevn]][!data[[input$sel_aesevn]] %in% c(1,2,3,4,5,NA)] <- 3)
         output$sel_aesevn_check2 <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -1574,9 +1582,10 @@ server <- shiny::shinyServer(function(input, output, session) {
     shiny::req(total_data_reac2())
     shiny::req(ae_data())
     shiny::req(input$type)
+    shiny::req(input$severity_grading_flag)
     ae_data <- ae_data()
     Q <- initQ(ae_data)
-    ae_data <- preproc_ae(ae_data)
+    ae_data <- preproc_ae(ae_data,grading=ifelse(input$severity_grading_flag=="Severity",FALSE,TRUE))
     ae_data <- ae_data[which(Q[, as.numeric(input$type)]), ]
     ae_data
   })
@@ -2956,13 +2965,22 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.sev <- function(x) {
-      as.character(x) %in% c(" 1", " 2", " 3","1","2","3","MILD","MODERATE","SEVERE","mild","moderate","severe","Mild","Moderate","Severe","",".",NA)
-    }
+      is.convertible.to.sev <- function(x) {
+        as.character(x) %in% c(" 1", " 2", " 3","1","2","3",
+                               "MILD","MODERATE","SEVERE","mild","moderate","severe","Mild","Moderate","Severe",
+                               "",".",NA)
+        }
+      is.convertible.to.grad <- function(x) {
+        as.character(x) %in% c(" 1", " 2", " 3", " 4", " 5","1","2","3","4","5",
+                               "MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH",
+                               "mild","moderate","severe","life-threatening","death",
+                               "Mild","Moderate","Severe","Life-threatening","Life-Threatening","Death",
+                               "",".",NA)
+        }
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.sev(x)}),2,all)))))
+    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.sev(x) | is.convertible.to.grad(x)}),2,all)))))
     if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.sev(x)}),2,all)))
+      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.sev(x) | is.convertible.to.grad(x)}),2,all)))
       choices <- sort(c(choices, choices2))
     }
     choices <- c(unique(choices), "Nothing selected")
@@ -2975,7 +2993,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aesevn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Severity/Intensity: </p>'),
+      label = shiny::HTML('<p style = "color:#ffffff"> Severity/Intensity/Grading: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2993,7 +3011,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         shiny::HTML(
           paste0(
             '<span style = "color:#E43157"> <i class="fa-solid fa-times"></i>
-            Please select a variable for adverse event severity flag. </span>'
+            Please select a variable for adverse event severity/grading flag. </span>'
           )
         )
       })

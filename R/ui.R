@@ -791,6 +791,14 @@ ui <- shiny::shinyUI(
                         shiny::uiOutput("sel_aesevn"),
                         shiny::uiOutput("sel_aesevn_check"),
                         shiny::uiOutput("sel_aesevn_check2")
+                      ),
+                      shiny::column(2,
+                        shiny::radioButtons(
+                          inputId = "severity_grading_flag",
+                          label = "Select Severity or Grading:",
+                          choices = c("Severity","Grading"),
+                          selected = "Severity"
+                        )
                       )
                     )
                   ),
