@@ -118,6 +118,13 @@ server <- shiny::shinyServer(function(input, output, session) {
     # }
   })
 
+  output$barchart_legend<- shiny::renderUI({
+    shiny::plotOutput(
+      outputId = "legend_bar",
+      height = "800px"
+    )
+  })
+
   legend_click <- shiny::reactiveValues(val = NULL)
 
   shiny::observeEvent(input$legend_click,{
@@ -218,6 +225,93 @@ server <- shiny::shinyServer(function(input, output, session) {
       return(NULL)
     } else {
       return(circle_legend2(aes = input_var()))
+    }
+  }, bg = "#424242")
+
+  #### create a legend for barchart
+  output$legend_bar <- shiny::renderPlot({
+    session$clientData$output_barchart_width
+    # session$clientData$output_legend_width
+    # session$clientData$output_circle_legend_width
+    # session$clientData$output_circle_legend2_width
+    input$add_row
+    input$rem_row
+    input$type
+    input$heightSlider
+    input$plus_zoom
+    input$minus_zoom
+    ## input$zoom
+    if (is.null(input_var())) {
+      return(NULL)
+    } else {
+      pre_value_legend_ae <- shiny::isolate(legend_ae$val)
+
+      if (length(input_var()) > 0) {
+        colors = c(
+          "#e43157", "#377eb8", "#4daf4a", "#984ea3",
+                   "#ff7f00", "#ffff33", "#a65628", "#f781bf",
+                   "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
+        )
+        #create dummy data set to draw legend
+        tmp <- data.frame(
+          "day_start"=rep(1, 12),
+          "day_end" = rep(3, 12),
+          "patient" = 1:12,
+          "ae" = c(input_var(),rep(NA, 12 - length(input_var()))),
+          "sev" = rep(3, 12),
+          "r" = rep(1, 12),
+          "d" = rep(NA, 12),
+          "Y" = rev(seq(1, 12 * 3, by = 3)),
+          "X" = rep(1, 12),
+          "cont" = "#424242",
+          "cont_bg" = c(rep("#383838", length(input_var())), rep("#383838", 12 - length(input_var()))),
+          "col" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var()))),
+          "num" = c(1:length(input_var()), rep(NA, 12 - length(input_var()))),
+          "bg" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var())))
+        )
+        #get information about nearest ae clicked
+        info <- shiny::nearPoints(
+          tmp,
+          legend_click$val,
+          threshold = 30,
+          maxpoints = 1,
+          xvar = "X",
+          yvar = "Y"
+        )
+      } else {
+        info <- NULL
+      }
+
+      #compare ae clicked before to remove an ae after second click
+      post_value_legend_ae <- info$ae
+
+      if (is.null(post_value_legend_ae)) {
+        legend_ae$val <- NULL
+        info <- NULL
+      } else if (length(post_value_legend_ae) == 0) {
+        legend_ae$val <- NULL
+        info <- NULL
+      }   else if (is.na(post_value_legend_ae)) {
+        legend_ae$val <- NULL
+        info <- NULL
+      } else if (is.null(pre_value_legend_ae)) {
+        plot_click$val <- NULL
+        legend_ae$val <-  post_value_legend_ae
+
+      } else if (post_value_legend_ae == pre_value_legend_ae){
+        legend_ae$val <- NULL
+        info <- NULL
+      } else {
+        plot_click$val <- NULL
+        legend_ae$val <- post_value_legend_ae
+      }
+      #draw legend
+      tmp <- barchart_legend(
+        tmp = tmp,
+        aes = input_var(),
+        legend_click = legend_click$val,
+        info = info
+      )
     }
   }, bg = "#424242")
 

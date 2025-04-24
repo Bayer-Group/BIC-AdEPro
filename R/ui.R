@@ -112,7 +112,7 @@ ui <- shiny::shinyUI(
                     shiny::conditionalPanel(condition = "input.view == 'pie'",
                       shiny::tags$br(),
                       shiny::helpText(
-                        "Note: By clicking update the sorting will be switch to 'SEQUENCING'."
+                        "Note: By clicking update the sorting will switch to 'SEQUENCING'."
                       ),
                       shiny::actionButton(
                         inputId = "AI.Update",
@@ -860,14 +860,20 @@ ui <- shiny::shinyUI(
                 ),
                 shiny::uiOutput("circle_legend2")
               )
-            ),
-            shiny::fluidRow(
-
             )
           ),
           shiny::conditionalPanel(condition = "input.view == 'chart'",
             shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
-              shiny::plotOutput("barchart"),
+               shiny::fluidRow(
+                 splitLayout(
+                   cellArgs = list(style='white-space: normal; resize: horizontal;'),
+                   cellWidths = c("9%", "91%"),
+                   shiny::uiOutput("barchart_legend"),
+                   shiny::plotOutput(
+                     outputId = "barchart",
+                     height = "100%")
+                 )
+              )
             ),
             shiny::conditionalPanel(condition = "input.var.length == 0",
               shiny::HTML('<p style="text-align:center; color:white;"> To use the bar plot view, please select at least one adverse event in the "Adverse event for animation"-Panel! </p>')
