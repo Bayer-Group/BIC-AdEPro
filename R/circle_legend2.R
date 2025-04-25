@@ -75,9 +75,16 @@ circle_legend2 <- function(
 
   graphics::rect(-100, -100, 100, 100, col = "#383838", border = "#383838")
 
-  for(i in c(1,2,3,5,6,7,8,9,11)) {
-    rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
-    text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","Life-threatening","Leading to death","","Resolved")[i], col = "white")
+  if (grading==F){
+    for(i in c(1,2,3,5,6,7,9)) {
+      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
+      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","Life-threatening","Leading to death","","Resolved")[i], col = "white")
+    }
+  } else {
+    for(i in c(1,2,3,5,6,7,8,9,11)) {
+      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
+      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","Life-threatening","Leading to death","","Resolved")[i], col = "white")
+    }
   }
 
   graphics::symbols(
@@ -90,16 +97,30 @@ circle_legend2 <- function(
     bg = tmp$cont_bg
   )
 
-  my.symbols(
-    x = tmp$X[c(5,6,7,8,9,11)],
-    y = tmp$Y[c(5,6,7,8,9,11)],
-    symb = poly_t,
-    num = tmp$num[c(5,6,7,8,9,11)],
-    rad = tmp$r[c(5,6,7,8,9,11)],
-    bg = tmp$bg[c(5,6,7,8,9,11)],
-    fg = tmp$col[c(5,6,7,8,9,11)],
-    xsize = 2,
-    add = TRUE
-  )
+  if (grading==F){
+    my.symbols(
+      x = tmp$X[c(5,6,7,9)],
+      y = tmp$Y[c(5,6,7,9)],
+      symb = poly_t,
+      num = tmp$num[c(5,6,7,9)],
+      rad = tmp$r[c(5,6,7,9)],
+      bg = tmp$bg[c(5,6,7,9)],
+      fg = tmp$col[c(5,6,7,9)],
+      xsize = 2,
+      add = TRUE
+    )
+  } else {
+    my.symbols(
+      x = tmp$X[c(5,6,7,8,9,11)],
+      y = tmp$Y[c(5,6,7,8,9,11)],
+      symb = poly_t,
+      num = tmp$num[c(5,6,7,8,9,11)],
+      rad = tmp$r[c(5,6,7,8,9,11)],
+      bg = tmp$bg[c(5,6,7,8,9,11)],
+      fg = tmp$col[c(5,6,7,8,9,11)],
+      xsize = 2,
+      add = TRUE
+    )
+  }
 }
 
