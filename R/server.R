@@ -891,6 +891,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       Q <- initQ(ae_data0)
       flag_name <- colnames(Q)[as.numeric(input$type)]
       #1. join treatment variable to adverse event data for grouping
+
       tmp <- dplyr::left_join(
         ae_data() %>%
           dplyr::filter(!!rlang::sym(flag_name) == 1),
@@ -901,103 +902,200 @@ server <- shiny::shinyServer(function(input, output, session) {
       )
 
       # remove rows with same ae for same subject
-      tmp <- tmp[!duplicated(tmp[,c("patient","ae")]),]
+      # tmp <- tmp[!duplicated(tmp[,c("patient","ae")]),]
 
-      #complete treatement and adverse events table:
+      #complete treatment and adverse events table:
 
       full_list <- merge(levels(tmp$treat), input_var())
       colnames(full_list) <- c("treat", "ae")
 
       full_list <- full_list[which(full_list$treat %in% input$sortTreatments),]
 
-      #2. get number of events until slider day grouped by treatement and events
-      tmp2 <- tmp %>%
-        dplyr::filter(ae %in% input_var()) %>%
-        dplyr::filter(day_start <= input$slider) %>%
-        dplyr::group_by(treat,ae) %>%
-        dplyr::summarise(N = n())
+      #Perform ae_summary update only when input_var are in correct format.
+      if(input_var()[1] %in% tmp$ae){
+        #2. get number of events until slider day grouped by treatement and events
+        tmp2a <- tmp %>%
+          dplyr::filter(ae %in% input_var()) %>%
+          dplyr::filter(day_start <= input$slider)
 
-      full_list <- full_list[order(match(full_list$treat, input$sortTreatments)),]
+        # Check if the filtered dataset is empty
+        if (nrow(tmp2a) > 0) {
+          tmp2a <- tmp2a %>%
+            mutate(Ongoing_AE = case_when(
+              day_end >= input$slider ~ 1,
+              TRUE ~ 0
+            ),
+            Resolved_AE = case_when(
+              day_end <= input$slider ~ 1,
+              TRUE ~ 0
+            )) %>%
+            dplyr::group_by(patient, ae) %>%
+            dplyr::summarise(
+              treat = first(treat),
+              Ongoing_AE = max(Ongoing_AE, na.rm = TRUE),  # Use na.rm = TRUE to avoid warnings
+              Resolved_AE = max(Resolved_AE, na.rm = TRUE)
+            )
+        } else {
+          tmp2a <- data.frame(patient = character(), ae = character(), treat = character(), Ongoing_AE = integer(), Resolved_AE = integer())
+        }
 
-      tmp2 <- tmp2 %>% dplyr::right_join(
-        full_list,
-        by = c("treat","ae")
-      )
-      tmp2[is.na(tmp2)] <- 0
-      tmp2 <- tmp2[order(match(tmp2$treat, input$sortTreatments)),]
-      #3. get number of events until slider day over all treatments
-      tmp3 <- tmp %>%
-        dplyr::filter(ae %in% input_var()) %>%
-        dplyr::filter(day_start <= input$slider) %>%
-        dplyr::group_by(ae) %>%
-        dplyr::summarise(N = n())
-      #4. join grouped counts and total counts and transfer to wider format
-      tmp4 <- dplyr::full_join(
-        tmp3,
-        tmp2 %>%
-          tidyr::pivot_wider(names_from = treat, values_from = N, names_prefix = "N_"),
-        by = "ae"
-      )
-
-      #4b. replace na's with 0
-      tmp4[is.na(tmp4)] <- 0
-      #5. create column 'text' with counts: total N (treatment1 N/ treatment2 N/...)
-
-      tmp5 <- tmp4 %>%
-        dplyr::mutate(
-          text = paste0(tmp4[["N"]], " (",apply(tmp4[, -c(1, 2)], 1, paste, collapse = "/"), ")")
-        )
-      #5b. order data frame by input_var() (adverse event selection)
-      tmp5 <- tmp5[match(input_var(),tmp5$ae),]
-
-      patients_ <- patients()[order(match(patients()$treat, input$sortTreatments)),]
-       N_treat <- patients_ %>%
-          dplyr::group_by(treat) %>%
-          dplyr::summarise(N = n()) %>%
-          tidyr::pivot_wider(names_from = treat, values_from = N, names_prefix = "N_") %>%
-          dplyr::mutate(N = rowSums(.)) %>%
-          dplyr::select(N, everything())
-
-        Big_N <- N_treat %>% dplyr::mutate(
-          text = paste0(N_treat[,1],"(",apply(N_treat[, -1], 1, paste, collapse = "/"),")"),
-          ae = "N:"
-        )
-
-      tmp5 <- rbind(Big_N,tmp5) %>%
-        dplyr::relocate(ae)
-
-      #calculate percentages when selected (input$percentage == TRUE):S
-      if (input$percentage) {
-        tmp6 <- tmp5 %>% dplyr::select(-c(ae,text))
-
-        tmp7 <- round(mapply('/', tmp6, N_treat)*100,1)
-        tmp8 <- cbind(tmp5 %>% dplyr::select(ae),tmp7)
-
-        tmp5 <- tmp8 %>% dplyr::mutate(
-          text = paste0(N, " (",paste(!!!rlang::syms(colnames(tmp8)[-c(1,2)]),sep = "/"), ")")
-        )
-        text2 <- c("Percent ",input_var())
-      } else {
-        text2 <- c("N ",input_var())
-      }
-
-      HTML(
-        paste(
-          paste(
-            "<p style='color:white'> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
-          ),
-          paste(
-            "<p style = 'color: ",
-            c("white","#e43157", "#377eb8", "#4daf4a", "#984ea3",
-            "#ff7f00", "#ffff33", "#a65628", "#f781bf",
-            "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
-            )[1:dim(tmp5)[1]],"'>",
-            text2,": ",tmp5$text,"
-            </p>", collapse = ""
+        tmp2 <- tmp2a %>%
+          dplyr::group_by(treat,ae) %>%
+          summarize(
+            N = n(),  # Count the total number of rows per treat-ae combination
+            Ongoing = sum(Ongoing_AE == 1),  # Count of Ongoing == 1
+            Resolved = sum(Resolved_AE == 1 & Ongoing_AE == 0),  # Count of Resolved == 1 where Ongoing == 0
           )
-        , collapse = ""
+
+        full_list <- full_list[order(match(full_list$treat, input$sortTreatments)),]
+
+        tmp2 <- tmp2 %>% dplyr::right_join(
+          full_list,
+          by = c("treat","ae")
         )
-      )
+        tmp2[is.na(tmp2)] <- 0
+        tmp2 <- tmp2[order(match(tmp2$treat, input$sortTreatments)),]
+        #3. get number of events until slider day over all treatments
+        tmp3 <- tmp2a %>%
+          dplyr::group_by(ae) %>%
+          summarize(
+            N = n(),  # Count the total number of rows per treat-ae combination
+            Ongoing = sum(Ongoing_AE == 1),  # Count of Ongoing == 1
+            Resolved = sum(Resolved_AE == 1 & Ongoing_AE == 0),  # Count of Resolved == 1 where Ongoing == 0
+          )
+        #4. join grouped counts and total counts and transfer to wider format
+        tmp4 <- dplyr::full_join(
+          tmp3,
+          tmp2 %>%
+            tidyr::pivot_wider(names_from = treat, values_from = c(N, Ongoing, Resolved)),
+          by = "ae"
+        )
+
+        #4b. replace na's with 0
+        tmp4[is.na(tmp4)] <- 0
+        #5. create column 'text' with counts: total N (treatment1 N/ treatment2 N/...)
+        tmp5 <- tmp4 %>%
+          dplyr::mutate(
+            N_text = paste0(tmp4[["N"]], " (",apply(tmp4[, -c(1, 2)] %>% select(-contains(c("Ongoing","Resolved"))), 1, paste, collapse = "/"), ")"),
+            Ongoing_text = paste0(tmp4[["Ongoing"]], " (",apply(tmp4[, -c(1,3)] %>% select(contains(c("Ongoing"))), 1, paste, collapse = "/"), ")"),
+            Resolved_text = paste0(tmp4[["Resolved"]], " (",apply(tmp4[, -c(1,4)] %>% select(contains(c("Resolved"))), 1, paste, collapse = "/"), ")")
+          )
+
+        tmp5a  <- tmp5 %>% select("ae","N",starts_with("N_"))
+        Ongoing  <- tmp5 %>% select("ae",starts_with("Ongoing"))# %>% rename_with(~ str_replace_all(., "Ongoing", "N"))
+        Resolved  <- tmp5 %>% select("ae",starts_with("Resolved"))# %>% rename_with(~ str_replace_all(., "Resolved", "N"))
+
+        #5b. order data frame by input_var() (adverse event selection)
+        tmp5a <- tmp5a[match(input_var(),tmp5a$ae),]
+        Ongoing <- Ongoing[match(input_var(),Ongoing$ae),]
+        Resolved <- Resolved[match(input_var(),Resolved$ae),]
+
+        patients_ <- patients()[order(match(patients()$treat, input$sortTreatments)),]
+         N_treat <- patients_ %>%
+            dplyr::group_by(treat) %>%
+            dplyr::summarise(N = n()) %>%
+            tidyr::pivot_wider(names_from = treat, values_from = N, names_prefix = "N_") %>%
+            dplyr::mutate(N = rowSums(.)) %>%
+            dplyr::select(N, everything())
+
+          Big_N <- N_treat %>% dplyr::mutate(
+            N_text = paste0(N_treat[,1],"(",apply(N_treat[, -1], 1, paste, collapse = "/"),")"),
+            ae = "N:"
+          )
+          Big_Ongoing <- N_treat %>%
+            rename_with(~ stringr::str_replace_all(., "N_", "Ongoing_")) %>%
+            rename("Ongoing"="N") %>%
+            dplyr::mutate(
+              Ongoing = NA_integer_,
+              across(starts_with("Ongoing"), ~ NA_integer_),
+              Ongoing_text = "",
+              ae = "Ongoing:"
+            )
+          Big_Resolved <- N_treat %>%
+            rename_with(~ stringr::str_replace_all(., "N_", "Resolved_")) %>%
+            rename("Resolved"="N") %>%
+            dplyr::mutate(
+                Resolved = NA_integer_,
+                across(starts_with("Resolved"), ~ NA_integer_),
+                Resolved_text = "",
+                ae = "Resolved:"
+              )
+
+        tmp5b <- rbind(Big_N,tmp5a) %>%
+          dplyr::relocate(ae)
+        Ongoing <- rbind(Big_Ongoing,Ongoing)%>%
+          dplyr::relocate(ae)
+        Resolved <- rbind(Big_Resolved,Resolved)%>%
+          dplyr::relocate(ae)
+
+        #calculate percentages when selected (input$percentage == TRUE):S
+        if (input$percentage) {
+          tmp5b <- tmp5b %>%
+            select(-c(ae, N_text)) %>%
+            {round(mapply('/', ., N_treat) * 100, 1)} %>%
+            cbind(tmp5b %>% select(ae), .) %>%
+            mutate(N_text = paste0(N, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"))
+          Ongoing <- Ongoing %>%
+            select(-c(ae, Ongoing_text)) %>%
+            {round(mapply('/', ., N_treat) * 100, 1)} %>%
+            cbind(Ongoing %>% select(ae), .) %>%
+            mutate(Ongoing_text = case_when(
+              !is.na(Ongoing) ~ paste0(Ongoing, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
+              TRUE ~ "")
+            )
+          Resolved <- Resolved %>%
+            select(-c(ae, Resolved_text)) %>%
+            {round(mapply('/', ., N_treat) * 100, 1)} %>%
+            cbind(Resolved %>% select(ae), .) %>%
+            mutate(Resolved_text = case_when(
+              !is.na(Resolved) ~ paste0(Resolved, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
+              TRUE ~ "")
+            )
+          text2 <- c("Percent",input_var())
+        } else {
+          text2 <- c("N",input_var())
+        }
+        text3 <- c("Ongoing",input_var())
+        text4 <- c("Resolved",input_var())
+
+        HTML(
+          paste(
+            paste(
+              "<p style='color:white'> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
+            ),
+              paste(
+                "<p style = 'line-height: 0.9; color: ",
+                c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
+                                     "#ff7f00", "#ffff33", "#a65628", "#f781bf",
+                                     "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
+                )[1:length(input_var())]),";'>",
+                text2,": ",tmp5b$N_text,"
+                </p>", collapse = ""
+              ),
+              br(),
+              paste(
+                "<p style = 'font-size: 12px; line-height: 0.75; color: ",
+                c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
+                                     "#ff7f00", "#ffff33", "#a65628", "#f781bf",
+                                     "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
+                )[1:length(input_var())]),";'>",
+                text3,": ",Ongoing$Ongoing_text,"
+                </p>", collapse = ""
+              ),
+              br(),
+              paste(
+                "<p style = 'font-size: 12px; line-height: 0.75; color: ",
+                c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
+                                     "#ff7f00", "#ffff33", "#a65628", "#f781bf",
+                                     "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
+                )[1:length(input_var())]),";'>",
+                text4,": ",Resolved$Resolved_text,"
+                  </p>", collapse = ""
+              )
+          , collapse = ""
+          )
+        )
+      }
     }
   })
   #### REACTIVE OBJECTS ####

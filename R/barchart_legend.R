@@ -1,4 +1,4 @@
-#' pie_legend2 - Creates Legend for adverse events barchart view in AdEPro (version 2)
+#' barchart_legend - Creates Legend for adverse events barchart view in AdEPro
 #'
 #' @description
 #' Drawing legends for adverse event colours in app
