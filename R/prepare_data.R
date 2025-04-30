@@ -140,11 +140,11 @@ prepare_data <- function(
       }
     }
 
-    if (SUBJIDN %in% names(adsl_data)) {
-    pat_data <- pat_data %>%
-      dplyr::select(var_list) %>%
-      dplyr::arrange(treat, ps) %>%
-      unique()
+    if (SUBJIDN %in% names(adsl_data) | is.null(adsl_data)) {
+      pat_data <- pat_data %>%
+        dplyr::select(var_list) %>%
+        dplyr::arrange(treat, ps) %>%
+        unique()
     }
 
     ae_data <- dat %>%
