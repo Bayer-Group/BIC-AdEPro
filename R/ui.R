@@ -687,34 +687,71 @@ ui <- shiny::shinyUI(
           shiny::br(),
           shiny::fluidRow(
             shiny::column(3,
-                shiny::column(12,
-                  shiny::fileInput(
-                    inputId = 'tot_dat',
-                    label = shiny::HTML('<p style = "color: #ffffff"> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
-                  ),
-                  shiny::uiOutput("wrong_adae_format_text"),
-                  shiny::br()
+              shiny::column(12,
+                    shiny::radioButtons(
+                    inputId ="radiobutton_data",
+                    label = HTML('<b style = "color: #ffffff"> Data type </b>'),
+                    choices = c("File upload"),
+                    selected = "File upload",
+                    inline = TRUE
+              ),
+              shiny::br(),
+              shiny::br(),
+
+                shiny::column(8,
+                  shiny::conditionalPanel("output.radio_data == 'File upload'",
+                    shiny::fileInput(
+                      inputId = 'tot_dat',
+                      label = shiny::HTML('<p style = "color: #ffffff"> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
+
+                    )
+                  )
                 ),
-                shiny::column(12,
+                shiny::column(1,
+                    shiny::conditionalPanel("output.radio_data == 'File upload'",
+                      shiny::actionButton(inputId = "reset_fileinput_adae", label = "", icon =icon("times"))
+                    )
+                 ),
+                  shiny::column(12,
+                  shiny::conditionalPanel("output.radio_data == 'File upload'",
+                  shiny::uiOutput("wrong_adae_format_text"),
+                    shiny::br(),
+                  )
+                ),
+                shiny::column(8,
+                  conditionalPanel("output.radio_data == 'File upload'",
                   shiny::fileInput(
                     inputId = 'tot_dat2',
                     label = shiny::HTML('<p style = "color: #ffffff"> Upload subject level data <span style = "color:#16de5f">(optional)</span> </p>')
-                  ),
-                  shiny::uiOutput("wrong_adsl_format_text"),
+                  )
+                  )
+                ),
+                shiny::column(1,
+                    shiny::conditionalPanel("output.radio_data == 'File upload'",
+                      shiny::actionButton(inputId = "reset_fileinput_adsl", label = "", icon =icon("times"))
+                    )
+                 ),
+                shiny::column(12,
+                  shiny::conditionalPanel("output.radio_data == 'File upload'",
+                  shiny::uiOutput("wrong_adsl_format_text")
+                  )
 
               ),
-              shiny::column(12,
-                conditionalPanel("output.demo_data_exists == true",
-                  shinyWidgets::prettyCheckbox(
-                    inputId ="use_demo_data",
-                    label = HTML('<b style = "color: #ffffff"> Use demo data </b>'),
-                    value = FALSE,
-                    status = "success",
-                    inline = TRUE,
-                    icon = icon("check-square")
-                  )
-                )
-              ),
+              # shiny::column(12,
+
+              #   conditionalPanel("output.demo_data_exists == true",
+              #     shiny::conditionalPanel("output.radio_data == 'Demo data'",
+              #     shinyWidgets::prettyCheckbox(
+              #       inputId ="use_demo_data",
+              #       label = HTML('<b style = "color: #ffffff"> Use demo data </b>'),
+              #       value = FALSE,
+              #       status = "success",
+              #       inline = TRUE,
+              #       icon = icon("check-square")
+              #     )
+              #     )
+              #   )
+              #),
               shiny::br(),
               shiny::column(12,
                 shiny::br(),

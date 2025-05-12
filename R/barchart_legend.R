@@ -19,6 +19,7 @@ barchart_legend <- function(
     legend_click = NULL,
     info
 ) {
+
   on_ex <- par("oma", "mar", "font")
   on.exit(par(on_ex))
   par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
@@ -55,18 +56,9 @@ barchart_legend <- function(
     }
 
     graphics::symbols(
-      tmp$X,
-      tmp$Y,
-      circles = cbind(rep(0.9, length(tmp$Y))),
-      inches = FALSE,
-      add = TRUE,
-      fg = tmp$cont_bg,
-      bg = tmp$cont_bg
-    )
-    graphics::symbols(
       tmp$X[1:length(aes)],
       tmp$Y[1:length(aes)],
-      circles = 0.85*tmp$r[1:length(aes)],
+      squares = 2*tmp$r[1:length(aes)],
       inches = FALSE,
       add = TRUE,
       fg = tmp$col[1:length(aes)],

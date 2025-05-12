@@ -42,6 +42,14 @@ server <- shiny::shinyServer(function(input, output, session) {
       shiny::uiOutput('tot_dat')
   })
 
+  shiny::observeEvent(c(input$reset_fileinput_adae), {
+    shinyjs::reset('tot_dat')
+    infile_adae$val <- NULL
+  })
+  shiny::observeEvent(c(input$reset_fileinput_adsl), {
+    shinyjs::reset('tot_dat2')
+    infile_adsl$val <- NULL
+  })
   # create a reactive Value called 'loaded' and set initial value to 0
   # use reactive value loaded$dat to create an output$load which can be
   # used with outputOptions() for the conditionalPanel() function.
@@ -600,6 +608,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     shiny::req(data_type())
     shiny::req(global_params())
     info <- reac_info_click()
+
     adepro_slice_plot(
       data = data(),
       patients = patients(),
@@ -871,6 +880,13 @@ server <- shiny::shinyServer(function(input, output, session) {
         shiny::fluidRow(
           shiny::column(12,
             shiny::uiOutput("summary_text"),
+            shiny::radioButtons(
+              inputId = "summary_option",
+              label = "Display:",
+              choices = c("All", "Ongoing", "Resolved"),
+              selected = "All",
+              inline = TRUE
+            ),
             shiny::checkboxInput(
               inputId = "percentage",
               label ="Show percentages",
@@ -1058,12 +1074,8 @@ server <- shiny::shinyServer(function(input, output, session) {
         text3 <- c("Ongoing",input_var())
         text4 <- c("Resolved",input_var())
 
-        HTML(
-          paste(
-            paste(
-              "<p style='color:white'> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
-            ),
-              paste(
+        if (input$summary_option == "All")  {
+           summary_text <- paste(
                 "<p style = 'line-height: 0.9; color: ",
                 c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
                                      "#ff7f00", "#ffff33", "#a65628", "#f781bf",
@@ -1071,20 +1083,20 @@ server <- shiny::shinyServer(function(input, output, session) {
                 )[1:length(input_var())]),";'>",
                 text2,": ",tmp5b$N_text,"
                 </p>", collapse = ""
-              ),
-              br(),
-              paste(
-                "<p style = 'font-size: 12px; line-height: 0.75; color: ",
+              )
+        } else if (input$summary_option == "Ongoing") {
+          summary_text <- paste(
+                "<p style = 'line-height: 0.9; color: ",
                 c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
                                      "#ff7f00", "#ffff33", "#a65628", "#f781bf",
                                      "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
                 )[1:length(input_var())]),";'>",
                 text3,": ",Ongoing$Ongoing_text,"
                 </p>", collapse = ""
-              ),
-              br(),
-              paste(
-                "<p style = 'font-size: 12px; line-height: 0.75; color: ",
+              )
+        } else if (input$summary_option == "Resolved") {
+          summary_text <- paste(
+                "<p style = 'line-height: 0.9; color: ",
                 c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
                                      "#ff7f00", "#ffff33", "#a65628", "#f781bf",
                                      "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
@@ -1092,6 +1104,13 @@ server <- shiny::shinyServer(function(input, output, session) {
                 text4,": ",Resolved$Resolved_text,"
                   </p>", collapse = ""
               )
+        }
+        HTML(
+          paste(
+            paste(
+              "<p style='color:white'> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
+            ),
+            summary_text
           , collapse = ""
           )
         )
@@ -1131,23 +1150,27 @@ server <- shiny::shinyServer(function(input, output, session) {
   })
 
   adae_data_reac <- shiny::reactive({
+    input$radiobutton_data
+    input$reset_fileinput_adae
     inFile <- infile_adae$val
-      if (is.null(inFile) & input$use_demo_data == FALSE) {
-          output$wrong_adae_format_text <- shiny::renderUI({
-                HTML(paste0("
-                <b style = 'color:#E43157'>
-                  Please upload adae data set!
-                </b>"))
+      if (is.null(inFile) & input$radiobutton_data == "File upload") {
+        output$wrong_adae_format_text <- shiny::renderUI({
+          HTML(
+            paste0("
+              <b style = 'color:#E43157'>
+                Please upload adae data set!
+              </b>"
+            )
+          )
         })
         return(NULL)
-      } else if (!is.null(inFile) & input$use_demo_data == FALSE) {
+      } else if (!is.null(inFile) & input$radiobutton_data == "File upload") {
         split_path <- strsplit(x = inFile, split = "[.]")
         path_ending <- split_path[[1]][length(split_path[[1]])]
         if (path_ending %in% c("csv", "sas7bdat", "sas7cdat")) {
           if (path_ending == "csv") {
             adae <- suppressWarnings(readr::read_csv(inFile, col_types = readr::cols("SEX" = "c"), na = c(".", "NA")))
             colnames(adae) <- toupper(colnames(adae))
-            #adae[adae == "."] <- NA
           } else if (path_ending == "sas7bdat" | path_ending == "sas7cdat") {
           adae <- haven::read_sas(inFile)
           adae <- adae %>%
@@ -1165,7 +1188,7 @@ server <- shiny::shinyServer(function(input, output, session) {
             })
             adae <- NULL
           }
-      } else if (input$use_demo_data == TRUE) {
+      } else if (input$radiobutton_data == "Demo data") {
         load("data//adae_data.rdata")
         adae <- adae_data
          output$wrong_adae_format_text <- shiny::renderUI({
@@ -1176,7 +1199,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     })
 
     adae_data_reac2 <- reactive({
-      shiny::req(adae_data_reac())
+      #shiny::req(adae_data_reac())
 
       if (!is.null(adae_data_reac())){
         adae <- adae_data_reac()
@@ -1192,16 +1215,19 @@ server <- shiny::shinyServer(function(input, output, session) {
         }
         adae
       }
+
     })
 
   adsl_data_reac <- shiny::reactive({
+    input$radiobutton_data
+    input$reset_fileinput_adsl
       inFile2 <- infile_adsl$val
-      if (is.null(inFile2) & input$use_demo_data == FALSE) {
+      if (is.null(inFile2) & input$radiobutton_data == "File upload") {
         adsl <- NULL
         output$wrong_adsl_format_text <- shiny::renderUI({
             HTML(paste0(""))
         })
-      } else if (!is.null(inFile2) & input$use_demo_data == FALSE ) {
+      } else if (!is.null(inFile2) & input$radiobutton_data == "File upload") {
         adsl_path <- inFile2
         split_path <- strsplit(x = adsl_path, split = "[.]")
         path_ending <- split_path[[1]][length(split_path[[1]])]
@@ -1227,7 +1253,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           })
           adsl <- NULL
       }
-    } else if (input$use_demo_data) {
+    } else if (input$radiobutton_data == "Demo data") {
       load("data/adsl_data.Rdata")
       adsl <- adsl_data
       output$wrong_adsl_format_text <- shiny::renderUI({
@@ -1241,15 +1267,21 @@ server <- shiny::shinyServer(function(input, output, session) {
   #### load data and prepare for graphics ####
   total_data_reac <- shiny::reactive({
 
-    shiny::req(adae_data_reac2())
+    #radtiobutton for file input or demo data
+    input$radiobutton_data
+
+    #shiny::req(adae_data_reac2())
     data <- adae_data_reac2()
     adae_data <- adae_data_reac()
     adsl_data <- adsl_data_reac()
 
     if (!is.null(data)) {
       loaded$dat <- 1
+    } else  {
+      loaded$dat <- 0
     }
 
+    if(!is.null(data)) {
     if (shiny::req(input$sel_dthdt) == "NA") {
       data <- data %>%
         dplyr::mutate(DTHDT = NA)
@@ -1270,7 +1302,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       number_unknown_aes <- 0
     }
 
-    # data %>% pull(!!rlang::sym(input$sel_aedecod)
     if (number_unknown_aes > 0) {
       if (input$sel_aedecod %in% colnames(adae_data)) {
         data$AEDECOD[which(data[[input$sel_aedecod]] == "")] <- "Unknown type of AE"
@@ -1381,22 +1412,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       number_ae_end_missing <- 0
     }
 
-    if(!is.null(input$sel_subjidn) & !is.null(input$sel_lvdt) & !is.null(input$sel_trtsdt)){
-
-
-    if (input$sel_lvdt != "Nothing selected" & input$sel_trtsdt != "Nothing selected") {
-
-      number_trt_end_missing <- data %>%
-        dplyr::mutate(end = as.numeric(!!rlang::sym(shiny::req(input$sel_lvdt))) - as.numeric(!!rlang::sym(shiny::req(input$sel_trtsdt))) + 1) %>%
-        dplyr::filter(is.na(end)) %>%
-        dplyr::pull(!!rlang::sym(input$sel_subjidn)) %>%
-        unique() %>%
-        length()
-    } else {
-      number_trt_end_missing <- 0
-    }
-    } else { number_trt_end_missing <- 0}
-
     if (!is.null(input$sel_lvdt)){
       if (input$sel_lvdt %in% colnames(adsl_data) & (!input$sel_lvdt %in% colnames(adae_data))) {
 
@@ -1450,6 +1465,19 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
     }
 
+    } else {
+      saffn_check_flag$val <- FALSE
+      subjidn_check_flag$val <- FALSE
+      aedecod_check_flag$val <- FALSE
+      trt01a_check_flag$val <- FALSE
+      lvdt_check_flag$val <- FALSE
+      dthdt_check_flag$val <- FALSE
+      trtsdt_check_flag$val<- FALSE
+      aestdy_check_flag$val <- FALSE
+      aetrtemn_check_flag$val <- FALSE
+      aeendy_check_flag$val<- FALSE
+      aesevn_check_flag$val<- FALSE
+    }
     # all required variables need to be valid:
     if (
       saffn_check_flag$val &&
@@ -1580,6 +1608,25 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
     }
 
+    if(!is.null(input$sel_subjidn) & !is.null(input$sel_lvdt) & !is.null(input$sel_trtsdt)) {
+
+     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      if (all(is.convertible.to.date(data[[input$sel_lvdt]])) & all(is.convertible.to.date(data[[input$sel_trtsdt]]))) {
+        number_trt_end_missing <- data %>%
+          dplyr::mutate(end = as.numeric(as.Date(!!rlang::sym(shiny::req(input$sel_lvdt)))) - as.numeric(as.Date(!!rlang::sym(shiny::req(input$sel_trtsdt)))) + 1) %>%
+          dplyr::filter(is.na(end)) %>%
+          dplyr::pull(!!rlang::sym(input$sel_subjidn)) %>%
+          unique() %>%
+          length()
+      } else {
+        number_trt_end_missing <- data %>%
+          dplyr::mutate(end = as.numeric(!!rlang::sym(shiny::req(input$sel_lvdt))) - as.numeric(!!rlang::sym(shiny::req(input$sel_trtsdt))) + 1) %>%
+          dplyr::filter(is.na(end)) %>%
+          dplyr::pull(!!rlang::sym(input$sel_subjidn)) %>%
+          unique() %>%
+          length()
+        }
+    } else { number_trt_end_missing <- 0}
 
      # Treatment End Day Missing (corrected)
     if (number_trt_end_missing > 0) {
@@ -2003,8 +2050,8 @@ server <- shiny::shinyServer(function(input, output, session) {
     )
   })
 
-  shiny::observeEvent(input$use_demo_data, {
-    if(input$use_demo_data){
+  shiny::observeEvent(input$radiobutton_data, {
+    if(input$radiobutton_data =="Demo data"){
       shinyBS::updateCollapse(
         session,
         id = "collapse_adae",
@@ -2015,6 +2062,20 @@ server <- shiny::shinyServer(function(input, output, session) {
       )
     }
   })
+
+  radio_data_reac <- shiny::reactiveValues(
+    val = "File upload"
+  )
+
+  output$radio_data <- shiny::reactive({
+    radio_data_reac$val
+  })
+
+  shiny::observe({
+    radio_data_reac$val <-input$radiobutton_data
+  })
+
+  shiny::outputOptions(output, "radio_data", suspendWhenHidden = FALSE)
 
   demo_exists_reac <- shiny::reactiveValues(
     val = FALSE
@@ -2030,6 +2091,13 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   shiny::outputOptions(output, "demo_data_exists", suspendWhenHidden = FALSE)
 
+  shiny::observeEvent(demo_exists_reac$val, {
+    shiny::updateRadioButtons(
+        session,
+        inputId ="radiobutton_data",
+        choices = c("File upload","Demo data")
+    )
+  })
 
   shiny::observeEvent(input$type, {
     shinyBS::updateCollapse(
@@ -2104,11 +2172,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- names(adae)
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
 
     if (!any(c("USUBJIDN", "USUBJID","SUBJIDN", "SUBJID") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("USUBJIDN", "USUBJID","SUBJIDN", "SUBJID")[which(c("USUBJIDN", "USUBJID","SUBJIDN", "SUBJID") %in% choices)[1]]
     }
@@ -2141,6 +2209,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       subjidn_check_flag$val <- FALSE
     } else {
       if (input$sel_subjidn == "Nothing selected") {
+         subjidn_check_flag$val <- FALSE
         output$sel_subjidn_check <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -2191,10 +2260,10 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     choices <- names(adae[unlist(lapply(adae, is.character), use.names = FALSE)])
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
     if (!"AEDECOD" %in% choices) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- "AEDECOD"
     }
@@ -2228,6 +2297,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aedecod_check_flag$val <- FALSE
     } else {
       if (input$sel_aedecod == "Nothing selected") {
+       aedecod_check_flag$val <- FALSE
         output$sel_aedecod_check <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -2284,10 +2354,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- colnames(adsl_data_reac())
     }
 
-    choices <- c(unique(choices),"Nothing selected")
+    choices <- c(unique(choices))
+    # choices <- c(unique(choices),"Nothing selected")
 
     if (!any(c("TRT01A", "TRT01AN","TRT01P","TRT01PN") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("TRT01A","TRT01AN","TRT01P","TRT01PN")[which(c("TRT01A","TRT01AN","TRT01P","TRT01PN") %in% choices)[1]]
     }
@@ -2320,16 +2391,17 @@ server <- shiny::shinyServer(function(input, output, session) {
       trt01a_check_flag$val <- FALSE
     } else {
 
-      if (input$sel_trt01a == "Nothing selected") {
-        output$sel_trt01a_check <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-              '<span style = "color:#E43157"> <i class="fa-solid fa-times"></i>
-              Variables TRT01A, TRT01AN, TRT01P, TRT01PN are not available.
-              Please select another variable, upload adsl data or add one of these variables to your data set.
-              </span>'))
-        })
-      } else {
+      # if (input$sel_trt01a == "Nothing selected") {
+      #   trt01a_check_flag$val <- FALSE
+      #   output$sel_trt01a_check <- shiny::renderUI({
+      #     shiny::HTML(
+      #       paste0(
+      #         '<span style = "color:#E43157"> <i class="fa-solid fa-times"></i>
+      #         Variables TRT01A, TRT01AN, TRT01P, TRT01PN are not available.
+      #         Please select another variable, upload adsl data or add one of these variables to your data set.
+      #         </span>'))
+      #   })
+      # } else {
         trt01a <- adae_data_reac2()[[input$sel_trt01a]]
 
         if (!any(input$sel_trt01a %in% c("TRT01A", "TRT01AN", "TRT01P", "TRT01PN"))) {
@@ -2358,7 +2430,7 @@ server <- shiny::shinyServer(function(input, output, session) {
             )
           })
         }
-      }
+      # }
     }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
@@ -2382,10 +2454,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices_int <- sort(c(choices_int, choices2_int))
     }
     choices <- sort(c(choices,choices_int))
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
+    # choices <- c(unique(choices))
 
     if(!"TRTSDT" %in% choices) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else if ("TRTSDT" %in% choices) {
       selected <- "TRTSDT"
     }
@@ -2419,17 +2492,18 @@ server <- shiny::shinyServer(function(input, output, session) {
     } else {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-      if (input$sel_trtsdt == "Nothing selected") {
-        output$sel_trtsdt_check <- renderUI({
-         shiny::HTML(
-          paste0('<span style = "color:#E43157"> <i class="fa-solid fa-times">
-                            </i>
-                            Variable TRTSDT is not available. Please select another variable,
-                            upload adsl data or add the variable to your data set.
-                            </span>'
-                    ))
-        })
-      } else {
+      # if (input$sel_trtsdt == "Nothing selected") {
+      #    trtsdt_check_flag$val <- FALSE
+      #   output$sel_trtsdt_check <- renderUI({
+      #    shiny::HTML(
+      #     paste0('<span style = "color:#E43157"> <i class="fa-solid fa-times">
+      #                       </i>
+      #                       Variable TRTSDT is not available. Please select another variable,
+      #                       upload adsl data or add the variable to your data set.
+      #                       </span>'
+      #               ))
+      #   })
+      # } else {
         trtsdt <- adae_data_reac2()[[input$sel_trtsdt]]
       ##back ##
 
@@ -2463,7 +2537,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           })
         }
       }
-    }
+    # }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
   #### LAST VISIT DATE - LVDT ####
@@ -2487,7 +2561,8 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices_int <- sort(c(choices_int, choices2_int))
     }
     choices <- sort(c(choices,choices_int))
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
+    # choices <- c(unique(choices))
 
     # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
     #
@@ -2496,10 +2571,10 @@ server <- shiny::shinyServer(function(input, output, session) {
     #   choices <- sort(c(choices, choices2))
     # }
 
-    # choices <- c(unique(choices), "Nothing selected")
+    # choices <- c(unique(choices))
 
     if (!"LVDT" %in% choices) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else if ("LVDT" %in% choices) {
       selected <- "LVDT"
     }
@@ -2535,6 +2610,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
        is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       if (input$sel_lvdt == "Nothing selected") {
+        lvdt_check_flag$val <- FALSE
         output$sel_lvdt_check <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -2595,10 +2671,10 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
     if (!any(c("AETRTEMN", "AETRTEM", "TRTEMFLN", "TRTEMFL") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AETRTEMN","AETRTEM","TRTEMFLN","TRTEMFL")[which(c("AETRTEMN","AETRTEM","TRTEMFLN","TRTEMFL") %in% choices)[1]]
     }
@@ -2633,6 +2709,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     } else {
 
       if (input$sel_aetrtemn == "Nothing selected") {
+         aetrtemn_check_flag$val <- FALSE
         output$sel_aetrtemn_check <- shiny::renderUI({
           shiny::HTML(
             paste0('<span style = "color:#E43157"> <i class="fa-solid fa-times"></i>
@@ -2692,10 +2769,11 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
     choices <- sort(c(choices,choices_int))
 
-    choices <- c(unique(choices),"NA", "Nothing selected")
+    choices <- c(unique(choices),"NA")
+    #choices <- c(unique(choices),"NA", "Nothing selected")
 
     if(!"DTHDT" %in% choices) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else if ("DTHDT" %in% choices) {
       selected <- "DTHDT"
     }
@@ -2733,6 +2811,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       ## back##
       if (input$sel_dthdt == "Nothing selected") {
+          dthdt_check_flag$val <- FALSE
         output$sel_dthdt_check <- renderUI({
           shiny::HTML(
             paste0(
@@ -2799,12 +2878,13 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices),"Nothing selected")
+    choices <- c(unique(choices))
+    # choices <- c(unique(choices),"Nothing selected")
 
     # choices <- colnames(adae_data_reac2())
 
     if (!any(c("SAFFN","SAFFL") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("SAFFN","SAFFL")[which(c("SAFFN","SAFFL") %in% choices)[1]]
     }
@@ -2836,6 +2916,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       saffn_check_flag$val <- FALSE
     } else {
       if (input$sel_saffn== "Nothing selected") {
+         saffn_check_flag$val <- FALSE
         output$sel_saffn_check <- renderUI({
           shiny::HTML(
             paste0(
@@ -2887,13 +2968,13 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
     # choices <- colnames(adae_data_reac2())
 
     if (!any(c("AESTDY","ASTDY") %in% choices)) {
       #choices <- c("Nothing selected", choices)
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AESTDY","ASTDY")[which(c("AESTDY","ASTDY") %in% choices)[1]]
     }
@@ -2925,6 +3006,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     } else {
 
       if (input$sel_aestdy == "Nothing selected") {
+             aestdy_check_flag$val <- FALSE
         output$sel_aestdy_check <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -2981,11 +3063,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
     if (!any(c("AEENDY","AENDY") %in% choices)) {
       #choices <- c("Nothing selected", choices)
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AEENDY","AENDY")[which(c("AEENDY","AENDY") %in% choices)[1]]
     }
@@ -3016,6 +3098,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aeendy_check_flag$val <- FALSE
     } else {
       if (input$sel_aeendy == "Nothing selected") {
+          aeendy_check_flag$val <- FALSE
         output$sel_aeendy_check <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -3081,10 +3164,10 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.sev(x) | is.convertible.to.grad(x)}),2,all)))
       choices <- sort(c(choices, choices2))
     }
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
     if (!any(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)) {
       #choices <- c("Nothing selected", choices)
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AESEVN", "AESEV", "ASEVN", "AESEV")[which(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)[1]]
     }
@@ -3116,6 +3199,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aesevn_check_flag$val <- FALSE
     } else {
       if (input$sel_aesevn == "Nothing selected") {
+          aesevn_check_flag$val <- FALSE
         output$sel_aesevn_check <- renderUI({
          shiny::HTML(
            paste0(
@@ -3173,10 +3257,10 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
      if (!any(c("AESERN", "AESER") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AESERN", "AESER")[which(c("AESERN", "AESER") %in% choices)[1]]
     }
@@ -3208,6 +3292,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aesern_check_flag$val <- FALSE
     } else {
       if (input$sel_aesern == "Nothing selected") {
+        aesern_check_flag$val <- FALSE
         output$sel_aesern_check <- shiny::renderUI({
           shiny::HTML(
             paste0(
@@ -3261,10 +3346,10 @@ server <- shiny::shinyServer(function(input, output, session) {
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
      if (!any(c("AERELN", "AEREL") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AERELN", "AEREL")[which(c("AERELN", "AEREL") %in% choices)[1]]
     }
@@ -3298,6 +3383,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aereln_check_flag$val <- FALSE
     } else {
       if (input$sel_aereln == "Nothing selected") {
+           aereln_check_flag$val <- FALSE
       output$sel_aereln_check <- shiny::renderUI({
         shiny::HTML(
           paste0(
@@ -3342,10 +3428,10 @@ output$sel_aerelprn <- shiny::renderUI({
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
      if (!any(c("AERELPRN", "AERELPR") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AERELPRN", "AERELPR")[which(c("AERELPRN", "AERELPR") %in% choices)[1]]
     }
@@ -3376,7 +3462,8 @@ output$sel_aerelprn <- shiny::renderUI({
       aerelprn_check_flag$val <- FALSE
     } else {
    if(input$sel_aerelprn == "Nothing selected") {
-      output$sel_aerelprn_check <- renderUI({
+     aerelprn_check_flag$val <- FALSE
+     output$sel_aerelprn_check <- renderUI({
        shiny::HTML(paste0('<span style = "color:#ffffff"> <i class="fa-solid fa-times">
                           </i>
                           Optional variable AERELPRN/AERELPR is not available. Please select another variable to use the functionality </span>'))
@@ -3417,10 +3504,10 @@ output$sel_aeacnn <- shiny::renderUI({
       choices <- sort(c(choices, choices2))
     }
 
-    choices <- c(unique(choices), "Nothing selected")
+    choices <- c(unique(choices))
 
      if (!any(c("AEACNN", "AEACN") %in% choices)) {
-      selected <- "Nothing selected"
+      selected <- NULL
     } else {
       selected <- c("AEACNN", "AEACN")[which(c("AEACNN", "AEACN") %in% choices)[1]]
     }
@@ -3455,6 +3542,7 @@ shiny::observeEvent(c(adae_data_reac2(), input$sel_aeacnn), {
     } else {
 
      if(input$sel_aeacnn == "Nothing selected") {
+        aeacnn_check_flag$val <- FALSE
         output$sel_aeacnn_check <- renderUI({
          shiny::HTML(paste0('<span style = "color:#ffffff"> <i class="fa-solid fa-times"></i>
                             Variable AEACNN is not available. Please select another variable or use the functionality. </span>'))
@@ -3485,6 +3573,22 @@ shiny::observeEvent(c(adae_data_reac2(), input$sel_aeacnn), {
         tags$style(
           HTML(
             '#submit{color: #ffffff; background-color:#e3e3e3;
+            border-color: #858585}'
+          )
+        )
+      ),
+      shiny::tags$head(
+        tags$style(
+          HTML(
+            '#reset_fileinput_adae{color: #ffffff; background-color:#4a4a4a;
+            border-color: #858585}'
+          )
+        )
+      ),
+       shiny::tags$head(
+        tags$style(
+          HTML(
+            '#reset_fileinput_adsl{color: #ffffff; background-color:#4a4a4a;
             border-color: #858585}'
           )
         )
