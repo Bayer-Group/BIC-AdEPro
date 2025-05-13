@@ -1189,7 +1189,7 @@ server <- shiny::shinyServer(function(input, output, session) {
             adae <- NULL
           }
       } else if (input$radiobutton_data == "Demo data") {
-        load("data//adae_data.rdata")
+        load("data//adae_data.rda")
         adae <- adae_data
          output$wrong_adae_format_text <- shiny::renderUI({
               HTML(paste0(""))
@@ -1254,7 +1254,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           adsl <- NULL
       }
     } else if (input$radiobutton_data == "Demo data") {
-      load("data/adsl_data.Rdata")
+      load("data/adsl_data.rda")
       adsl <- adsl_data
       output$wrong_adsl_format_text <- shiny::renderUI({
             HTML(paste0(""))
@@ -1282,10 +1282,11 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
 
     if(!is.null(data)) {
-    if (shiny::req(input$sel_dthdt) == "NA") {
-      data <- data %>%
-        dplyr::mutate(DTHDT = NA)
-    }
+    # if (shiny::req(input$sel_dthdt) == "NA") {
+    #   #case 2
+    #   data <- data %>%
+    #     dplyr::mutate(DTHDT = NA)
+    # }
 
     #Get the number of unknown Adverse Events:
     if (!is.null(input$sel_aedecod)) {
@@ -1492,7 +1493,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aeendy_check_flag$val &&
       aesevn_check_flag$val
     ) {
-    tmp <- prepare_data(
+    tmp <- prepare_data2(
       dat = data,
       SUBJIDN = input$sel_subjidn,
       TRT01A = input$sel_trt01a,

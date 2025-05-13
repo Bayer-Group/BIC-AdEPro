@@ -1,5 +1,4 @@
 #' Subject level data set included in AdEPro
 #'
-#'@name adsl
-#'@keywords internal
-NULL
+#'@name adsl_data
+"adsl_data"

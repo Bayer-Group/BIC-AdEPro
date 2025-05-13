@@ -44,83 +44,56 @@ prepare_data2 <- function(
   AEACNN = "AEACNN",
   adsl_data = NULL
 ) {
-
-  dat_ <<- dat
-  adsl_data_ <<- adsl_data
-  SUBJIDN_ <<- SUBJIDN
-  TRT01A_ <<- TRT01A
-  SAFFN_ <<- SAFFN
-  LVDT_ <<- LVDT
-  DTHDT_ <<- DTHDT
-  TRTSDT_ <<- TRTSDT
-  AEDECOD_ <<- AEDECOD
-  AESTDY_ <<- AESTDY
-  AETRTEMN_ <<- AETRTEMN
-  AEENDY_ <<- AEENDY
-  AESEVN_ <<- AESEVN
-  AESERN_ <<- AESERN
-  AERELN_ <<- AERELN
-  AERELPRN_ <<- AERELPRN
-  AEACNN_ <<- AEACNN
-
-  # dat <- dat_
-  # adsl_data <- adsl_data_
-  # SUBJIDN <- SUBJIDN_
-  # TRT01A <- TRT01A_
-  # SAFFN <- SAFFN_
-  # LVDT <- LVDT_
-  # DTHDT <- DTHDT_
-  # TRTSDT <- TRTSDT_
-  # AEDECOD <- AEDECOD_
-  # AESTDY <- AESTDY_
-  # AETRTEMN <- AETRTEMN_
-  # AEENDY <- AEENDY_
-  # AESEVN <- AESEVN_
-  # AESERN <- AESERN_
-  # AERELN <- AERELN_
-  # AERELPRN <- AERELPRN_
-  # AEACNN <- AEACNN_
-
-
+  #check if parameter dat is data.frame
   if (!is.data.frame(dat)) {
     stop("Parameter 'dat' must be a data frame!")
   }
 
+  #create vector with required variable names
   required_vars <- c(SUBJIDN, TRT01A, SAFFN ,LVDT, DTHDT, TRTSDT, AEDECOD, AESTDY, AETRTEMN, AEENDY, AESEVN)
 
-  #merge adsl_data when available
+  #check if adsl_data are available
   if (!is.null(adsl_data)) {
-    #get joint variables in adae and adsl
 
+    #get joint variables in adae and adsl
     joint_vars <- dplyr::intersect(colnames(dat), colnames(adsl_data))
 
-    subject_id_index <- dplyr::intersect(dat[,SUBJIDN],adsl_data[,SUBJIDN]) %>% na.omit()
+    ## compare if subjects, which are available in adae and adsl have the same
+    ## entries for common variables
+
+    # get vector with subject identifier available in adae and adsl
+    subject_id_index <- dplyr::intersect(dat[,SUBJIDN],adsl_data[,SUBJIDN]) %>%
+      na.omit()
+
     #compare if the variable for merging have the same values e.g. a subject has the same treatment in adae and adsl
-    comp1 <- dat %>%
-      dplyr::filter(SUBJIDN %in% dplyr::pull(subject_id_index)) %>%
-      dplyr::select(!!!rlang::syms(joint_vars)) %>%
-      dplyr::distinct() %>%
-      dplyr::arrange(!!rlang::sym(SUBJIDN))
-    comp2 <- adsl_data %>%
-      dplyr::filter(SUBJIDN %in% dplyr::pull(subject_id_index)) %>%
+    comp1 <- dat[dat[,SUBJIDN] %in% subject_id_index,] %>%
       dplyr::select(!!!rlang::syms(joint_vars)) %>%
       dplyr::distinct() %>%
       dplyr::arrange(!!rlang::sym(SUBJIDN))
 
+    comp2 <- adsl_data[adsl_data[,SUBJIDN] %in% subject_id_index,] %>%
+      dplyr::select(!!!rlang::syms(joint_vars)) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(!!rlang::sym(SUBJIDN))
+
+    #remove attributes from compare objects
     attr(comp1, "ATT") <- NULL
     attr(comp2, "ATT") <- NULL
 
+    #return index of columns which are identical for adae and adsl in common subjects
     index_match <- sapply(joint_vars, function(x){identical(comp1 %>% dplyr::pull(x),comp2 %>% dplyr::pull(x))})
 
+    #get joint variables which match
     joint_vars_match <- joint_vars[which(index_match)]
     joint_vars_no_match <- joint_vars[which(!index_match)]
 
-
+    #if required variables differ from adae and adsl for a subject stop and return error message
     if (any(joint_vars_no_match %in% required_vars)) {
       stop(paste0("Entries for adae and adsl mismatch in required variables used for merging: ",paste(joint_vars_no_match[(joint_vars_no_match %in% required_vars)], collapse=" "), " !"))
     }
-    ####
 
+    # if a non required variables differs between adae and adsl, it is duplicated in the join and given the extention .x, .y
+    # (e.g. ADSNAME with entries "ADSL" and "ADAE")
     pat_dat <- dplyr::full_join(adsl_data,dat, by = join_by(!!!rlang::syms(joint_vars_match)))
 
   } else {
@@ -131,7 +104,8 @@ prepare_data2 <- function(
   if (!all(required_vars %in% colnames(pat_dat))) {
     stop("Required variables are missing in data set 'dat'!")
   }
-  #create variables ps, treat, end, death and filter for safety flags
+
+  #create variables ps, treat, end, death and filter for safety flag
   prepared_data <- filter_and_prepare_patient_data(data = pat_dat, SAFFN = SAFFN, LVDT = LVDT, TRTSDT = TRTSDT, TRT01A = TRT01A, SUBJIDN = SUBJIDN, DTHDT = DTHDT)
 
   #filter for adverse event data set

@@ -85,6 +85,7 @@ test_that("check function prepare_data2:", {
 
 
   res <- prepare_data2(dat = adae_data, adsl_data = NULL)
+    #res <- prepare_data(dat = adae_data, adsl_data = NULL)
   #check function without adsl data
   #general
   testthat::expect_equal(is.list(res), TRUE)
@@ -214,6 +215,7 @@ test_that("check function prepare_data2:", {
 
   #remove subjects 1234502 and 1234503 with expected error from adsl
   res2 <- prepare_data2(dat = adae_data, adsl_data = adsl_data %>% dplyr::filter(SUBJIDN != 1234502 & SUBJIDN != 1234503 & SUBJIDN != 1234505))
+      #res2 <- prepare_data(dat = adae_data, adsl_data = adsl_data %>% dplyr::filter(SUBJIDN != 1234502 & SUBJIDN != 1234503 & SUBJIDN != 1234505))
 
   #check function without adsl data
   #general
@@ -249,5 +251,35 @@ test_that("check function prepare_data2:", {
   #missing subject information in adae but available in adsl
   testthat::expect_equal(res2$pat_data[res2$pat_data$ps == 1234513 &!is.na(res2$pat_data$ps),"death"], 99999)
 
+})
+
+
+
+test_that("check function prepare_data2 with demo data:", {
+
+  res <- prepare_data2(dat = adae_data, adsl_data = NULL)
+
+  testthat::expect_equal(is.list(res), TRUE)
+  testthat::expect_equal(length(res), 2)
+  testthat::expect_equal(names(res), c("ae_data","pat_data"))
+
+  #check ae_data:
+  testthat::expect_equal(all(c("patient","day_start","day_end","ae","sev","trtem","ser","nonser") %in% colnames(res$ae_data)), TRUE)
+  #check pat_data:
+  testthat::expect_equal(all(c("ps","treat","end","death") %in% colnames(res$pat_data)), TRUE)
+
+  #with adsl_data
+  res2 <- prepare_data2(dat = adae_data, adsl_data = adsl_data)
+
+   #check function without adsl data
+  #general
+  testthat::expect_equal(is.list(res2), TRUE)
+  testthat::expect_equal(length(res2), 2)
+  testthat::expect_equal(names(res2), c("ae_data","pat_data"))
+
+  #check ae_data:
+  testthat::expect_equal(all(c("patient","day_start","day_end","ae","sev","trtem","ser","nonser") %in% colnames(res2$ae_data)), TRUE)
+  #check pat_data:
+  testthat::expect_equal(all(c("ps","treat","end","death") %in% colnames(res2$pat_data)), TRUE)
 })
 
