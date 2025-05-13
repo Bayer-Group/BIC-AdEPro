@@ -768,6 +768,7 @@ ui <- shiny::shinyUI(
               shiny::column(12,
                 shiny::tags$style(".btn-custom {background-color: #ffffff; color: #000000;}"),
               )
+              )
             ),
             shiny::conditionalPanel(condition = "output.load == 1",
               shiny::column(8,
