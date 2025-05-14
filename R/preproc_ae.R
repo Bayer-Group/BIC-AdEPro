@@ -7,10 +7,15 @@
 #'
 #' @keywords internal
 
-preproc_ae <- function(ae_data) {
+preproc_ae <- function(ae_data,grading=F) {
   ae_data <- ae_data[,1:5]
-  denom <- 4
-  ae_data$r <- (ae_data$sev + 1) / denom
+  if(grading==F){
+    denom <- 4
+    ae_data$r <- (ae_data$sev + 1) / denom
+  } else {
+    denom <- 20
+    ae_data$r <- (3*ae_data$sev + 5 ) / denom
+  }
   ae_data$d <- rep(NA, nrow(ae_data))
   return(ae_data)
 }

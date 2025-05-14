@@ -112,7 +112,7 @@ ui <- shiny::shinyUI(
                     shiny::conditionalPanel(condition = "input.view == 'pie'",
                       shiny::tags$br(),
                       shiny::helpText(
-                        "Note: By clicking update the sorting will be switch to 'SEQUENCING'."
+                        "Note: By clicking update the sorting will switch to 'SEQUENCING'."
                       ),
                       shiny::actionButton(
                         inputId = "AI.Update",
@@ -687,34 +687,71 @@ ui <- shiny::shinyUI(
           shiny::br(),
           shiny::fluidRow(
             shiny::column(3,
-                shiny::column(12,
-                  shiny::fileInput(
-                    inputId = 'tot_dat',
-                    label = shiny::HTML('<p style = "color: #ffffff"> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
-                  ),
-                  shiny::uiOutput("wrong_adae_format_text"),
-                  shiny::br()
+              shiny::column(12,
+                    shiny::radioButtons(
+                    inputId ="radiobutton_data",
+                    label = HTML('<b style = "color: #ffffff"> Data type </b>'),
+                    choices = c("File upload"),
+                    selected = "File upload",
+                    inline = TRUE
+              ),
+              shiny::br(),
+              shiny::br(),
+
+                shiny::column(8,
+                  shiny::conditionalPanel("output.radio_data == 'File upload'",
+                    shiny::fileInput(
+                      inputId = 'tot_dat',
+                      label = shiny::HTML('<p style = "color: #ffffff"> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
+
+                    )
+                  )
                 ),
-                shiny::column(12,
+                shiny::column(1,
+                    shiny::conditionalPanel("output.radio_data == 'File upload'",
+                      shiny::actionButton(inputId = "reset_fileinput_adae", label = "", icon =icon("times"))
+                    )
+                 ),
+                  shiny::column(12,
+                  shiny::conditionalPanel("output.radio_data == 'File upload'",
+                  shiny::uiOutput("wrong_adae_format_text"),
+                    shiny::br(),
+                  )
+                ),
+                shiny::column(8,
+                  conditionalPanel("output.radio_data == 'File upload'",
                   shiny::fileInput(
                     inputId = 'tot_dat2',
                     label = shiny::HTML('<p style = "color: #ffffff"> Upload subject level data <span style = "color:#16de5f">(optional)</span> </p>')
-                  ),
-                  shiny::uiOutput("wrong_adsl_format_text"),
+                  )
+                  )
+                ),
+                shiny::column(1,
+                    shiny::conditionalPanel("output.radio_data == 'File upload'",
+                      shiny::actionButton(inputId = "reset_fileinput_adsl", label = "", icon =icon("times"))
+                    )
+                 ),
+                shiny::column(12,
+                  shiny::conditionalPanel("output.radio_data == 'File upload'",
+                  shiny::uiOutput("wrong_adsl_format_text")
+                  )
 
               ),
-              shiny::column(12,
-                conditionalPanel("output.demo_data_exists == true",
-                  shinyWidgets::prettyCheckbox(
-                    inputId ="use_demo_data",
-                    label = HTML('<b style = "color: #ffffff"> Use demo data </b>'),
-                    value = FALSE,
-                    status = "success",
-                    inline = TRUE,
-                    icon = icon("check-square")
-                  )
-                )
-              ),
+              # shiny::column(12,
+
+              #   conditionalPanel("output.demo_data_exists == true",
+              #     shiny::conditionalPanel("output.radio_data == 'Demo data'",
+              #     shinyWidgets::prettyCheckbox(
+              #       inputId ="use_demo_data",
+              #       label = HTML('<b style = "color: #ffffff"> Use demo data </b>'),
+              #       value = FALSE,
+              #       status = "success",
+              #       inline = TRUE,
+              #       icon = icon("check-square")
+              #     )
+              #     )
+              #   )
+              #),
               shiny::br(),
               shiny::column(12,
                 shiny::br(),
@@ -730,6 +767,7 @@ ui <- shiny::shinyUI(
               ),
               shiny::column(12,
                 shiny::tags$style(".btn-custom {background-color: #ffffff; color: #000000;}"),
+              )
               )
             ),
             shiny::conditionalPanel(condition = "output.load == 1",
@@ -791,6 +829,14 @@ ui <- shiny::shinyUI(
                         shiny::uiOutput("sel_aesevn"),
                         shiny::uiOutput("sel_aesevn_check"),
                         shiny::uiOutput("sel_aesevn_check2")
+                      ),
+                      shiny::column(2,
+                        shiny::radioButtons(
+                          inputId = "severity_grading_flag",
+                          label = "Select Severity or Grading:",
+                          choices = c("Severity","Grading"),
+                          selected = "Severity"
+                        )
                       )
                     )
                   ),
@@ -860,14 +906,20 @@ ui <- shiny::shinyUI(
                 ),
                 shiny::uiOutput("circle_legend2")
               )
-            ),
-            shiny::fluidRow(
-
             )
           ),
           shiny::conditionalPanel(condition = "input.view == 'chart'",
             shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
-              shiny::plotOutput("barchart"),
+               shiny::fluidRow(
+                 splitLayout(
+                   cellArgs = list(style='white-space: normal; resize: horizontal;'),
+                   cellWidths = c("9%", "91%"),
+                   shiny::uiOutput("barchart_legend"),
+                   shiny::plotOutput(
+                     outputId = "barchart",
+                     height = "100%")
+                 )
+              )
             ),
             shiny::conditionalPanel(condition = "input.var.length == 0",
               shiny::HTML('<p style="text-align:center; color:white;"> To use the bar plot view, please select at least one adverse event in the "Adverse event for animation"-Panel! </p>')

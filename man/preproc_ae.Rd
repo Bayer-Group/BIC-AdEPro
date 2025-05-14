@@ -4,7 +4,7 @@
 \alias{preproc_ae}
 \title{preproc_ae - Preprocessing adverse event data}
 \usage{
-preproc_ae(ae_data)
+preproc_ae(ae_data, grading = F)
 }
 \arguments{
 \item{ae_data}{adverse event dataset}
