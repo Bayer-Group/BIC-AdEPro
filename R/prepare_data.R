@@ -59,50 +59,50 @@ prepare_data <- function(
   optional_vars <- colnames(pat_data)
 
   #if adsl data are uploaded
-  if (!is.null(adsl_data)) {
-    if (SUBJIDN %in% names(adsl_data)) {
-      pat_data2 <- filter_and_prepare_patient_data(adsl_data, SAFFN = SAFFN, LVDT = LVDT, TRTSDT = TRTSDT, TRT01A = TRT01A, SUBJIDN = SUBJIDN, DTHDT = DTHDT)
-
-      #deselect variables which are only included in one of the data sets
-      pat_data <- pat_data %>%
-        dplyr::select(all_of(intersect(colnames(pat_data), colnames(pat_data2))))
-      pat_data2 <- pat_data2 %>%
-        dplyr::select(all_of(intersect(colnames(pat_data), colnames(pat_data2))))
-
-      diff_subjid <- setdiff(
-        pat_data2 %>%
-          select(all_of(!!rlang::sym(SUBJIDN))) %>%
-          dplyr::pull() %>% as.vector(),
-        pat_data %>%
-          dplyr::select(all_of(!!rlang::sym(SUBJIDN))) %>%
-          dplyr::pull() %>% as.vector()
-      )
-
-      jointly_vars <- names(which(unlist(lapply(lapply(pat_data2,class), function(l){l[[1]]})) == unlist(lapply(lapply(pat_data, class),function(l){l[[1]]}))))
-
-      #merge adae and adsl data and inlude subjects from adsl which have no adverse events
-      pat_data <- rbind(
-        pat_data %>%
-              dplyr::select(all_of(jointly_vars)),
-        pat_data2 %>%
-          dplyr::select(all_of(jointly_vars)) %>%
-          dplyr::filter(SUBJIDN %in% diff_subjid)
-      )
-    } else {
-      #if variable name for subject identifier is not included in adsl return NULL
-      return(
-        list(
-          "ae_data" = as.data.frame(NULL, stringsAsFactors = FALSE),
-          "pat_data" = as.data.frame(NULL, stringsAsFactors = FALSE)
-        )
-      )
-    }
-  }
-
-  if (!is.null(adsl_data)) {
-    optional_vars <- colnames(pat_data)
-    #optional_vars <- colnames(adsl_data)
-  }
+  # if (!is.null(adsl_data)) {
+  #   if (SUBJIDN %in% names(adsl_data)) {
+  #     pat_data2 <- filter_and_prepare_patient_data(adsl_data, SAFFN = SAFFN, LVDT = LVDT, TRTSDT = TRTSDT, TRT01A = TRT01A, SUBJIDN = SUBJIDN, DTHDT = DTHDT)
+  #
+  #     #deselect variables which are only included in one of the data sets
+  #     pat_data <- pat_data %>%
+  #       dplyr::select(all_of(intersect(colnames(pat_data), colnames(pat_data2))))
+  #     pat_data2 <- pat_data2 %>%
+  #       dplyr::select(all_of(intersect(colnames(pat_data), colnames(pat_data2))))
+  #
+  #     diff_subjid <- setdiff(
+  #       pat_data2 %>%
+  #         select(all_of(!!rlang::sym(SUBJIDN))) %>%
+  #         dplyr::pull() %>% as.vector(),
+  #       pat_data %>%
+  #         dplyr::select(all_of(!!rlang::sym(SUBJIDN))) %>%
+  #         dplyr::pull() %>% as.vector()
+  #     )
+  #
+  #     jointly_vars <- names(which(unlist(lapply(lapply(pat_data2,class), function(l){l[[1]]})) == unlist(lapply(lapply(pat_data, class),function(l){l[[1]]}))))
+  #
+  #     #merge adae and adsl data and inlude subjects from adsl which have no adverse events
+  #     pat_data <- rbind(
+  #       pat_data %>%
+  #             dplyr::select(all_of(jointly_vars)),
+  #       pat_data2 %>%
+  #         dplyr::select(all_of(jointly_vars)) %>%
+  #         dplyr::filter(SUBJIDN %in% diff_subjid)
+  #     )
+  #   } else {
+  #     #if variable name for subject identifier is not included in adsl return NULL
+  #     return(
+  #       list(
+  #         "ae_data" = as.data.frame(NULL, stringsAsFactors = FALSE),
+  #         "pat_data" = as.data.frame(NULL, stringsAsFactors = FALSE)
+  #       )
+  #     )
+  #   }
+  # }
+  #
+  # if (!is.null(adsl_data)) {
+  #   optional_vars <- colnames(pat_data)
+  #   #optional_vars <- colnames(adsl_data)
+  # }
 
   for (i in unique(pat_data$ps)) {
     index <- apply(pat_data[pat_data$ps == i, optional_vars], 2, function(x){length(unique(x))})
@@ -128,12 +128,12 @@ prepare_data <- function(
     }
   }
 
-  if (SUBJIDN %in% names(adsl_data) | is.null(adsl_data)) {
-    pat_data <- pat_data %>%
-      dplyr::select(all_of(var_list)) %>%
-      dplyr::arrange(treat, ps) %>%
-      unique()
-  }
+  # if (SUBJIDN %in% names(adsl_data) | is.null(adsl_data)) {
+  #   pat_data <- pat_data %>%
+  #     dplyr::select(all_of(var_list)) %>%
+  #     dplyr::arrange(treat, ps) %>%
+  #     unique()
+  # }
 
   ae_data <- dat %>%
     dplyr::filter(

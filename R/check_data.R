@@ -9,6 +9,7 @@
 #' @keywords internal
 
 check_data <- function(ae_data, patients) {
+
   # Basic parameter checks:
   if (!is.data.frame(ae_data)) stop("ae_data has to be a data frame")
   if (!is.data.frame(patients)) stop("patients has to be a data frame")

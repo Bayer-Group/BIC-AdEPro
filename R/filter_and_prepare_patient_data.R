@@ -1,9 +1,6 @@
-
-#' filter_and_prepare_patient_data - filter for safety flag and create required variables
-#' @description
-#' Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application
+#' Filter for Safety Flag and Create Required Variables
 #'
-#' @param data adae (optional merged adsl) data set
+#' @param data frame with adverse event data set
 #' @param SUBJIDN Subject Id as numeric (required)
 #' @param TRT01A Treatment Group as character (required)
 #' @param SAFFN Safety Flag as numeric (required)
@@ -11,10 +8,23 @@
 #' @param DTHDT Death Date as numeric (required)
 #' @param TRTSDT Treatment Start Date as numeric (required)
 #'
-#' @keywords internal
+#' @return data frame with filtered adverse event data
 #'
 
-filter_and_prepare_patient_data <- function(data,SAFFN = SAFFN, LVDT = LVDT, TRTSDT = TRTSDT, TRT01A = TRT01A, SUBJIDN = SUBJIDN, DTHDT = DTHDT) {
+filter_and_prepare_patient_data <- function(data, SAFFN = SAFFN, LVDT = LVDT, TRTSDT = TRTSDT, TRT01A = TRT01A, SUBJIDN = SUBJIDN, DTHDT = DTHDT) {
+
+    #check if parameter dat is data.frame
+    if (!is.data.frame(data)) {
+      stop("Parameter 'data' must be a data frame!")
+    }
+
+    #check if required parameter are in data
+    if (!SAFFN %in% colnames(data)) {stop("Parameter 'SAFFN' must be in data frame!")}
+    if (!LVDT %in% colnames(data)) {stop("Parameter 'LVDT' must be in data frame!")}
+    if (!TRTSDT %in% colnames(data)) {stop("Parameter 'TRTSDT' must be in data frame!")}
+    if (!TRT01A %in% colnames(data)) {stop("Parameter 'TRT01A' must be in data frame!")}
+    if (!SUBJIDN %in% colnames(data)) {stop("Parameter 'SUBJIDN' must be in data frame!")}
+    if (!DTHDT %in% colnames(data)) {stop("Parameter 'DTHDT' must be in data frame!")}
 
     #helper function
     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))

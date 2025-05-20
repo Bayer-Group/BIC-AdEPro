@@ -1,4 +1,4 @@
-test_that("check function prepare_data2:", {
+test_that("check function prepare_data_for_adepro:", {
 
  #create adae test data for test_that package
  adae_data <- data.frame(
@@ -22,8 +22,8 @@ test_that("check function prepare_data2:", {
        #subject 1234504 with safety flag 0
        t(c(1234504,   "Headache", 1,        2,       2,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     0,      NA,      NA)),
 
-       #subject 1234505 with safety flag 0 for one ae
-       t(c(1234505,   "Headache", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     0,      NA,      NA)),
+       #subject 1234505 with safety adverse event ended before day 1
+       t(c(1234505,   "Headache", -7,        -2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
        t(c(1234505,   "Pain",     1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
 
        ## warnings/error
@@ -64,7 +64,23 @@ test_that("check function prepare_data2:", {
        t(c(1234515,   "Headache",1,        3,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01",     1,      NA,      NA)),
 
        #subject 1234516 with wrong coding for ae related flag
-       t(c(1234516,   "Headache",1,        3,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01",     1,     3,      NA))
+       t(c(1234516,   "Headache",1,        3,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01",     1,     3,      NA)),
+
+       #subject 1234517 with ae start day and end day missing
+       t(c(1234517,   "Headache",NA,        NA,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01",     1,     3,      NA)),
+
+       #subject 1234518 with ae start day and end day missing and ae code missing
+       t(c(1234518,   NA ,NA,        NA,       2,       1,           0,       1,        "Trtmt",  "2010-01-01", "2010-12-31", "2009-01-01",     1,     3,      NA)),
+
+       #subject 1234519 with no expected error/warning and 1 entries
+       t(c(1234519,   NA, 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
+
+       #subject 1234502 with no expected error/warning and 1 entries
+       t(c(1234520,   "", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
+
+       #subject 1234521 with no expected error/warning and 1 entries
+       t(c(1234521,   "Headache", 10,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA))
+
 
      )
   )
@@ -84,8 +100,12 @@ test_that("check function prepare_data2:", {
   adae_data$LVDT <- as.Date(adae_data$LVDT)
 
 
-  res <- prepare_data2(dat = adae_data, adsl_data = NULL)
-    #res <- prepare_data(dat = adae_data, adsl_data = NULL)
+  filtered <- filter_for_safety_flag(dat = adae_data, SAFFN = "SAFFN")
+  #subject 1234505 should be removed since saffn = 0
+
+  imputed <- calculate_and_impute_required_variables_missing_values(data = filtered, severity_grading_flag = "Severity")
+
+  res <- prepare_data_for_adepro(dat = imputed$data)
   #check function without adsl data
   #general
   testthat::expect_equal(is.list(res), TRUE)
@@ -94,21 +114,29 @@ test_that("check function prepare_data2:", {
 
   #check ae_data:
   testthat::expect_equal(all(c("patient","day_start","day_end","ae","sev","trtem","ser","nonser") %in% colnames(res$ae_data)), TRUE)
+
   #check if 3 adverse events are available for subject 1234500
-  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234500 &!is.na(res$ae_data$patient),]), c(3,13))
+  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234500 &!is.na(res$ae_data$patient),]), c(3,15))
   #check if 2 adverse events are available for subject 1234501
-  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234501 &!is.na(res$ae_data$patient),]), c(2,13))
+  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234501 &!is.na(res$ae_data$patient),]), c(2,15))
   #check if 1 adverse events are available for subject 1234505 (one has safetyflag 0)
-  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234505 &!is.na(res$ae_data$patient),]), c(1,13))
+  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234505 &!is.na(res$ae_data$patient),]), c(1,15))
   #check if 1 adverse event is available for subject 1234510 (duplicated rows)
-  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234510 &!is.na(res$ae_data$patient),]), c(1,13))
+  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234510 &!is.na(res$ae_data$patient),]), c(1,15))
   #check if no adverse events are available for subject 1234513 (subjectid is missing)
-  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234513 &!is.na(res$ae_data$patient),]), c(0,13))
+  testthat::expect_equal(dim(res$ae_data[res$ae_data$patient == 1234513 &!is.na(res$ae_data$patient),]), c(0,15))
+
+  #check if missing ae is not imputed since ae start day and end day are also missing
+  expect_equal(nrow(res$ae_data[res$ae_data$patient == 1234518 &!is.na(res$ae_data$patient),]),0)
+  #check if missing ae is imputed
+  expect_equal(as.character(res$ae_data[res$ae_data$patient == 1234519 &!is.na(res$ae_data$patient),]$ae),"Unknown type of AE")
+  #check if missing ae is imputed
+  expect_equal(as.character(res$ae_data[res$ae_data$patient == 1234520 &!is.na(res$ae_data$patient),]$ae),"Unknown type of AE")
+  #check if missing ae is not imputed since ae start day and end day are also missing
+  expect_equal(nrow(res$ae_data[res$ae_data$patient == 1234521 &!is.na(res$ae_data$patient),]),0)
 
   testthat::expect_equal(res$ae_data[res$ae_data$patient == 1234503 &!is.na(res$ae_data$patient),"day_start"], 1)
   testthat::expect_equal(res$ae_data[res$ae_data$patient == 1234503 &!is.na(res$ae_data$patient),"day_end"], 2)
-  testthat::expect_equal(res$ae_data[res$ae_data$patient == 1234511 &!is.na(res$ae_data$patient),"day_start"], 3)
-  testthat::expect_equal(res$ae_data[res$ae_data$patient == 1234511 &!is.na(res$ae_data$patient),"day_end"], 2)
 
 
   #check pat_data:
@@ -121,27 +149,27 @@ test_that("check function prepare_data2:", {
 
   #Check Errors & Warnings
   #test for data.frame
-  testthat::expect_error(prepare_data2(dat = NULL))
-  testthat::expect_error(prepare_data2(dat = 1))
+  testthat::expect_error(prepare_data_for_adepro(dat = NULL))
+  testthat::expect_error(prepare_data_for_adepro(dat = 1))
 
   # without required variables in data set dat:
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("SUBJIDN", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("AEDECOD", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("AESTDY", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("AESEVN", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("AETRTEMN", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("AEENDY", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("TRT01A", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("TRTSDT", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("LVDT", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("DTHDT", colnames(adae_data))]))
-  testthat::expect_error(prepare_data2(dat = adae_data[,-grep("SAFFN", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("SUBJIDN", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("AEDECOD", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("AESTDY", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("AESEVN", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("AETRTEMN", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("AEENDY", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("TRT01A", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("TRTSDT", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("LVDT", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("DTHDT", colnames(adae_data))]))
+  testthat::expect_error(prepare_data_for_adepro(dat = adae_data[,-grep("SAFFN", colnames(adae_data))]))
 
   #expect no error for optional vars
-  testthat::expect_no_error(prepare_data2(dat = adae_data[,-grep("AERELN", colnames(adae_data))]))
-  testthat::expect_no_error(prepare_data2(dat = adae_data[,-grep("AESERN", colnames(adae_data))]))
-  testthat::expect_no_error(prepare_data2(dat = adae_data[,-grep("AERELPRN", colnames(adae_data))]))
-  testthat::expect_no_error(prepare_data2(dat = adae_data[,-grep("AEACNN", colnames(adae_data))]))
+  testthat::expect_no_error(prepare_data_for_adepro(dat = adae_data[,-grep("AERELN", colnames(adae_data))]))
+  testthat::expect_no_error(prepare_data_for_adepro(dat = adae_data[,-grep("AESERN", colnames(adae_data))]))
+  testthat::expect_no_error(prepare_data_for_adepro(dat = adae_data[,-grep("AERELPRN", colnames(adae_data))]))
+  testthat::expect_no_error(prepare_data_for_adepro(dat = adae_data[,-grep("AEACNN", colnames(adae_data))]))
 
 
   #
@@ -210,11 +238,14 @@ test_that("check function prepare_data2:", {
   adsl_data$DTHDT <- as.character(adsl_data$DTHDT)
   adsl_data$SAFFN <- as.numeric(adsl_data$SAFFN)
 
-  #expect error due to different treatment variables and different trt start dates for some subjects
-  testthat::expect_error(prepare_data2(dat = adae_data, adsl_data = adsl_data))
+  adae_and_adsl <- join_adae_and_adsl(dat_adae = adae_data, dat_adsl = adsl_data %>% dplyr::filter(SUBJIDN != 1234502 & SUBJIDN != 1234503 & SUBJIDN != 1234505), SUBJIDN = "SUBJIDN")
 
+  filtered <- filter_for_safety_flag(dat = adae_and_adsl, SAFFN = "SAFFN")
+  #subject 1234505 should be removed since saffn = 0
+
+  imputed <- calculate_and_impute_required_variables_missing_values(data = filtered, severity_grading_flag = "Severity")
   #remove subjects 1234502 and 1234503 with expected error from adsl
-  res2 <- prepare_data2(dat = adae_data, adsl_data = adsl_data %>% dplyr::filter(SUBJIDN != 1234502 & SUBJIDN != 1234503 & SUBJIDN != 1234505))
+  res2 <- prepare_data_for_adepro(dat = imputed$data)
       #res2 <- prepare_data(dat = adae_data, adsl_data = adsl_data %>% dplyr::filter(SUBJIDN != 1234502 & SUBJIDN != 1234503 & SUBJIDN != 1234505))
 
   #check function without adsl data
@@ -226,20 +257,18 @@ test_that("check function prepare_data2:", {
   #check ae_data:
   testthat::expect_equal(all(c("patient","day_start","day_end","ae","sev","trtem","ser","nonser") %in% colnames(res2$ae_data)), TRUE)
   #check if 3 adverse events are available for subject 1234500
-  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234500 &!is.na(res2$ae_data$patient),]), c(3,13))
+  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234500 &!is.na(res2$ae_data$patient),]), c(3,15))
   #check if 2 adverse events are available for subject 1234501
-  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234501 &!is.na(res2$ae_data$patient),]), c(2,13))
+  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234501 &!is.na(res2$ae_data$patient),]), c(2,15))
   #check if 1 adverse events are available for subject 1234505 (one has safetyflag 0)
-  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234505 &!is.na(res2$ae_data$patient),]), c(1,13))
+  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234505 &!is.na(res2$ae_data$patient),]), c(1,15))
   #check if 1 adverse event is available for subject 1234510 (duplicated rows)
-  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234510 &!is.na(res2$ae_data$patient),]), c(1,13))
+  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234510 &!is.na(res2$ae_data$patient),]), c(1,15))
   #check if no adverse events are available for subject 1234513 (subjectid is missing)
-  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234513 &!is.na(res2$ae_data$patient),]), c(0,13))
+  testthat::expect_equal(dim(res2$ae_data[res2$ae_data$patient == 1234513 &!is.na(res2$ae_data$patient),]), c(0,15))
 
   testthat::expect_equal(res2$ae_data[res2$ae_data$patient == 1234503 &!is.na(res2$ae_data$patient),"day_start"], 1)
   testthat::expect_equal(res2$ae_data[res2$ae_data$patient == 1234503 &!is.na(res2$ae_data$patient),"day_end"], 2)
-  testthat::expect_equal(res2$ae_data[res2$ae_data$patient == 1234511 &!is.na(res2$ae_data$patient),"day_start"], 3)
-  testthat::expect_equal(res2$ae_data[res2$ae_data$patient == 1234511 &!is.na(res2$ae_data$patient),"day_end"], 2)
 
 
   #check pat_data:
@@ -255,9 +284,15 @@ test_that("check function prepare_data2:", {
 
 
 
-test_that("check function prepare_data2 with demo data:", {
+test_that("check function prepare_data_for_adepro with demo data:", {
 
-  res <- prepare_data2(dat = adae_data, adsl_data = NULL)
+
+  filtered <- filter_for_safety_flag(dat = adae_data, SAFFN = "SAFFN")
+  #subject 1234505 should be removed since saffn = 0
+
+  imputed <- calculate_and_impute_required_variables_missing_values(data = filtered, severity_grading_flag = "Severity")
+
+  res <- prepare_data_for_adepro(dat = imputed$data)
 
   testthat::expect_equal(is.list(res), TRUE)
   testthat::expect_equal(length(res), 2)
@@ -265,13 +300,18 @@ test_that("check function prepare_data2 with demo data:", {
 
   #check ae_data:
   testthat::expect_equal(all(c("patient","day_start","day_end","ae","sev","trtem","ser","nonser") %in% colnames(res$ae_data)), TRUE)
+  testthat::expect_equal(length(unique(res$ae_data$patient)),255)
   #check pat_data:
   testthat::expect_equal(all(c("ps","treat","end","death") %in% colnames(res$pat_data)), TRUE)
+  testthat::expect_equal(length(unique(res$pat_data$ps)), length(res$pat_data$ps))
+  testthat::expect_equal(length(unique(res$pat_data$ps)),255)
+  testthat::expect_equal(length(unique(res$pat_data$patient)),0)
 
   #with adsl_data
-  res2 <- prepare_data2(dat = adae_data, adsl_data = adsl_data)
+  adae_and_adsl <- join_adae_and_adsl(dat_adae = adae_data, dat_adsl = adsl_data, "SUBJIDN")
+  res2 <- prepare_data_for_adepro(dat = adae_and_adsl)
 
-   #check function without adsl data
+  #check function without adsl data
   #general
   testthat::expect_equal(is.list(res2), TRUE)
   testthat::expect_equal(length(res2), 2)
@@ -279,7 +319,10 @@ test_that("check function prepare_data2 with demo data:", {
 
   #check ae_data:
   testthat::expect_equal(all(c("patient","day_start","day_end","ae","sev","trtem","ser","nonser") %in% colnames(res2$ae_data)), TRUE)
+  testthat::expect_equal(length(unique(res2$ae_data$patient)),255)
   #check pat_data:
   testthat::expect_equal(all(c("ps","treat","end","death") %in% colnames(res2$pat_data)), TRUE)
+  testthat::expect_equal(length(unique(res2$pat_data$ps)), length(res2$pat_data$ps))
+  testthat::expect_equal(length(unique(res2$pat_data$ps)), 300)
 })
 
