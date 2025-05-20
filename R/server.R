@@ -1265,15 +1265,12 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   #### load data and prepare for graphics ####
   prepared_merged_data_reac <- shiny::reactive({
-    print("prepared__start:")
     #react for file input radiobuttons or demo data
     input$radiobutton_data
 
     #adae or adae+adsl
     data <- merged_adae_adsl_data()
 
-    print("data:")
-    print(data)
     #initiate loading flag when data are available
     if (!is.null(data)) {
       loaded$dat <- 1
@@ -1303,8 +1300,6 @@ server <- shiny::shinyServer(function(input, output, session) {
         AESEVN = input$sel_aesevn,
         severity_grading_flag = input$severity_grading_flag
       )
-      print("missing_replaced_data:")
-      print(missing_replaced_data)
       # Create app text for upload page about number missing (and replaced) data
       if (missing_replaced_data$number_days_removed > 0) {
         output$sel_aestdy_check3 <- shiny::renderUI({
@@ -1446,12 +1441,6 @@ server <- shiny::shinyServer(function(input, output, session) {
         AERELPRN = input$sel_aerelprn,
         AEACNN = input$sel_aeacnn
       )
-
-      print("prepared_data_result_object")
-      print(prepared_data_result_object)
-      # Fri May 16 13:44:23 2025 ------------------------------
-      #to be done
-
 
       if (dim(prepared_data_result_object$ae_data)[1] == 0) {
         return(NULL)
