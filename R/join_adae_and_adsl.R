@@ -53,8 +53,11 @@ join_adae_and_adsl <- function(dat_adae, dat_adsl, SUBJIDN) {
   attr(comp1, "ATT") <- NULL
   attr(comp2, "ATT") <- NULL
 
+  attributes(comp1)$label <- NULL
+  attributes(comp2)$label <- NULL
+
   #return index of columns which are identical for adae and adsl in common subjects
-  index_match <- sapply(joint_vars, function(x){identical(comp1 %>% dplyr::pull(x),comp2 %>% dplyr::pull(x))})
+  index_match <- sapply(joint_vars, function(x){identical(comp1 %>% dplyr::select(!!rlang::sym(x), !!rlang::sym(SUBJIDN)) %>% dplyr::distinct(),comp2 %>% dplyr::select(!!rlang::sym(x), !!rlang::sym(SUBJIDN)) %>% dplyr::distinct())})
 
   #get joint variables which match
   joint_vars_match <- joint_vars[which(index_match)]
@@ -62,7 +65,7 @@ join_adae_and_adsl <- function(dat_adae, dat_adsl, SUBJIDN) {
 
   # if a non required variables differs between adae and adsl, it is duplicated in the join and given the extention .x, .y
   # (e.g. ADSNAME with entries "ADSL" and "ADAE")
-  if(length(join_adae_and_adsl) > 0) {
+  if(length(joint_vars_match) > 0) {
     pat_dat <- dplyr::full_join(dat_adsl,dat_adae, by = join_by(!!!rlang::syms(joint_vars_match)))
   } else {
     stop("Error: no variables with matching entries")

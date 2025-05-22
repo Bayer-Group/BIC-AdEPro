@@ -28,6 +28,7 @@ calculate_and_impute_required_variables_missing_values <- function(
   severity_grading_flag
 ) {
 
+
   #check if parameter dat is data.frame
   if (!is.data.frame(data)) {
     stop("Parameter 'data' must be a data frame!")
@@ -35,7 +36,6 @@ calculate_and_impute_required_variables_missing_values <- function(
 
   #check if required parameter are in data
   if (!LVDT %in% colnames(data)) {stop("Parameter 'LVDT' must be in data frame!")}
-  if (!DTHDT %in% colnames(data)) {stop("Parameter 'DTHDT' must be in data frame!")}
   if (!TRTSDT %in% colnames(data)) {stop("Parameter 'TRTSDT' must be in data frame!")}
   if (!AEDECOD %in% colnames(data)) {stop("Parameter 'AEDECOD' must be in data frame!")}
   if (!AESTDY %in% colnames(data)) {stop("Parameter 'AESTDY' must be in data frame!")}
@@ -228,8 +228,8 @@ calculate_and_impute_required_variables_missing_values <- function(
        ## as.Date
       last_study_day <- data %>%
         dplyr::mutate(
-          end1 = as.numeric(as.numeric(as.Date(!!rlang::sym(LVDT)) - as.Date(!!rlang::sym(TRTSDT)))+ 1),
-          end2 = as.numeric(as.Date(!!rlang::sym(DTHDT)) - as.Date(!!rlang::sym(TRTSDT)) + 1),
+          end1 = as.numeric(as.numeric(as.Date(anytime::anydate(!!rlang::sym(LVDT))) - as.Date(anytime::anydate(!!rlang::sym(TRTSDT))))+ 1),
+          end2 = as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))) - as.Date(anytime::anydate(!!rlang::sym(TRTSDT))) + 1),
           end3 = !!rlang::sym(AEENDY)) %>%
         dplyr::mutate(end = max(end1,end2,end3,na.rm=TRUE)) %>%
         dplyr::pull(end) %>%
@@ -262,14 +262,14 @@ calculate_and_impute_required_variables_missing_values <- function(
 
   if (number_missing_lvdt  > 0) {
 
-    last_date <- tail(sort(data$LVDT,na.rm = TRUE), n = 1)
 
-    # data <- data %>%
-    #   dplyr::mutate(!!rlang::sym(LVDT):= dplyr::if_else(is.na(!!rlang::sym(LVDT)),as.Date(last_date),as.Date(!!rlang::sym(LVDT))))
+    last_date <- data %>% dplyr::mutate(LVDT_ = case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>% dplyr::pull(LVDT_) %>% sort() %>% tail() %>% unique()
+    #last_date <- tail(sort(anytime::anydate(data[LVDT]),na.rm = TRUE), n = 1)
 
       data <- data %>%
-        dplyr::mutate(!!rlang::sym(paste0(LVDT,"_raw")):= !!rlang::sym(LVDT)) %>%
-        dplyr::mutate(!!rlang::sym(LVDT):= dplyr::if_else(is.na(!!rlang::sym(LVDT)),as.Date(last_date),as.Date(!!rlang::sym(LVDT)))) %>%
+        dplyr::mutate(!!rlang::sym(paste0(LVDT,"_raw")):= case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(LVDT) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>%
+        dplyr::mutate(!!rlang::sym(LVDT):=
+                        case_when(is.na(!!rlang::sym(LVDT)) ~ last_date, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>%
         dplyr::mutate(!!rlang::sym(paste0(LVDT,"_imputed_flag")):= dplyr::case_when(
           is.na(!!rlang::sym(paste0(LVDT,"_raw"))) & !is.na(!!rlang::sym(LVDT)) ~ 1,
           !is.na(!!rlang::sym(paste0(LVDT,"_raw"))) & is.na(!!rlang::sym(LVDT)) ~ 1,
@@ -294,7 +294,7 @@ calculate_and_impute_required_variables_missing_values <- function(
   if (number_days_removed > 0) {
      data %>%
         dplyr::mutate(!!rlang::sym(paste0(LVDT,"_raw")):= !!rlang::sym(LVDT)) %>%
-        dplyr::mutate(!!rlang::sym(LVDT):= dplyr::if_else(is.na(!!rlang::sym(LVDT)),as.Date(last_date),as.Date(!!rlang::sym(LVDT)))) %>%
+        dplyr::mutate(!!rlang::sym(LVDT):= dplyr::if_else(is.na(!!rlang::sym(LVDT)),as.Date(anytime::anydate(last_date)),as.Date(anytime::anydate(!!rlang::sym(LVDT))))) %>%
         dplyr::mutate(!!rlang::sym(paste0(LVDT,"_imputed_flag")):= dplyr::case_when(
           is.na(!!rlang::sym(paste0(LVDT,"_raw"))) & !is.na(!!rlang::sym(LVDT)) ~ 1,
           !is.na(!!rlang::sym(paste0(LVDT,"_raw"))) & is.na(!!rlang::sym(LVDT)) ~ 1,

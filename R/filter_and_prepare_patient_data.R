@@ -24,10 +24,10 @@ filter_and_prepare_patient_data <- function(data, SAFFN = SAFFN, LVDT = LVDT, TR
     if (!TRTSDT %in% colnames(data)) {stop("Parameter 'TRTSDT' must be in data frame!")}
     if (!TRT01A %in% colnames(data)) {stop("Parameter 'TRT01A' must be in data frame!")}
     if (!SUBJIDN %in% colnames(data)) {stop("Parameter 'SUBJIDN' must be in data frame!")}
-    if (!DTHDT %in% colnames(data)) {stop("Parameter 'DTHDT' must be in data frame!")}
+    # if (!DTHDT %in% colnames(data)) {stop("Parameter 'DTHDT' must be in data frame!")}
 
     #helper function
-    is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.date <- function(x) !is.na(as.Date(anytime::anydate(as.character(x))))
 
     #filter for safety flag and create ps and treat variable for subject and treatment
     pat_data <- data  %>%
@@ -51,10 +51,10 @@ filter_and_prepare_patient_data <- function(data, SAFFN = SAFFN, LVDT = LVDT, TR
       pat_data <- pat_data  %>%
         dplyr::mutate(
           death = case_when(
-            is.na(as.numeric(as.Date(!!rlang::sym(DTHDT)))) ~ 99999,
-            !is.na(as.numeric(as.Date(!!rlang::sym(DTHDT)))) ~ as.numeric(as.Date(!!rlang::sym(DTHDT))) - as.numeric(as.Date(!!rlang::sym(TRTSDT))) + 1,
+            is.na(as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))))) ~ 99999,
+            !is.na(as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))))) ~ as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT)))) - as.numeric(as.Date(anytime::anydate(!!rlang::sym(TRTSDT)))) + 1,
           ),
-          end = (as.numeric(as.Date(!!rlang::sym(LVDT))) - as.numeric(as.Date(!!rlang::sym(TRTSDT))) + 1)
+          end = (as.numeric(as.Date(anytime::anydate(!!rlang::sym(LVDT)))) - as.numeric(as.Date(anytime::anydate(!!rlang::sym(TRTSDT)))) + 1)
         )
     } else {
       pat_data <- pat_data  %>%

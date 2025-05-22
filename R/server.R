@@ -917,9 +917,6 @@ server <- shiny::shinyServer(function(input, output, session) {
         by = "patient"
       )
 
-      # remove rows with same ae for same subject
-      # tmp <- tmp[!duplicated(tmp[,c("patient","ae")]),]
-
       #complete treatment and adverse events table:
 
       full_list <- merge(levels(tmp$treat), input_var())
@@ -1249,6 +1246,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     merged_adae_adsl_data <- reactive({
       adae_data_reac()
       adsl_data_reac()
+
       if (!is.null(adae_data_reac())) {
         adae <- adae_data_reac()
         if (!is.null(adsl_data_reac())) {
@@ -1264,39 +1262,37 @@ server <- shiny::shinyServer(function(input, output, session) {
   convertible_to_date_variables <- reactive({
 
     dat <- merged_adae_adsl_data()
-    is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
 
+     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
 
     choices <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.date(x)}),2,any)))))
     choices_int <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-
     sort(unique(c(choices,choices_int)))
   })
 
   convertible_to_flag_variables <- reactive({
-
     dat <- merged_adae_adsl_data()
-    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    is.convertible.to.flag <- function(x) {as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".") | is.na(x)}
 
-    choices <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    choices <- sort(names(which(apply(dat %>% dplyr::mutate_all(is.convertible.to.flag),2,all))))
+   # choices <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.flag(x)}),2,all)))))
     sort(unique(c(choices)))
   })
 
   #### load data and prepare for graphics ####
   prepared_merged_data_reac <- shiny::reactive({
     #react for file input radiobuttons or demo data
+
     input$radiobutton_data
     #adae or adae+adsl
     data <- merged_adae_adsl_data()
-
     #initiate loading flag when data are available
     if (!is.null(data)) {
       loaded$dat <- 1
     } else  {
       loaded$dat <- 0
     }
-
     # filter all data sets (when available) for safety flag (requires safety flag selected)
     if (!is.null(shiny::req(input$sel_saffn))) {
       if (!is.null(data)) {
@@ -1305,116 +1301,143 @@ server <- shiny::shinyServer(function(input, output, session) {
         }
       }
     }
-    if (!is.null(data)) {
-      #calculate number of missing values and imputate missing data
-      missing_replaced_data <- calculate_and_impute_required_variables_missing_values(
-        data = data,
-        SUBJIDN = input$sel_subjidn,
-        LVDT = input$sel_lvdt,
-        DTHDT = ifelse(input$sel_dthdt == "NA", "DTHDT", input$sel_dthdt),
-        TRTSDT = input$sel_trtsdt,
-        AEDECOD = input$sel_aedecod,
-        AESTDY = input$sel_aestdy,
-        AETRTEMN = input$sel_aetrtemn,
-        AEENDY = input$sel_aeendy,
-        AESEVN = input$sel_aesevn,
-        severity_grading_flag = input$severity_grading_flag
-      )
+    if (!is.null(data) ) {
+      if(!is.null(input$sel_lvdt) &
+         !is.null(input$sel_subjidn) &
+         !is.null(input$sel_trtsdt) &
+         !is.null(input$sel_aedecod) &
+         !is.null(input$sel_aetrtemn) &
+         !is.null(input$sel_aeendy)
+      ){
 
-      # Create app text for upload page about number missing (and replaced) data
-      if (missing_replaced_data$number_days_removed > 0) {
-        output$sel_aestdy_check3 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-              '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Adverse event start day was later than end date for ',
-              missing_replaced_data$number_days_removed,
-              ' subject(s). The end date is/was set to start date in these cases. </span>'
+
+      if(input$sel_lvdt %in% colnames(data) &
+         input$sel_subjidn %in% colnames(data) &
+         input$sel_trtsdt %in% colnames(data) &
+         input$sel_aedecod %in% colnames(data) &
+         input$sel_aetrtemn %in% colnames(data) &
+         input$sel_aeendy %in% colnames(data) &
+         input$sel_aesevn %in% colnames(data)
+        ) {
+        #calculate number of missing values and imputate missing data
+        if(is.null(input$sel_dthdt)) {
+          dthdt <- "DTHDT"
+        } else if (input$sel_dthdt == 'NA') {
+           dthdt <- "DTHDT"
+        } else  {
+           dthdt <- input$sel_dthdt
+        }
+        missing_replaced_data <- calculate_and_impute_required_variables_missing_values(
+          data = data,
+          SUBJIDN = shiny::req(input$sel_subjidn),
+          LVDT = shiny::req(input$sel_lvdt),
+          DTHDT = dthdt,
+          TRTSDT = shiny::req(input$sel_trtsdt),
+          AEDECOD = shiny::req(input$sel_aedecod),
+          AESTDY = shiny::req(input$sel_aestdy),
+          AETRTEMN = shiny::req(input$sel_aetrtemn),
+          AEENDY =shiny::req(input$sel_aeendy),
+          AESEVN = shiny::req(input$sel_aesevn),
+          severity_grading_flag = input$severity_grading_flag
+        )
+        # Create app text for upload page about number missing (and replaced) data
+        if (missing_replaced_data$number_days_removed > 0) {
+          output$sel_aestdy_check3 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+                '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Adverse event start day was later than end date for ',
+                missing_replaced_data$number_days_removed,
+                ' subject(s). The end date is/was set to start date in these cases. </span>'
+              )
             )
-          )
-        })
-      }
-      if (missing_replaced_data$number_missing_lvdt  > 0) {
-        output$sel_lvdt_check2 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-              '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"> </i> Note: Last visit date is missing for ',
-              missing_replaced_data$number_missing_lvdt,
-              ' subjects. The last visit date is/was set to maximum treatment day/date in these cases.</span>'
+          })
+        }
+        if (missing_replaced_data$number_missing_lvdt  > 0) {
+          output$sel_lvdt_check2 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+                '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"> </i> Note: Last visit date is missing for ',
+                missing_replaced_data$number_missing_lvdt,
+                ' subjects. The last visit date is/was set to maximum treatment day/date in these cases.</span>'
+              )
             )
-          )
-        })
+          })
+        } else {
+          output$sel_lvdt_check2 <- shiny::renderUI({
+            shiny::HTML(paste0(''))
+          })
+        }
+
+        if (missing_replaced_data$number_ae_end_missing > 0) {
+          output$sel_aeendy_check2 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+                '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Analysis end date is missing for ',
+                missing_replaced_data$number_ae_end_missing,' events. The adverse event end day is/was set to maximum treatment day or death day in these cases. </span>'
+              )
+            )
+          })
+
+        } else {
+          output$sel_aeendy_check2 <- shiny::renderUI({
+            shiny::HTML(paste0(''))
+          })
+        }
+
+        if (missing_replaced_data$number_ae_start_missing > 0) {
+          output$sel_aestdy_check2 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+                '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Analysis start day is missing for ',
+                missing_replaced_data$number_ae_start_missing,
+                ' events. The adverse event start is/was set to 1 in these cases. </span>'
+              )
+            )
+          })
+        } else {
+          output$sel_aestdy_check2 <- shiny::renderUI({
+            shiny::HTML(paste0(''))
+          })
+        }
+
+        if (missing_replaced_data$number_severe_missing > 0) {
+          output$sel_aesevn_check2 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+                '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Variable is not as expected or missing for ',
+                missing_replaced_data$number_severe_missing,
+                ' entries and was set to grade SEVERE. </span>'
+              )
+            )
+          })
+        } else {
+          output$sel_aesevn_check2 <- shiny::renderUI({
+            shiny::HTML(paste0(''))
+          })
+        }
+
+        if (missing_replaced_data$number_unknown_aes > 0) {
+          output$sel_aedecod_check2 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+              '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: ', missing_replaced_data$number_unknown_aes,' adverse events
+              have an Unknown type and where set to "Unknown type of AE".</span>'
+              )
+            )
+          })
+        } else {
+          output$sel_aedecod_check2 <- shiny::renderUI({
+            shiny::HTML(
+              paste0(
+              ''
+              )
+            )
+          })
+        }
       } else {
-        output$sel_lvdt_check2 <- shiny::renderUI({
-          shiny::HTML(paste0(''))
-        })
+        missing_replaced_data <- NULL
       }
-
-      if (missing_replaced_data$number_ae_end_missing > 0) {
-        output$sel_aeendy_check2 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-              '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Analysis end date is missing for ',
-              missing_replaced_data$number_ae_end_missing,' events. The adverse event end day is/was set to maximum treatment day or death day in these cases. </span>'
-            )
-          )
-        })
-
-      } else {
-        output$sel_aeendy_check2 <- shiny::renderUI({
-          shiny::HTML(paste0(''))
-        })
-      }
-
-      if (missing_replaced_data$number_ae_start_missing > 0) {
-        output$sel_aestdy_check2 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-              '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Analysis start day is missing for ',
-              missing_replaced_data$number_ae_start_missing,
-              ' events. The adverse event start is/was set to 1 in these cases. </span>'
-            )
-          )
-        })
-      } else {
-        output$sel_aestdy_check2 <- shiny::renderUI({
-          shiny::HTML(paste0(''))
-        })
-      }
-
-      if (missing_replaced_data$number_severe_missing > 0) {
-        output$sel_aesevn_check2 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-              '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: Variable is not as expected or missing for ',
-              missing_replaced_data$number_severe_missing,
-              ' entries and was set to grade SEVERE. </span>'
-            )
-          )
-        })
-      } else {
-        output$sel_aesevn_check2 <- shiny::renderUI({
-          shiny::HTML(paste0(''))
-        })
-      }
-
-      if (missing_replaced_data$number_unknown_aes > 0) {
-        output$sel_aedecod_check2 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-            '<span style = "color: #aed5f5"> <i class="fa-solid fa-exclamation"></i> Note: ', missing_replaced_data$number_unknown_aes,' adverse events
-            have an Unknown type and where set to "Unknown type of AE".</span>'
-            )
-          )
-        })
-      } else {
-        output$sel_aedecod_check2 <- shiny::renderUI({
-          shiny::HTML(
-            paste0(
-            ''
-            )
-          )
-        })
-      }
+    }
     } else {
       saffn_check_flag$val <- FALSE
       subjidn_check_flag$val <- FALSE
@@ -1436,12 +1459,13 @@ server <- shiny::shinyServer(function(input, output, session) {
       aedecod_check_flag$val &&
       trt01a_check_flag$val &&
       lvdt_check_flag$val &&
-      dthdt_check_flag$val &&
+      #dthdt_check_flag$val &&
       trtsdt_check_flag$val &&
       aestdy_check_flag$val &&
       aetrtemn_check_flag$val &&
       aeendy_check_flag$val &&
-      aesevn_check_flag$val
+      aesevn_check_flag$val &
+      !is.null(missing_replaced_data)
     ) {
       prepared_data_result_object <- prepare_data_for_adepro(
         dat = missing_replaced_data$data,
@@ -1449,7 +1473,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         TRT01A = input$sel_trt01a,
         SAFFN = input$sel_saffn,
         LVDT = input$sel_lvdt,
-        DTHDT = ifelse(input$sel_dthdt == "NA","DTHDT",input$sel_dthdt),
+        DTHDT = dthdt,
         TRTSDT = input$sel_trtsdt,
         AEDECOD = input$sel_aedecod,
         AESTDY = input$sel_aestdy,
@@ -1464,7 +1488,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       if (dim(prepared_data_result_object$ae_data)[1] == 0) {
         return(NULL)
       }
-
       shinyjs::enable("submit")
 
       prepared_data_result_object
@@ -1967,12 +1990,22 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   #### SUBJECT ID - SUBJIDN ####
   output$sel_subjidn <- shiny::renderUI({
-    adae <- merged_adae_adsl_data()
+    # adae <- merged_adae_adsl_data()
+    adae_data_reac()
+    adsl_data_reac()
+      if (!is.null(adae_data_reac())) {
+        choices <- names(adae_data_reac())
+        if (!is.null(adsl_data_reac())) {
+            choices <- dplyr::intersect(names(adae_data_reac()),names(adsl_data_reac()))
+        }
+      } else {
+        choices <- NULL
+      }
     # if (!is.null(adsl)) {
     #   choices <- intersect(names(adae),names(adsl))
     #   choices <- names(which(apply(adsl[choices], 2, function(x) {length(unique(x))}) == dim(adsl)[1]))
     # } else {
-      choices <- names(adae)
+      # choices <- names(adae)
     # }
 
     choices <- c(unique(choices))
@@ -2083,7 +2116,6 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aedecod), {
     shiny::req(merged_adae_adsl_data())
-
     if (is.null(input$sel_aedecod)) {
       output$sel_aedecod_check <- shiny::renderUI({
         shiny::HTML(
@@ -2290,7 +2322,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
       trtsdt_check_flag$val <- FALSE
     } else {
-      is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      is.convertible.to.date <- function(x) {!is.na(anytime::anydate(as.character(x)))}
       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       # if (input$sel_trtsdt == "Nothing selected") {
       #    trtsdt_check_flag$val <- FALSE
@@ -2407,9 +2439,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
       lvdt_check_flag$val <- FALSE
     } else {
-      is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      #is.convertible.to.date <- function(x) !is.na(as.Date(anytime::anydate(as.character(x))))
+       #is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+       is.convertible.to.date <- function(x) {!is.na(anytime::anydate(as.character(x)))}
        is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-      if (input$sel_lvdt == "Nothing selected") {
+      if (!input$sel_lvdt %in% colnames(merged_adae_adsl_data())) {
         lvdt_check_flag$val <- FALSE
         output$sel_lvdt_check <- shiny::renderUI({
           shiny::HTML(
@@ -2608,7 +2642,9 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
       dthdt_check_flag$val <- FALSE
     } else {
-      is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      #is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+      is.convertible.to.date <- function(x) {!is.na(anytime::anydate(as.character(x)))}
+      # is.convertible.to.date <- function(x) !is.na(as.Date(anytime::anydate(as.character(x))))
       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       ## back##
       if (input$sel_dthdt == "Nothing selected") {
@@ -3295,22 +3331,12 @@ output$sel_aerelprn <- shiny::renderUI({
  }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
 
-
 #### AEACNN ####
 output$sel_aeacnn <- shiny::renderUI({
     shiny::req(merged_adae_adsl_data())
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
-#
-#     is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-#
-#     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-#     if(!is.null(adsl)) {
-#       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-#       choices <- sort(c(choices, choices2))
-#     }
-#
-#     choices <- c(unique(choices))
+
     choices <- convertible_to_flag_variables()
 
      if (!any(c("AEACNN", "AEACN") %in% choices)) {
@@ -3318,7 +3344,6 @@ output$sel_aeacnn <- shiny::renderUI({
     } else {
       selected <- c("AEACNN", "AEACN")[which(c("AEACNN", "AEACN") %in% choices)[1]]
     }
-
 
     shinyWidgets::pickerInput(
       inputId = "sel_aeacnn",
@@ -3426,17 +3451,19 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
       aedecod_check_flag$val,
       trt01a_check_flag$val,
       lvdt_check_flag$val,
-      dthdt_check_flag$val,
+     #dthdt_check_flag$val,
       aesevn_check_flag$val,
       aestdy_check_flag$val,
       aeendy_check_flag$val,
       trtsdt_check_flag$val,
       aetrtemn_check_flag$val
     ), {
-    if (saffn_check_flag$val && subjidn_check_flag$val && aedecod_check_flag$val &&
-        trt01a_check_flag$val && lvdt_check_flag$val && dthdt_check_flag$val &&
-        aesevn_check_flag$val && aestdy_check_flag$val && aeendy_check_flag$val &&
-        trtsdt_check_flag$val && aetrtemn_check_flag$val) {
+    if (
+      saffn_check_flag$val && subjidn_check_flag$val && aedecod_check_flag$val &&
+      trt01a_check_flag$val && lvdt_check_flag$val && #dthdt_check_flag$val &&
+      aesevn_check_flag$val && aestdy_check_flag$val && aeendy_check_flag$val &&
+      trtsdt_check_flag$val && aetrtemn_check_flag$val
+    ) {
       output$cont1 <- shiny::renderUI({
         list(
           shiny::tags$head(

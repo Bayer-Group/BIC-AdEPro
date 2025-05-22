@@ -49,7 +49,7 @@ prepare_data_for_adepro <- function(
   }
 
   #create vector with required variable names
-  required_vars <- c(SUBJIDN, TRT01A, SAFFN ,LVDT, DTHDT, TRTSDT, AEDECOD, AESTDY, AETRTEMN, AEENDY, AESEVN)
+  required_vars <- c(SUBJIDN, TRT01A, SAFFN ,LVDT, TRTSDT, AEDECOD, AESTDY, AETRTEMN, AEENDY, AESEVN)
 
   #check for required variables in adae data
   if (!all(required_vars %in% colnames(dat))) {

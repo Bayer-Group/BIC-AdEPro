@@ -807,10 +807,6 @@ ui <- shiny::shinyUI(
                     ),
                     shiny::column(12,
                       shiny::column(2,
-                        shiny::uiOutput("sel_dthdt"),
-                        shiny::uiOutput("sel_dthdt_check")
-                      ),
-                      shiny::column(2,
                         shiny::uiOutput("sel_saffn"),
                         shiny::uiOutput("sel_saffn_check")
                       ),
@@ -842,6 +838,10 @@ ui <- shiny::shinyUI(
                   ),
                   shinyBS::bsCollapsePanel(
                     shiny::HTML('<p style="color:white; font-size:100%;"> Optional variables: </p>'),
+                     shiny::column(2,
+                        shiny::uiOutput("sel_dthdt"),
+                        shiny::uiOutput("sel_dthdt_check")
+                      ),
                     shiny::column(2,
                       shiny::uiOutput("sel_aesern"),
                       shiny::uiOutput("sel_aesern_check")
