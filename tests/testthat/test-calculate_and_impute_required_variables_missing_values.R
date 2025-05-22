@@ -161,7 +161,15 @@ test_that("check function prepare_data_for_adepro:", {
        t(c(1234520,   "", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
 
        #subject 1234521 with no expected error/warning and 1 entries
-       t(c(1234521,   "Headache", 10,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA))
+       t(c(1234521,   "Headache", 10,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
+
+       t(c(1234522,   "Pain",     2,        4,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,    NA,     6,        7,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,   "Headache", 10,       130,     1,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+
+       #subject 1234501 with no expected error/warning and 2 entries
+       t(c(1234523,   "",     2,        4,       NA,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0)),
+       t(c(1234523,   "Pain",     6,        7,       5,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0))
      )
   )
 
@@ -189,8 +197,8 @@ test_that("check function prepare_data_for_adepro:", {
   testthat::expect_equal(is.data.frame(imputed$data),TRUE)
 
   #aes for subject 19 and 20
-  testthat::expect_equal(imputed$number_unknown_aes, 2)
-  testthat::expect_equal(sum(imputed$data$AEDECOD_imputed_flag == 1),2)
+  testthat::expect_equal(imputed$number_unknown_aes, 4)
+  testthat::expect_equal(sum(imputed$data$AEDECOD_imputed_flag == 1),4)
 
   #aes for subject 12 and 17
   testthat::expect_equal(imputed$number_ae_end_missing,2)
@@ -205,8 +213,8 @@ test_that("check function prepare_data_for_adepro:", {
   testthat::expect_equal(sum(imputed$data$AESTDY_imputed_flag == 1),3)
 
   # subject 14
-  testthat::expect_equal(imputed$number_severe_missing,1)
-  testthat::expect_equal(sum(imputed$data$AESEVN_imputed_flag == 1),1)
+  testthat::expect_equal(imputed$number_severe_missing, 5)
+  testthat::expect_equal(sum(imputed$data$AESEVN_imputed_flag == 1),5)
 
   # subject 11 and subject 21
   testthat::expect_equal(imputed$number_days_removed,2)
@@ -267,7 +275,14 @@ test_that("check function prepare_data_for_adepro:", {
        t(c(1234515, "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,     "Europe",   "M",   20)),
 
        #subject 1234516
-       t(c(1234516,  "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,    "Europe",   "M",   20))
+       t(c(1234516,  "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,    "Europe",   "M",   20)),
+
+       #subject 1234522 with missing severity grades
+       t(c(1234522,   "Trtmt",    "2010-01-01", "2010-12-31",    NA,   1,      "Asia",   "F",   30)),
+
+       #subject 1234523 with missing severity grades
+       t(c(1234523,    "Placebo",     "2010-01-01", "2010-12-31",   NA,   1,   "Europe",   "F",   40))
+
 
      )
   )
@@ -289,9 +304,10 @@ test_that("check function prepare_data_for_adepro:", {
   testthat::expect_equal(is.list(imputed),TRUE)
   testthat::expect_equal(is.data.frame(imputed$data),TRUE)
 
+
   #aes for subject 19 and 20
-  testthat::expect_equal(imputed$number_unknown_aes, 2)
-  testthat::expect_equal(sum(imputed$data$AEDECOD_imputed_flag == 1),2)
+  testthat::expect_equal(imputed$number_unknown_aes, 4)
+  testthat::expect_equal(sum(imputed$data$AEDECOD_imputed_flag == 1),4)
 
   #aes for subject 12 and 17
   testthat::expect_equal(imputed$number_ae_end_missing,2)
@@ -306,8 +322,8 @@ test_that("check function prepare_data_for_adepro:", {
   testthat::expect_equal(sum(imputed$data$AESTDY_imputed_flag == 1),3)
 
   # subject 14
-  testthat::expect_equal(imputed$number_severe_missing,1)
-  testthat::expect_equal(sum(imputed$data$AESEVN_imputed_flag == 1),1)
+  testthat::expect_equal(imputed$number_severe_missing, 5)
+  testthat::expect_equal(sum(imputed$data$AESEVN_imputed_flag == 1),5)
 
   # subject 11 and subject 21
   testthat::expect_equal(imputed$number_days_removed,2)

@@ -95,7 +95,16 @@ test_that("test joining created data", {
        t(c(1234520,   "", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
 
        #subject 1234521 with no expected error/warning and 1 entries
-       t(c(1234521,   "Headache", 10,        12,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     4,      NA,      NA))
+       t(c(1234521,   "Headache", 10,        12,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     4,      NA,      NA)),
+
+       #subject 1234522 with missing severity grades
+       t(c(1234522,   "Pain",     2,        4,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,    NA,     6,        7,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,   "Headache", 10,       130,     1,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+
+       #subject 1234523 with missing severity grades
+       t(c(1234523,   "",     2,        4,       NA,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0)),
+       t(c(1234523,   "Pain",     6,        7,       5,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0))
 
 
      )
@@ -119,56 +128,62 @@ test_that("test joining created data", {
   adsl_data <- data.frame(
     rbind(
       #subject 1234500
-       # "SUBJIDN",  "TRT01A",        "TRTSDT",     "LVDT",  "DTHDT","SAFFN", "REGION", "SEX", "AGE")
-       t(c(1234500,  "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      "Europe",   "M",   20)),
+       # "SUBJIDN",  "TRT01A",        "TRTSDT",     "LVDT",  "DTHDT",       "SAFFN", "REGION", "SEX", "AGE")
+       t(c(1234500,  "Trtmt",    "2010-01-01", "2010-12-31", NA,            1,      "Europe",   "M",   20)),
 
       #subject 1234501
-       t(c(1234501, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      "Europe",   "M",   20)),
+       t(c(1234501, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,      "Europe",   "M",   20)),
 
        #subject 1234502 with different TRT01A than in adae
-       t(c(1234502,  "Trtmt",  "2010-01-01",  "2010-12-31", NA,     1,      "Europe",   "M",   20)),
+       t(c(1234502,  "Trtmt",  "2010-01-01",  "2010-12-31", NA,            1,      "Europe",   "M",   20)),
 
        #subject 1234503 different/missing TRTSDT than in adae
-       t(c(1234503,  "Trtmt",    NA,          "2010-12-31", NA,     1,      "Europe",   "M",   60)),
+       t(c(1234503,  "Trtmt",    NA,          "2010-12-31", NA,            1,      "Europe",   "M",   60)),
 
        #subject 1234504
-       t(c(1234504,  "Trtmt",   "2010-01-01", "2010-12-31", NA,     0,      "Europe",   "M",   20)),
+       t(c(1234504,  "Trtmt",   "2010-01-01", "2010-12-31", NA,            0,      "Europe",   "M",   20)),
 
        #subject 1234505
-       t(c(1234505, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,       "Europe",   "M",   50)),
+       t(c(1234505, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,       "Europe",   "M",   50)),
 
        #subject 1234506 set subjid to missing
-       t(c(NA,  "Placebo",      NA,           "2010-12-31", NA,     1,       "Europe",   "M",   20)),
+       t(c(NA,  "Placebo",      NA,           "2010-12-31", NA,            1,       "Europe",   "M",   20)),
 
        #subject 1234507
-       t(c(1234507, "Placebo",  NA,           NA,           NA,     1,     "Europe",   "F",   20)),
+       t(c(1234507, "Placebo",  NA,           NA,           NA,            1,     "Europe",   "F",   20)),
 
        #subject 1234508
-       t(c(1234508, "Placebo",  NA,           "2010-12-31", NA,     1,     "Europe",   "M",   40)),
+       t(c(1234508, "Placebo",  NA,           "2010-12-31", NA,            1,     "Europe",   "M",   40)),
 
        #subject 1234509
-       t(c(1234509, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      "Europe",   "M",   20)),
+       t(c(1234509, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,      "Europe",   "M",   20)),
 
        #subject 1234510
-       t(c(1234510, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      "Europe",   "F",   20)),
+       t(c(1234510, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,      "Europe",   "F",   20)),
 
        #subject 1234511
-       t(c(1234511, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,       "Europe",   "M",   20)),
+       t(c(1234511, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,       "Europe",   "M",   20)),
 
        #subject 1234512
-       t(c(1234512, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,     "Europe",   "M",   20)),
+       t(c(1234512, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,     "Europe",   "M",   20)),
 
        #subject 1234513 add subject id
-       t(c(1234513, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,       "Europe",   "M",   30)),
+       t(c(1234513, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,     "Europe",   "M",   30)),
 
        #subject 1234514
-       t(c(1234514, "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      "Europe",   "F",   20)),
+       t(c(1234514, "Placebo",  "2010-01-01", "2010-12-31", NA,            1,      "Europe",   "F",   20)),
 
        #subject 1234515
-       t(c(1234515, "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,     "Europe",   "M",   20)),
+       t(c(1234515, "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01",  1,     "Europe",   "M",   20)),
 
        #subject 1234516
-       t(c(1234516,  "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,    "Europe",   "M",   20))
+       t(c(1234516,  "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,    "Europe",   "M",   20)),
+
+      #subject 1234522 with missing severity grades
+       t(c(1234522,   "Trtmt",    "2010-01-01", "2010-12-31", NA,           1,    "Asia",   "F",   30)),
+
+       #subject 1234523 with missing severity grades
+       t(c(1234523,    "Placebo", "2010-01-01", "2010-12-31", NA,           1,     "Europe",   "F",   40))
 
      )
   )
@@ -245,6 +260,6 @@ test_that("test joining created data", {
       "AEACNN"
     )
   )
-  testthat::expect_equal(adae_and_adsl3 %>% nrow, 32)
+  testthat::expect_equal(adae_and_adsl3 %>% nrow, 37)
 
 })

@@ -79,9 +79,16 @@ test_that("Check filter for safety flag is working (Part1)", {
        t(c(1234520,   "", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
 
        #subject 1234521 with no expected error/warning and 1 entries
-       t(c(1234521,   "Headache", 10,        12,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     4,      NA,      NA))
+       t(c(1234521,   "Headache", 10,        12,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     4,      NA,      NA)),
 
+       #subject 1234522 with missing severity grades
+       t(c(1234522,   "Pain",     2,        4,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,    NA,     6,        7,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,   "Headache", 10,       130,     1,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
 
+       #subject 1234523 with missing severity grades
+       t(c(1234523,   "",     2,        4,       NA,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0)),
+       t(c(1234523,   "Pain",     6,        7,       5,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0))
      )
   )
 
@@ -205,7 +212,16 @@ test_that("Check filter for safety flag is working with character safety flag (P
        t(c(1234520,   "", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     "YES",      NA,      NA)),
 
        #subject 1234521 with no expected error/warning and 1 entries
-       t(c(1234521,   "Headache", 10,        12,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     "YESSS",      NA,      NA))
+       t(c(1234521,   "Headache", 10,        12,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     "YESSS",      NA,      NA)),
+
+       #subject 1234522 with missing severity grades
+       t(c(1234522,   "Pain",     2,        4,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     "YES",      1,      1)),
+       t(c(1234522,    NA,     6,        7,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     "YES",      1,      1)),
+       t(c(1234522,   "Headache", 10,       130,     1,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     "YES",      1,      1)),
+
+       #subject 1234523 with missing severity grades
+       t(c(1234523,   "",     2,        4,       NA,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     "YES",      0,      0)),
+       t(c(1234523,   "Pain",     6,        7,       5,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     "YES",      0,      0))
 
 
      )
@@ -230,7 +246,9 @@ test_that("Check filter for safety flag is working with character safety flag (P
   #subject 1234505 should be removed since safety flag is 0 and subject 1234521 since invalid safety flag (4)
 
   testthat::expect_equal(is.data.frame(ffsf), TRUE)
+
   testthat::expect_equal(nrow(adae_data %>% dplyr::filter(SAFFN %in% c("YES","yes"))), nrow(ffsf))
+
   testthat::expect_equal(nrow(adae_data) - 2, nrow(ffsf))
 
   testthat::expect_equal(nrow(adae_data %>% dplyr::filter(SUBJIDN == 1234504)),1)

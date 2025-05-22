@@ -7,7 +7,7 @@
 #' @return numeric value with the number missing grades
 #'
 
-calculate_number_missing_severity_flag <- function(dat = adae_data, sel_aesevn = NULL, severity_grading_flag)  {
+calculate_number_missing_severity_flag <- function(dat = adae_data, sel_aesevn = NULL, sel_aedecod, severity_grading_flag)  {
 
   #check if parameter dat is data.frame
   if (!is.data.frame(dat)) {
@@ -23,15 +23,15 @@ calculate_number_missing_severity_flag <- function(dat = adae_data, sel_aesevn =
    if (is.character(dat[[sel_aesevn]])) {
       number_severe_missing <- ifelse(
         severity_grading_flag == "Severity",
-        sum(!dat[[sel_aesevn]] %in% c("MILD","MODERATE","SEVERE",NA)),
-        sum(!dat[[sel_aesevn]] %in% c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH",NA))
+        sum(!dat[[sel_aesevn]] %in% c("MILD","MODERATE","SEVERE") & !is.na(dat[[sel_aedecod]])),
+        sum(!dat[[sel_aesevn]] %in% c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH") & !is.na(dat[[sel_aedecod]]))
       )
 
    } else if (is.numeric(dat[[sel_aesevn]])) {
       number_severe_missing <- ifelse(
         severity_grading_flag=="Severity",
-        sum(!dat[[sel_aesevn]] %in% c(1,2,3,NA)),
-        sum(!dat[[sel_aesevn]] %in% c(1,2,3,4,5,NA))
+        sum(!dat[[sel_aesevn]] %in% c(1,2,3) & !is.na(dat[[sel_aedecod]])),
+        sum(!dat[[sel_aesevn]] %in% c(1,2,3,4,5) & !is.na(dat[[sel_aedecod]]))
       )
    }
   return(number_severe_missing)

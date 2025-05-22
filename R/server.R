@@ -1261,13 +1261,32 @@ server <- shiny::shinyServer(function(input, output, session) {
       }
     })
 
+  convertible_to_date_variables <- reactive({
 
+    dat <- merged_adae_adsl_data()
+    is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+
+
+    choices <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    choices_int <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.integer(x)}),2,any)))))
+
+    sort(unique(c(choices,choices_int)))
+  })
+
+  convertible_to_flag_variables <- reactive({
+
+    dat <- merged_adae_adsl_data()
+    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+
+    choices <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    sort(unique(c(choices)))
+  })
 
   #### load data and prepare for graphics ####
   prepared_merged_data_reac <- shiny::reactive({
     #react for file input radiobuttons or demo data
     input$radiobutton_data
-
     #adae or adae+adsl
     data <- merged_adae_adsl_data()
 
@@ -1277,6 +1296,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     } else  {
       loaded$dat <- 0
     }
+
     # filter all data sets (when available) for safety flag (requires safety flag selected)
     if (!is.null(shiny::req(input$sel_saffn))) {
       if (!is.null(data)) {
@@ -1300,6 +1320,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         AESEVN = input$sel_aesevn,
         severity_grading_flag = input$severity_grading_flag
       )
+
       # Create app text for upload page about number missing (and replaced) data
       if (missing_replaced_data$number_days_removed > 0) {
         output$sel_aestdy_check3 <- shiny::renderUI({
@@ -1422,7 +1443,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       aeendy_check_flag$val &&
       aesevn_check_flag$val
     ) {
-
       prepared_data_result_object <- prepare_data_for_adepro(
         dat = missing_replaced_data$data,
         SUBJIDN = input$sel_subjidn,
@@ -1441,7 +1461,6 @@ server <- shiny::shinyServer(function(input, output, session) {
         AERELPRN = input$sel_aerelprn,
         AEACNN = input$sel_aeacnn
       )
-
       if (dim(prepared_data_result_object$ae_data)[1] == 0) {
         return(NULL)
       }
@@ -1548,7 +1567,6 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     aes <- names(ae_table)
     aes2 <- names(ae_table2)
-
     if(input$ae_var_sorting == "days") {
       ae_table_labels
     } else if (input$ae_var_sorting == "frequency") {
@@ -1949,15 +1967,13 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   #### SUBJECT ID - SUBJIDN ####
   output$sel_subjidn <- shiny::renderUI({
-    adae <- shiny::req(adae_data_reac())
-    adsl <- adsl_data_reac()
-
-    if (!is.null(adsl)) {
-      choices <- intersect(names(adae),names(adsl))
-      choices <- names(which(apply(adsl[choices], 2, function(x) {length(unique(x))}) == dim(adsl)[1]))
-    } else {
+    adae <- merged_adae_adsl_data()
+    # if (!is.null(adsl)) {
+    #   choices <- intersect(names(adae),names(adsl))
+    #   choices <- names(which(apply(adsl[choices], 2, function(x) {length(unique(x))}) == dim(adsl)[1]))
+    # } else {
       choices <- names(adae)
-    }
+    # }
 
     choices <- c(unique(choices))
 
@@ -1981,7 +1997,6 @@ server <- shiny::shinyServer(function(input, output, session) {
   subjidn_check_flag <- shiny::reactiveValues(val = FALSE)
 
   shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_subjidn), {
-
 
     shiny::req(merged_adae_adsl_data())
     if (is.null(input$sel_subjidn)) {
@@ -2042,7 +2057,6 @@ server <- shiny::shinyServer(function(input, output, session) {
   #### ADVERSE EVENT CODE - AEDECOD ####
    output$sel_aedecod <- shiny::renderUI({
     shiny::req(merged_adae_adsl_data())
-
     adae <- shiny::req(adae_data_reac())
 
     choices <- names(adae[unlist(lapply(adae, is.character), use.names = FALSE)])
@@ -2228,28 +2242,27 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+    # is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    # is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+    #
 
-
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
-      choices <- sort(c(choices, choices2))
-      choices_int <- sort(c(choices_int, choices2_int))
-    }
-    choices <- sort(c(choices,choices_int))
-    choices <- c(unique(choices))
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    # choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+    #   choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
+    #   choices <- sort(c(choices, choices2))
+    #   choices_int <- sort(c(choices_int, choices2_int))
+    # }
+    # choices <- sort(c(choices,choices_int))
     # choices <- c(unique(choices))
-
+    # choices <- c(unique(choices))
+    choices <- convertible_to_date_variables()
     if(!"TRTSDT" %in% choices) {
       selected <- NULL
     } else if ("TRTSDT" %in% choices) {
       selected <- "TRTSDT"
     }
-
     shinyWidgets::pickerInput(
       inputId = "sel_trtsdt",
       label = shiny::HTML('<p style = "color:#ffffff"> Date of First Exposure to Treatment: </p>'),
@@ -2334,23 +2347,23 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-
-    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-
-
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
-      choices <- sort(c(choices, choices2))
-      choices_int <- sort(c(choices_int, choices2_int))
-    }
-    choices <- sort(c(choices,choices_int))
-    choices <- c(unique(choices))
+    # is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+    #
+    # is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+    #
+    #
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+    # choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+    #   choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
+    #   choices <- sort(c(choices, choices2))
+    #   choices_int <- sort(c(choices_int, choices2_int))
+    # }
+    # choices <- sort(c(choices,choices_int))
     # choices <- c(unique(choices))
-
+    # choices <- c(unique(choices))
+    choices <- convertible_to_date_variables()
     # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
     #
     # if(!is.null(adsl)) {
@@ -2446,7 +2459,6 @@ server <- shiny::shinyServer(function(input, output, session) {
  #### ADVERSE EVENT EMERGENT TREATMENT FLAG - AETRTEMN ####
   output$sel_aetrtemn <- shiny::renderUI({
     shiny::req(merged_adae_adsl_data())
-
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
@@ -2459,6 +2471,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
 
     choices <- c(unique(choices))
+    # choices <- convertible_to_flag_variables()
 
     if (!any(c("AETRTEMN", "AETRTEM", "TRTEMFLN", "TRTEMFL") %in% choices)) {
       selected <- NULL
@@ -2541,22 +2554,23 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
-
-    is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-    is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-
-
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-    choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-      choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
-      choices <- sort(c(choices, choices2))
-      choices_int <- sort(c(choices_int, choices2_int))
-    }
-    choices <- sort(c(choices,choices_int))
-
-    choices <- c(unique(choices),"NA")
+#
+#     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
+#     is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
+#
+#
+#     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
+#     choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
+#     if(!is.null(adsl)) {
+#       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
+#       choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
+#       choices <- sort(c(choices, choices2))
+#       choices_int <- sort(c(choices_int, choices2_int))
+#     }
+#     choices <- sort(c(choices,choices_int))
+#
+#     choices <- c(unique(choices),"NA")
+    choices <- convertible_to_date_variables()
     #choices <- c(unique(choices),"NA", "Nothing selected")
 
     if(!"DTHDT" %in% choices) {
@@ -2657,15 +2671,16 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-      choices <- sort(c(choices, choices2))
-    }
-
-    choices <- c(unique(choices))
+    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    #
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
+    #   choices <- sort(c(choices, choices2))
+    # }
+    #
+    # choices <- c(unique(choices))
+    choices <- convertible_to_flag_variables()
     # choices <- c(unique(choices),"Nothing selected")
 
     # choices <- colnames(adae_data_reac2())
@@ -3036,15 +3051,16 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-      choices <- sort(c(choices, choices2))
-    }
-
-    choices <- c(unique(choices))
+    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    #
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
+    #   choices <- sort(c(choices, choices2))
+    # }
+    #
+    # choices <- c(unique(choices))
+    choices <- convertible_to_flag_variables()
 
      if (!any(c("AESERN", "AESER") %in% choices)) {
       selected <- NULL
@@ -3125,15 +3141,17 @@ server <- shiny::shinyServer(function(input, output, session) {
    adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    #
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
+    #   choices <- sort(c(choices, choices2))
+    # }
+    #
+    # choices <- c(unique(choices))
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-      choices <- sort(c(choices, choices2))
-    }
-
-    choices <- c(unique(choices))
+    choices <- convertible_to_flag_variables()
 
      if (!any(c("AERELN", "AEREL") %in% choices)) {
       selected <- NULL
@@ -3207,16 +3225,17 @@ output$sel_aerelprn <- shiny::renderUI({
      adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+    #
+    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+    # if(!is.null(adsl)) {
+    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
+    #   choices <- sort(c(choices, choices2))
+    # }
+    #
+    # choices <- c(unique(choices))
 
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-      choices <- sort(c(choices, choices2))
-    }
-
-    choices <- c(unique(choices))
-
+    choices <- convertible_to_flag_variables()
      if (!any(c("AERELPRN", "AERELPR") %in% choices)) {
       selected <- NULL
     } else {
@@ -3282,16 +3301,17 @@ output$sel_aeacnn <- shiny::renderUI({
     shiny::req(merged_adae_adsl_data())
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
-
-    is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-
-    choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    if(!is.null(adsl)) {
-      choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-      choices <- sort(c(choices, choices2))
-    }
-
-    choices <- c(unique(choices))
+#
+#     is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
+#
+#     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
+#     if(!is.null(adsl)) {
+#       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
+#       choices <- sort(c(choices, choices2))
+#     }
+#
+#     choices <- c(unique(choices))
+    choices <- convertible_to_flag_variables()
 
      if (!any(c("AEACNN", "AEACN") %in% choices)) {
       selected <- NULL
@@ -3433,8 +3453,8 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
     }
   })
 
-  output$table_ae <- DT::renderDataTable(adae_data_reac(), options = list(autoWidth = FALSE))
-  output$table_pat <- DT::renderDataTable(adsl_data_reac(), options = list(autoWidth = FALSE))
+  # output$table_ae <- DT::renderDataTable(adae_data_reac(), options = list(autoWidth = FALSE))
+  # output$table_pat <- DT::renderDataTable(adsl_data_reac(), options = list(autoWidth = FALSE))
 
 })
 

@@ -859,23 +859,23 @@ ui <- shiny::shinyUI(
                       shiny::uiOutput("sel_aeacnn_check")
                     )
                   ),
-                  shinyBS::bsCollapsePanel(
-                    shiny::HTML('<p style="color:white; font-size:100%;"> adae data (click to open/close table): </p>'),
-                    shiny::wellPanel(
-                      id = "table_ae_Panel",
-                      style = "color:black; overflow-y:scroll; max-height: 600px",
-                      shiny::dataTableOutput('table_ae')
-                    )
-                  ),
+                  # shinyBS::bsCollapsePanel(
+                  #   shiny::HTML('<p style="color:white; font-size:100%;"> adae data (click to open/close table): </p>'),
+                  #   shiny::wellPanel(
+                  #     id = "table_ae_Panel",
+                  #     style = "color:black; overflow-y:scroll; max-height: 600px",
+                  #     shiny::dataTableOutput('table_ae')
+                  #   )
+                  # ),
                   multiple = TRUE,
                   id = "collapse_adae",
-                  open = shiny::HTML('<p style="color:white; font-size:100%;"> Plot settings</p>'),
-                  shinyBS::bsCollapsePanel(
-                    shiny::HTML('<p style="color:white; font-size:100%;"> adsl data (click to open/close table): </p>'),
-                    shiny::wellPanel(id = "table_ae_Panel",style = "color:black; overflow-y:scroll; max-height: 600px",
-                      shiny::dataTableOutput('table_pat')
-                    )
-                  )
+                  open = shiny::HTML('<p style="color:white; font-size:100%;"> Plot settings</p>')#,
+                  # shinyBS::bsCollapsePanel(
+                  #   shiny::HTML('<p style="color:white; font-size:100%;"> adsl data (click to open/close table): </p>'),
+                  #   shiny::wellPanel(id = "table_ae_Panel",style = "color:black; overflow-y:scroll; max-height: 600px",
+                  #     shiny::dataTableOutput('table_pat')
+                  #   )
+                  # )
                 )
               )
             )

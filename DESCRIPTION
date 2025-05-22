@@ -1,7 +1,7 @@
 Package: adepro
 Type: Package
 Title: A 'shiny' Application for the (Audio-)Visualization of Adverse Event Profiles
-Version: 4.4.0
+Version: 4.4.1
 Authors@R: c(person(given = "Nicole",
                    family = "Rethemeier",
                      role = "cre",

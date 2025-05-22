@@ -87,7 +87,7 @@ calculate_and_impute_required_variables_missing_values <- function(
   if (!is.null(AESEVN)) {
     if (!is.null(data)) {
       if (!is.null(severity_grading_flag)) {
-        number_severe_missing <- calculate_number_missing_severity_flag(dat = data, sel_aesevn = AESEVN,severity_grading_flag = severity_grading_flag)
+        number_severe_missing <- calculate_number_missing_severity_flag(dat = data, sel_aesevn = AESEVN, sel_aedecod = AEDECOD, severity_grading_flag = severity_grading_flag)
       }
     }
   } else {
@@ -101,10 +101,17 @@ calculate_and_impute_required_variables_missing_values <- function(
         if (severity_grading_flag == "Severity") {
           data <- data %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_raw")):= !!rlang::sym(AESEVN)) %>%
-            dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c(1,2,3)),!!rlang::sym(AESEVN),3)) %>%
+            # dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c(1,2,3)),!!rlang::sym(AESEVN),3)) %>%
+            dplyr::mutate(!!rlang::sym(AESEVN):= dplyr::case_when(
+              is.na(!!rlang::sym(AESEVN)) & !is.na(!!rlang::sym(AEDECOD)) ~ 3,
+              is.na(!!rlang::sym(AESEVN)) & is.na(!!rlang::sym(AEDECOD)) ~ !!rlang::sym(AESEVN),
+              !!rlang::sym(AESEVN) %in% c(1,2,3) & !is.na(!!rlang::sym(AESEVN)) ~ !!rlang::sym(AESEVN),
+              !(!!rlang::sym(AESEVN) %in% c(1,2,3)) & !is.na(!!rlang::sym(AESEVN)) ~ 3
+              )
+            ) %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_imputed_flag")):= dplyr::case_when(
-              is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN)) ~ 0,
-              !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 0,
+              is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN))  ~ 1,
+              !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 1,
               is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 0,
               !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(paste0(AESEVN,"_raw")) != !!rlang::sym(AESEVN) ~ 1,
               !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(paste0(AESEVN,"_raw")) == !!rlang::sym(AESEVN) ~ 0,
@@ -113,7 +120,14 @@ calculate_and_impute_required_variables_missing_values <- function(
         } else {
           data <- data %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_raw")):= !!rlang::sym(AESEVN)) %>%
-            dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c(1,2,3,4,5)) & !is.na(AEDECOD),!!rlang::sym(AESEVN),3)) %>%
+            #dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c(1,2,3,4,5)) & !is.na(AEDECOD),!!rlang::sym(AESEVN),3)) %>%
+            dplyr::mutate(!!rlang::sym(AESEVN):= dplyr::case_when(
+              is.na(!!rlang::sym(AESEVN)) & !is.na(!!rlang::sym(AEDECOD)) ~ 3,
+              is.na(!!rlang::sym(AESEVN)) & is.na(!!rlang::sym(AEDECOD)) ~ !!rlang::sym(AESEVN),
+              !!rlang::sym(AESEVN) %in% c(1,2,3,4,5) & !is.na(!!rlang::sym(AESEVN)) ~ !!rlang::sym(AESEVN),
+              !(!!rlang::sym(AESEVN) %in% c(1,2,3,4,5)) & !is.na(!!rlang::sym(AESEVN)) ~ 3
+              )
+            ) %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_imputed_flag")):= dplyr::case_when(
               is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN)) ~ 1,
               !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 1,
@@ -127,8 +141,15 @@ calculate_and_impute_required_variables_missing_values <- function(
          if (severity_grading_flag == "Severity") {
           data <- data %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_raw")):= !!rlang::sym(AESEVN)) %>%
-            dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c("MILD","MODERATE","SEVERE")),!!rlang::sym(AESEVN),"SEVERE")) %>%
-            dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_imputed_flag")):= dplyr::case_when(
+            # dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c("MILD","MODERATE","SEVERE")),!!rlang::sym(AESEVN),"SEVERE")) %>%
+            dplyr::mutate(!!rlang::sym(AESEVN):= dplyr::case_when(
+              is.na(!!rlang::sym(AESEVN)) & !is.na(!!rlang::sym(AEDECOD)) ~ "SEVERE",
+              is.na(!!rlang::sym(AESEVN)) & is.na(!!rlang::sym(AEDECOD)) ~ !!rlang::sym(AESEVN),
+              !!rlang::sym(AESEVN) %in% c("MILD","MODERATE","SEVERE") & !is.na(!!rlang::sym(AESEVN)) ~ !!rlang::sym(AESEVN),
+              !(!!rlang::sym(AESEVN) %in% c("MILD","MODERATE","SEVERE")) & !is.na(!!rlang::sym(AESEVN)) ~ "SEVERE"
+              )
+            ) %>%
+             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_imputed_flag")):= dplyr::case_when(
               is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN)) ~ 1,
               !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 1,
               is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 0,
@@ -139,7 +160,14 @@ calculate_and_impute_required_variables_missing_values <- function(
         } else {
           data <- data %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_raw")):= !!rlang::sym(AESEVN)) %>%
-            dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH")),!!rlang::sym(AESEVN),"SEVERE")) %>%
+            #dplyr::mutate(!!rlang::sym(AESEVN):= ifelse((!is.na(!!rlang::sym(AESEVN)) & !!rlang::sym(AESEVN)%in%c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH")),!!rlang::sym(AESEVN),"SEVERE")) %>%
+               dplyr::mutate(!!rlang::sym(AESEVN):= dplyr::case_when(
+              is.na(!!rlang::sym(AESEVN)) & !is.na(!!rlang::sym(AEDECOD)) ~ "SEVERE",
+              is.na(!!rlang::sym(AESEVN)) & is.na(!!rlang::sym(AEDECOD)) ~ !!rlang::sym(AESEVN),
+              !!rlang::sym(AESEVN) %in% c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH") & !is.na(!!rlang::sym(AESEVN)) ~ !!rlang::sym(AESEVN),
+              !(!!rlang::sym(AESEVN) %in% c("MILD","MODERATE","SEVERE","LIFE-THREATENING","DEATH")) & !is.na(!!rlang::sym(AESEVN)) ~ "SEVERE"
+              )
+            ) %>%
             dplyr::mutate(!!rlang::sym(paste0(AESEVN,"_imputed_flag")):= dplyr::case_when(
               is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & !is.na(!!rlang::sym(AESEVN)) ~ 1,
               !is.na(!!rlang::sym(paste0(AESEVN,"_raw"))) & is.na(!!rlang::sym(AESEVN)) ~ 1,
@@ -158,7 +186,6 @@ calculate_and_impute_required_variables_missing_values <- function(
   #   aes_removed_since_treatment_emergent <- calculate_number_aes_not_treatment_emergent(dat = data, sel_aedecod = input$sel_aedecod, sel_aetrtemn = input$sel_aetrtemn)
   #
   #
-
   #4.Get the number of adverse events start day missing
   if (!is.null(AESTDY)) {
     number_ae_start_missing <- calculate_number_ae_start_missing(dat = data, sel_aestdy = AESTDY, sel_aedecod = AEDECOD, sel_aeendy = AEENDY)
