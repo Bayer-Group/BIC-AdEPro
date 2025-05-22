@@ -79,7 +79,16 @@ test_that("check function prepare_data_for_adepro:", {
        t(c(1234520,   "", 1,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
 
        #subject 1234521 with no expected error/warning and 1 entries
-       t(c(1234521,   "Headache", 10,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA))
+       t(c(1234521,   "Headache", 10,        2,       2,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      NA,      NA)),
+
+       #subject 1234522 with missing severity grades
+       t(c(1234522,   "Pain",     2,        4,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,    NA,     6,        7,       NA,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+       t(c(1234522,   "Headache", 10,       130,     1,       1,           0,       1,        "Trtmt",    "2010-01-01", "2010-12-31", NA,     1,      1,      1)),
+
+       #subject 1234523 with missing severity grades
+       t(c(1234523,   "",     2,        4,       NA,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0)),
+       t(c(1234523,   "Pain",     6,        7,       5,       1,           0,       1,        "Placebo",  "2010-01-01", "2010-12-31", NA,     1,      0,      0))
 
 
      )
@@ -226,7 +235,13 @@ test_that("check function prepare_data_for_adepro:", {
        t(c(1234515, "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,     "Europe",   "M",   20)),
 
        #subject 1234516
-       t(c(1234516,  "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,    "Europe",   "M",   20))
+       t(c(1234516,  "Placebo",  "2010-01-01", "2010-12-31", "2009-01-01", 1,    "Europe",   "M",   20)),
+
+       #subject 1234522 with missing severity grades
+       t(c(1234522,   "Trtmt",    "2010-01-01", "2010-12-31",       NA,  1,     "Asia",   "F",   30)),
+
+       #subject 1234523 with missing severity grades
+       t(c(1234523,    "Placebo",     "2010-01-01", "2010-12-31", NA, 1,    "Europe",   "F",   40))
 
      )
   )
