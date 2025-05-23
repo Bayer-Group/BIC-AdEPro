@@ -4,7 +4,7 @@
 \alias{calculate_number_missing_last_visit_dates}
 \title{Calculate the Number of Missing Last Visit Dates}
 \usage{
-calculate_number_missing_last_visit_dates(dat, sel_lvdt)
+calculate_number_missing_last_visit_dates(dat, sel_lvdt, sel_subjidn)
 }
 \arguments{
 \item{dat}{data frame with adverse event data}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/join_adae_and_adsl.R
 \name{join_adae_and_adsl}
 \alias{join_adae_and_adsl}
-\title{Join Adverse Event data and Subject level data sets}
+\title{Join Adverse Event Data and Subject Level Data Sets}
 \usage{
 join_adae_and_adsl(dat_adae, dat_adsl, SUBJIDN)
 }
@@ -11,11 +11,11 @@ join_adae_and_adsl(dat_adae, dat_adsl, SUBJIDN)
 
 \item{dat_adsl}{data frame with subject level data set}
 
-\item{SUBJIDN}{character with subject identifier variable}
+\item{SUBJIDN}{character with subject identifier variable (required column in both data sets)}
 }
 \value{
 merged data set with adae and adsl information
 }
 \description{
-Join Adverse Event data and Subject level data sets
+Join Adverse Event Data and Subject Level Data Sets
 }

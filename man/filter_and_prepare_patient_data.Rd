@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_and_prepare_patient_data.R
 \name{filter_and_prepare_patient_data}
 \alias{filter_and_prepare_patient_data}
-\title{filter_and_prepare_patient_data - filter for safety flag and create required variables}
+\title{Filter for Safety Flag and Create Required Variables}
 \usage{
 filter_and_prepare_patient_data(
   data,
@@ -15,7 +15,7 @@ filter_and_prepare_patient_data(
 )
 }
 \arguments{
-\item{data}{adae (optional merged adsl) data set}
+\item{data}{frame with adverse event data set}
 
 \item{SAFFN}{Safety Flag as numeric (required)}
 
@@ -29,7 +29,9 @@ filter_and_prepare_patient_data(
 
 \item{DTHDT}{Death Date as numeric (required)}
 }
-\description{
-Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application
+\value{
+data frame with filtered adverse event data
 }
-\keyword{internal}
+\description{
+Filter for Safety Flag and Create Required Variables
+}

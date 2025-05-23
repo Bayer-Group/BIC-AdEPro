@@ -5,6 +5,7 @@
 #'
 #' @param aes list of selected adverse events
 #' @param colors color vector for adverse events
+#' @param color_theme logical value for dark/light theme
 #'
 #' @keywords internal
 
@@ -17,9 +18,19 @@ barchart_legend <- function(
       "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
     ),
     legend_click = NULL,
-    info
+    info,
+    color_theme = TRUE
 ) {
 
+  if(color_theme) {
+    bg_col <- "#424242"
+    fg_col <- "#383838"
+    text_col <- "white"
+  } else {
+    bg_col <- "#ffffff"
+    fg_col <- "#dedede"
+    text_col <- "black"
+  }
   on_ex <- par("oma", "mar", "font")
   on.exit(par(on_ex))
   par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
@@ -44,15 +55,15 @@ barchart_legend <- function(
       y = NA,
       xlim = c(0.5, 1.5),
       ylim = c(0, (12 * 3) + 1),
-      col.lab = "white",
+      col.lab = text_col,
       axes = FALSE,
     )
 
-    graphics::rect(-100, -100, 100, 100, col = "#383838", border = "#383838")
+    graphics::rect(-100, -100, 100, 100, col = fg_col, border = fg_col)
 
     for(i in 1:length(aes)) {
-      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
-      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, tmp$ae[i], col = "white")
+      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = bg_col)
+      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, tmp$ae[i], col = text_col)
     }
 
     graphics::symbols(
@@ -66,23 +77,6 @@ barchart_legend <- function(
       lwd = 1
     )
 
-    if (!is.null(info)) {
-      if (dim(info)[1] > 0) {
-       graphics::symbols(
-          info$X,
-          info$Y,
-          squares = cbind(rep(2, length(info$Y))),
-          inches = FALSE,
-          add = TRUE,
-          fg = "#ffffff10",
-          bg = "#ffffff10",
-          lwd = 3,
-          xlab = "",
-          ylab = "",
-          main = "",
-        )
-      }
-    }
   }
   return(info)
 }

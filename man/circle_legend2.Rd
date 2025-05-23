@@ -8,13 +8,16 @@ circle_legend2(
   aes,
   colors = c("#e43157", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628",
     "#f781bf", "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"),
-  grading = F
+  grading = F,
+  color_theme = TRUE
 )
 }
 \arguments{
 \item{aes}{list of selected adverse events}
 
 \item{colors}{color vector for adverse events}
+
+\item{color_theme}{logical value for dark/light theme}
 }
 \description{
 Drawing legends for symbols in app

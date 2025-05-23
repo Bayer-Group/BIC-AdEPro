@@ -18,6 +18,28 @@ server <- shiny::shinyServer(function(input, output, session) {
     "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
   )
 
+  shiny::observeEvent(input$bslib_theme, {
+    if (input$bslib_theme) {
+      session$setCurrentTheme(
+        bslib::bs_theme(
+          version = 3,
+          bg = "#383838",
+          fg = "#ffffff",
+          primary = "#377eb8"
+        )
+      )
+    } else {
+     session$setCurrentTheme(
+        bslib::bs_theme(
+          version = 3,
+          bg = "#dedede",
+          fg = "#000",
+          primary = "#377eb8"
+        )
+      )
+    }
+  })
+
   #### Data upload ####
   # use shinyjs package to disable the submit until data are uploaded and checked
   shinyjs::disable("submit")
@@ -67,13 +89,11 @@ server <- shiny::shinyServer(function(input, output, session) {
     if (submit_flag$dat > 0) {
       shinyWidgets::knobInput(
         inputId = "speed",
-        label = shiny::HTML('<p style="color:white"> Animation Speed (sec.)</p>'),
+        label = shiny::HTML('<p> Animation Speed (sec.)</p>'),
         value = 2,
         min = 1,
         max = 10,
         step = 1,
-        inputColor = "white",
-        fgColor = "#377EB8",
         width = "70px",
         height = "70px",
         cursor = TRUE
@@ -108,22 +128,18 @@ server <- shiny::shinyServer(function(input, output, session) {
   })
 
    output$circle_legend<- shiny::renderUI({
-    # if(!is.null(input$heightSlider)) {
      shiny::plotOutput(
        outputId = "legend",
        height = "800px",
        click = clickOpts(id = "legend_click"),
       )
-    # }
   })
 
   output$circle_legend2<- shiny::renderUI({
-    # if(!is.null(input$heightSlider)) {
      shiny::plotOutput(
        outputId = "legend2",
        height = "800px"
       )
-    # }
   })
 
   output$barchart_legend<- shiny::renderUI({
@@ -158,6 +174,14 @@ server <- shiny::shinyServer(function(input, output, session) {
           "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
         )
         #create dummy data set to draw legend
+        if(input$bslib_theme) {
+          bg_col <- "#424242"
+          fg_col <- "#383838"
+        } else {
+          bg_col <- "#ffffff"
+          fg_col <- "#dedede"
+        }
+
         tmp <- data.frame(
           "day_start"=rep(1, 12),
           "day_end" = rep(3, 12),
@@ -168,8 +192,8 @@ server <- shiny::shinyServer(function(input, output, session) {
           "d" = rep(NA, 12),
           "Y" = rev(seq(1, 12 * 3, by = 3)),
           "X" = rep(1, 12),
-           "cont" = "#424242",
-          "cont_bg" = c(rep("#383838", length(input_var())), rep("#383838", 12 - length(input_var()))),
+           "cont" =  bg_col,
+          "cont_bg" = c(rep(fg_col, length(input_var())), rep(fg_col, 12 - length(input_var()))),
           "col" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var()))),
           "num" = c(1:length(input_var()), rep(NA, 12 - length(input_var()))),
           "bg" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var())))
@@ -215,7 +239,8 @@ server <- shiny::shinyServer(function(input, output, session) {
         tmp = tmp,
         aes = input_var(),
         legend_click = legend_click$val,
-        info = info
+        info = info,
+        color_theme = input$bslib_theme
       )
     }
   }, bg = "#424242")
@@ -232,23 +257,20 @@ server <- shiny::shinyServer(function(input, output, session) {
     if (is.null(input_var())) {
       return(NULL)
     } else {
-      return(circle_legend2(aes = input_var(),grading=ifelse(input$severity_grading_flag=="Severity",FALSE,TRUE)))
+      return(circle_legend2(aes = input_var(),grading=ifelse(input$severity_grading_flag=="Severity",FALSE,TRUE),
+       color_theme = input$bslib_theme))
     }
   }, bg = "#424242")
 
   #### create a legend for barchart
   output$legend_bar <- shiny::renderPlot({
     session$clientData$output_barchart_width
-    # session$clientData$output_legend_width
-    # session$clientData$output_circle_legend_width
-    # session$clientData$output_circle_legend2_width
     input$add_row
     input$rem_row
     input$type
     input$heightSlider
     input$plus_zoom
     input$minus_zoom
-    ## input$zoom
     if (is.null(input_var())) {
       return(NULL)
     } else {
@@ -318,25 +340,12 @@ server <- shiny::shinyServer(function(input, output, session) {
         tmp = tmp,
         aes = input_var(),
         legend_click = legend_click$val,
-        info = info
+        info = info,
+        color_theme = input$bslib_theme
       )
     }
   }, bg = "#424242")
 
-
-  # # create a legend with function 'pie_circle'
-  # output$legend2 <- shiny::renderPlot({
-  #   session$clientData$output_slicePlots_width
-  #   session$clientData$output_legend_width
-  #   session$clientData$output_circle_legend_width
-  #   session$clientData$output_circle_legend2_width
-  #   input$heightSlider
-  #   if (is.null(input_var())) {
-  #     return(NULL)
-  #   } else {
-  #     return(circle_legend2(aes = input_var()))
-  #   }
-  # }, bg = "#424242")
 
   # CSS style information of the output$dayinfo - see below (actual day number of the slider)
   output$dynamic_css <- shiny::renderUI({
@@ -402,10 +411,14 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   output$ae_type <- shiny::renderUI({
     global_params <- shiny::isolate(global_params())
+
+    choices <- global_params$AE_options
+    choices <- choices[names(choices) != "character(0)"]
+
     shiny::selectizeInput(
       inputId = "type",
       label = "Select type of Adverse Event:",
-      choices  = c(global_params$AE_options),
+      choices  = choices,
       selected = 1
     )
   })
@@ -581,9 +594,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         prev_clicked_subject$val <- info
         legend_click$val <- NULL
       }
-    }# else {
-    #  legend_ae$val <- NULL
-    #}
+    }
     info
   }, ignoreNULL = FALSE)
 
@@ -621,12 +632,12 @@ server <- shiny::shinyServer(function(input, output, session) {
       xval = c(0, cumsum(global_params()$plines[[1]])[-length(global_params()$plines[[1]])]) + global_params()$plines[[1]]/2,
       title = as.character(unique(patients()$treat)),
       subgroup = input$subgroup,
-      subjidn = input$sel_subjidn,
       slider = input$slider,
       info = info,
       legend_ae = legend_ae$val,
       arrow_data = prepared_merged_data_reac2()$ae_data,
-      show_arrows = input$show_imputations
+      show_arrows = input$show_imputations,
+      color_theme = input$bslib_theme
     )
 
     #sound
@@ -635,7 +646,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     tf2 <- max(c(0, counts$freq[which(counts$day == input$slider & counts$treat == input$sound2)]))
     tone(tf1, tf2)
 
-    }, bg = "#424242", height = function(){heightSlider$val}, width = function() {
+    }, height = function(){heightSlider$val}, width = function() {
     session$clientData$output_slicePlots_width
     }
   )
@@ -674,9 +685,10 @@ server <- shiny::shinyServer(function(input, output, session) {
         day_max = day_mx,
         count_max = count_mx,
         treatments = levels(patient$treat)[1:length(unique(patient$treat))],
-        cex.n = (((2.5 - 1.5) * heightSlider$val + (1.5 * 1600 - 3 * 400)) / (1600 - 400))
+        cex.n = (((2.5 - 1.5) * heightSlider$val + (1.5 * 1600 - 3 * 400)) / (1600 - 400)),
+        color_theme = input$bslib_theme
       )
-    }, bg = "#424242", height = function(){heightSlider$val }, width = function() {
+    }, height = function(){heightSlider$val }, width = function() {
     session$clientData$output_barchart_width}
   )
 
@@ -694,7 +706,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         bottom = "auto",
         width = 75,
         height = 75,
-        shiny::HTML('<p style="color:white"> Number of Rows: </p>'),
+        shiny::HTML('<p> Number of Rows: </p>'),
         shiny::fluidRow(
           shiny::column(2,
             div(style = "display:inline-block",
@@ -733,7 +745,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         bottom = "auto",
         width = 75,
         height = 75,
-        shiny::HTML('<p style="color:white"> Change Plot height: </p>'),
+        shiny::HTML('<p> Change Plot height: </p>'),
         shiny::fluidRow(
           shiny::column(2,
             div(style = "display:inline-block",
@@ -826,26 +838,24 @@ server <- shiny::shinyServer(function(input, output, session) {
       draggable = TRUE,
       shiny::HTML(
         paste0(
-          "<button style = 'background: #424242;
-          color:#ffffff',
-          data-toggle = 'collapse' data-target = '#demo3'>
+          "<button style = 'background: ",ifelse(input$bslib_theme,"#424242","#dedede"),"; color: ",ifelse(input$bslib_theme,"#ffffff","black"),"' data-toggle = 'collapse' data-target = '#demo3'>
           <i class='fa-solid fa-compress'></i> Info Box</button>"
         )
       ),
-      top = 45,
+      top = 85,
       left = "auto",
       right = 105,
       bottom = "auto",
       width = 250,
       height = "auto",
       tags$div(id = 'demo3',  class = "collapse",
-         shiny::HTML('<p style="color:white"> Overall information: </p>'),
+         shiny::HTML('<p> Overall information: </p>'),
          shiny::fluidRow(
           shiny::column(12,
             shiny::verbatimTextOutput("overall_info")
           )
          ),
-         shiny::HTML('<p style="color:white"> Patient information: </p>'),
+         shiny::HTML('<p> Patient information: </p>'),
          shiny::fluidRow(
           shiny::column(12,
             shiny::verbatimTextOutput("plot_hoverinfo")
@@ -863,13 +873,11 @@ server <- shiny::shinyServer(function(input, output, session) {
       draggable = TRUE,
       shiny::HTML(
         paste0(
-          "<button style = 'background: #424242;
-          color:#ffffff',
-          data-toggle = 'collapse' data-target = '#demo4'>
+          "<button style = 'background: ",ifelse(input$bslib_theme,"#424242","#dedede"),"; color: ",ifelse(input$bslib_theme,"#ffffff","black"),"' data-toggle = 'collapse' data-target = '#demo4'>
           <i class='fa-solid fa-compress'></i> Adverse event summary </button>"
         )
       ),
-      top = 5,
+      top = 45,
       left = "auto",
       right = 105,
       bottom = "auto",
@@ -1105,7 +1113,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         HTML(
           paste(
             paste(
-              "<p style='color:white'> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
+              "<p> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
             ),
             summary_text
           , collapse = ""
@@ -1276,14 +1284,13 @@ server <- shiny::shinyServer(function(input, output, session) {
     is.convertible.to.flag <- function(x) {as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".") | is.na(x)}
 
     choices <- sort(names(which(apply(dat %>% dplyr::mutate_all(is.convertible.to.flag),2,all))))
-   # choices <- sort(c(names(which(apply(apply(dat,2,function(x){is.convertible.to.flag(x)}),2,all)))))
     sort(unique(c(choices)))
   })
 
   #### load data and prepare for graphics ####
   prepared_merged_data_reac <- shiny::reactive({
     #react for file input radiobuttons or demo data
-
+    missing_replaced_data <- NULL
     input$radiobutton_data
     #adae or adae+adsl
     data <- merged_adae_adsl_data()
@@ -1434,10 +1441,8 @@ server <- shiny::shinyServer(function(input, output, session) {
             )
           })
         }
-      } else {
-        missing_replaced_data <- NULL
       }
-    }
+      }
     } else {
       saffn_check_flag$val <- FALSE
       subjidn_check_flag$val <- FALSE
@@ -1459,7 +1464,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       aedecod_check_flag$val &&
       trt01a_check_flag$val &&
       lvdt_check_flag$val &&
-      #dthdt_check_flag$val &&
       trtsdt_check_flag$val &&
       aestdy_check_flag$val &&
       aetrtemn_check_flag$val &&
@@ -1467,6 +1471,7 @@ server <- shiny::shinyServer(function(input, output, session) {
       aesevn_check_flag$val &
       !is.null(missing_replaced_data)
     ) {
+      if(!is.null(missing_replaced_data)){
       prepared_data_result_object <- prepare_data_for_adepro(
         dat = missing_replaced_data$data,
         SUBJIDN = input$sel_subjidn,
@@ -1491,6 +1496,9 @@ server <- shiny::shinyServer(function(input, output, session) {
       shinyjs::enable("submit")
 
       prepared_data_result_object
+      } else {
+      shinyjs::disable("submit")
+      }
     } else {
       shinyjs::disable("submit")
     }
@@ -1628,7 +1636,8 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   output$subgroup <- shiny::renderUI({
 
-    choices <- names(which(apply(shiny::isolate(patients()),2,function(x){length(unique(x))}) < 20))
+    pmdr <- shiny::req(prepared_merged_data_reac())
+    choices <- names(which(apply(pmdr$pat_data,2,function(x){length(unique(x))}) < 20))
     choices <- choices[!choices %in% c("X","Y")]
 
     shinyWidgets::pickerInput(
@@ -1841,10 +1850,10 @@ server <- shiny::shinyServer(function(input, output, session) {
       id = "collapse",
       open = c(
         shiny::HTML(
-          '<p style="color:white; font-size:100%;"> Modify data </p>'
+          '<p> Modify data </p>'
         ),
-        shiny::HTML('<p style="color:white; font-size:100%;"> Adverse events for animation </p>'),
-        shiny::HTML('<p style="color:white; font-size:100%;"> Subgroup setting </p>')
+        shiny::HTML('<p> Adverse events for animation </p>'),
+        shiny::HTML('<p> Subgroup setting </p>')
       )
     )
   })
@@ -1872,8 +1881,8 @@ server <- shiny::shinyServer(function(input, output, session) {
       session,
       id = "collapse_adae",
       open = c(
-        shiny::HTML('<p style="color:white; font-size:100%;"> Required variables: </p>'),
-        shiny::HTML('<p style="color:white; font-size:100%;"> Optional variables: </p>' )
+        shiny::HTML('<p> Required variables: </p>'),
+        shiny::HTML('<p> Optional variables: </p>' )
       )
     )
   })
@@ -1884,8 +1893,8 @@ server <- shiny::shinyServer(function(input, output, session) {
         session,
         id = "collapse_adae",
         open = c(
-          shiny::HTML('<p style="color:white; font-size:100%;"> Required variables: </p>'),
-          shiny::HTML('<p style="color:white; font-size:100%;"> Optional variables: </p>' )
+          shiny::HTML('<p> Required variables: </p>'),
+          shiny::HTML('<p> Optional variables: </p>' )
         )
       )
     }
@@ -1931,7 +1940,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     shinyBS::updateCollapse(
       session,
       id = "collapse",
-      open = shiny::HTML('<p style="color:white; font-size:100%;"> Adverse events for animation </p>')
+      open = shiny::HTML('<p> Adverse events for animation </p>')
     )
   })
 
@@ -1990,7 +1999,6 @@ server <- shiny::shinyServer(function(input, output, session) {
 
   #### SUBJECT ID - SUBJIDN ####
   output$sel_subjidn <- shiny::renderUI({
-    # adae <- merged_adae_adsl_data()
     adae_data_reac()
     adsl_data_reac()
       if (!is.null(adae_data_reac())) {
@@ -2001,12 +2009,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       } else {
         choices <- NULL
       }
-    # if (!is.null(adsl)) {
-    #   choices <- intersect(names(adae),names(adsl))
-    #   choices <- names(which(apply(adsl[choices], 2, function(x) {length(unique(x))}) == dim(adsl)[1]))
-    # } else {
-      # choices <- names(adae)
-    # }
 
     choices <- c(unique(choices))
 
@@ -2019,7 +2021,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_subjidn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Subject Identifier:</p>'),
+      label = shiny::HTML('<p> Subject Identifier:</p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2065,7 +2067,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_subjidn_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question">
+                '<span> <i class="fa-solid fa-question">
                 </i>
                 A variable different to SUBJIDN, SUBJID, USUBJIDN, USUBJID is selected.
                 </span>'
@@ -2104,7 +2106,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aedecod",
-      label = shiny::HTML('<p style = "color:#ffffff"> Dictionary Derived Term: </p>'),
+      label = shiny::HTML('<p> Dictionary Derived Term: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2158,7 +2160,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_aedecod_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"> </i>
+                '<span> <i class="fa-solid fa-question"> </i>
                 Variable AEDECOD is not available or selected.
                 </span>'
               )
@@ -2197,7 +2199,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
     shinyWidgets::pickerInput(
       inputId = "sel_trt01a",
-      label = shiny::HTML('<p style = "color:#ffffff"> Actual treatment: </p>'),
+      label = shiny::HTML('<p> Actual treatment: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2224,17 +2226,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       trt01a_check_flag$val <- FALSE
     } else {
 
-      # if (input$sel_trt01a == "Nothing selected") {
-      #   trt01a_check_flag$val <- FALSE
-      #   output$sel_trt01a_check <- shiny::renderUI({
-      #     shiny::HTML(
-      #       paste0(
-      #         '<span style = "color:#E43157"> <i class="fa-solid fa-times"></i>
-      #         Variables TRT01A, TRT01AN, TRT01P, TRT01PN are not available.
-      #         Please select another variable, upload adsl data or add one of these variables to your data set.
-      #         </span>'))
-      #   })
-      # } else {
         trt01a <- merged_adae_adsl_data()[[input$sel_trt01a]]
 
         if (!any(input$sel_trt01a %in% c("TRT01A", "TRT01AN", "TRT01P", "TRT01PN"))) {
@@ -2242,7 +2233,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_trt01a_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff">
+                '<span>
                 <i class="fa-solid fa-question">
                 </i>
                 Variable different to TRT01A, TRT01AN, TRT01P, TRT01PN is selected.
@@ -2274,21 +2265,6 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    # is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-    # is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-    #
-
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-    # choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-    #   choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
-    #   choices <- sort(c(choices, choices2))
-    #   choices_int <- sort(c(choices_int, choices2_int))
-    # }
-    # choices <- sort(c(choices,choices_int))
-    # choices <- c(unique(choices))
-    # choices <- c(unique(choices))
     choices <- convertible_to_date_variables()
     if(!"TRTSDT" %in% choices) {
       selected <- NULL
@@ -2297,7 +2273,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
     shinyWidgets::pickerInput(
       inputId = "sel_trtsdt",
-      label = shiny::HTML('<p style = "color:#ffffff"> Date of First Exposure to Treatment: </p>'),
+      label = shiny::HTML('<p> Date of First Exposure to Treatment: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2324,20 +2300,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     } else {
       is.convertible.to.date <- function(x) {!is.na(anytime::anydate(as.character(x)))}
       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-      # if (input$sel_trtsdt == "Nothing selected") {
-      #    trtsdt_check_flag$val <- FALSE
-      #   output$sel_trtsdt_check <- renderUI({
-      #    shiny::HTML(
-      #     paste0('<span style = "color:#E43157"> <i class="fa-solid fa-times">
-      #                       </i>
-      #                       Variable TRTSDT is not available. Please select another variable,
-      #                       upload adsl data or add the variable to your data set.
-      #                       </span>'
-      #               ))
-      #   })
-      # } else {
         trtsdt <- merged_adae_adsl_data()[[input$sel_trtsdt]]
-      ##back ##
 
         if (!any(sapply(trtsdt, is.convertible.to.date)) & !any(sapply(trtsdt, is.convertible.to.integer))) {
          trtsdt_check_flag$val <- FALSE
@@ -2353,7 +2316,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_trtsdt_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>
+                '<span> <i class="fa-solid fa-question"></i>
                  Variable TRTSDT is not available or selected. </span>'
               )
             )
@@ -2369,7 +2332,6 @@ server <- shiny::shinyServer(function(input, output, session) {
           })
         }
       }
-    # }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
   #### LAST VISIT DATE - LVDT ####
@@ -2379,31 +2341,7 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    # is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-    #
-    # is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-    #
-    #
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-    # choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-    #   choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
-    #   choices <- sort(c(choices, choices2))
-    #   choices_int <- sort(c(choices_int, choices2_int))
-    # }
-    # choices <- sort(c(choices,choices_int))
-    # choices <- c(unique(choices))
-    # choices <- c(unique(choices))
     choices <- convertible_to_date_variables()
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-    #
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-    #   choices <- sort(c(choices, choices2))
-    # }
-
-    # choices <- c(unique(choices))
 
     if (!"LVDT" %in% choices) {
       selected <- NULL
@@ -2413,7 +2351,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_lvdt",
-      label = shiny::HTML('<p style = "color:#ffffff"> Date of Last Visit: </p>'),
+      label = shiny::HTML('<p> Date of Last Visit: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2439,8 +2377,6 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
       lvdt_check_flag$val <- FALSE
     } else {
-      #is.convertible.to.date <- function(x) !is.na(as.Date(anytime::anydate(as.character(x))))
-       #is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
        is.convertible.to.date <- function(x) {!is.na(anytime::anydate(as.character(x)))}
        is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
       if (!input$sel_lvdt %in% colnames(merged_adae_adsl_data())) {
@@ -2471,7 +2407,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_lvdt_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>  Variable LVDT is not available or selected.</span>'
+                '<span> <i class="fa-solid fa-question"></i>  Variable LVDT is not available or selected.</span>'
               )
             )
           })
@@ -2515,7 +2451,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aetrtemn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Treatment Emergent Analysis Flag: </p>'),
+      label = shiny::HTML('<p> Treatment Emergent Analysis Flag: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2561,7 +2497,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_aetrtemn_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question">
+                '<span> <i class="fa-solid fa-question">
                 </i>
                 Variable different to AETRTEMN, AETRTEM, TRTEMFLN, TRTEMFL is selected.
                 </span>'
@@ -2588,24 +2524,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
-#
-#     is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
-#     is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-#
-#
-#     choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.date(x)}),2,any)))))
-#     choices_int <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.integer(x)}),2,any)))))
-#     if(!is.null(adsl)) {
-#       choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.date(x)}),2,any)))
-#       choices2_int <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.integer(x)}),2,any)))
-#       choices <- sort(c(choices, choices2))
-#       choices_int <- sort(c(choices_int, choices2_int))
-#     }
-#     choices <- sort(c(choices,choices_int))
-#
-#     choices <- c(unique(choices),"NA")
     choices <- convertible_to_date_variables()
-    #choices <- c(unique(choices),"NA", "Nothing selected")
 
     if(!"DTHDT" %in% choices) {
       selected <- NULL
@@ -2615,7 +2534,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_dthdt",
-      label = shiny::HTML('<p style = "color:#ffffff"> Date of Death: </p>'),
+      label = shiny::HTML('<p> Date of Death: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2642,11 +2561,8 @@ server <- shiny::shinyServer(function(input, output, session) {
       })
       dthdt_check_flag$val <- FALSE
     } else {
-      #is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC', format = '%Y-%m-%d'))
       is.convertible.to.date <- function(x) {!is.na(anytime::anydate(as.character(x)))}
-      # is.convertible.to.date <- function(x) !is.na(as.Date(anytime::anydate(as.character(x))))
       is.convertible.to.integer <- function(x) {suppressWarnings(x == as.integer(x))}
-      ## back##
       if (input$sel_dthdt == "Nothing selected") {
           dthdt_check_flag$val <- FALSE
         output$sel_dthdt_check <- renderUI({
@@ -2682,7 +2598,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_dthdt_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>Variable DTHDT is not available or selected. </span>'
+                '<span> <i class="fa-solid fa-question"></i>Variable DTHDT is not available or selected. </span>'
               )
             )
           })
@@ -2706,20 +2622,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
-
-    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-    #
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-    #   choices <- sort(c(choices, choices2))
-    # }
-    #
-    # choices <- c(unique(choices))
     choices <- convertible_to_flag_variables()
-    # choices <- c(unique(choices),"Nothing selected")
-
-    # choices <- colnames(adae_data_reac2())
 
     if (!any(c("SAFFN","SAFFL") %in% choices)) {
       selected <- NULL
@@ -2729,7 +2632,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_saffn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Safety Population Flag: </p>'),
+      label = shiny::HTML('<p> Safety Population Flag: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2774,7 +2677,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_saffn_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"> </i> Variable different to SAFFN, SAFFL is selected. </span>'
+                '<span> <i class="fa-solid fa-question"> </i> Variable different to SAFFN, SAFFL is selected. </span>'
               )
             )
           })
@@ -2808,10 +2711,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     choices <- c(unique(choices))
 
-    # choices <- colnames(merged_adae_adsl_data())
-
     if (!any(c("AESTDY","ASTDY") %in% choices)) {
-      #choices <- c("Nothing selected", choices)
       selected <- NULL
     } else {
       selected <- c("AESTDY","ASTDY")[which(c("AESTDY","ASTDY") %in% choices)[1]]
@@ -2819,7 +2719,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aestdy",
-      label = shiny::HTML('<p style = "color:#ffffff"> Adverse Event Start Day: </p>'),
+      label = shiny::HTML('<p> Adverse Event Start Day: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2866,7 +2766,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_aestdy_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"> </i> Variable different to AESTDY, ASTDY is selected. </span>'
+                '<span> <i class="fa-solid fa-question"> </i> Variable different to AESTDY, ASTDY is selected. </span>'
               )
             )
           })
@@ -2892,9 +2792,6 @@ server <- shiny::shinyServer(function(input, output, session) {
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    # is.convertible.to.num <- function(x) !is.na(as.numeric(as.character(x)))
-
-    #choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.num(x)}),2,any)))))
     choices <- names(adae[unlist(lapply(adae, is.numeric), use.names = FALSE)])
     if(!is.null(adsl)) {
       choices2 <- names(adsl[unlist(lapply(adsl, is.numeric), use.names = FALSE)])
@@ -2904,7 +2801,6 @@ server <- shiny::shinyServer(function(input, output, session) {
     choices <- c(unique(choices))
 
     if (!any(c("AEENDY","AENDY") %in% choices)) {
-      #choices <- c("Nothing selected", choices)
       selected <- NULL
     } else {
       selected <- c("AEENDY","AENDY")[which(c("AEENDY","AENDY") %in% choices)[1]]
@@ -2912,7 +2808,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aeendy",
-      label = shiny::HTML('<p style = "color:#ffffff"> Adverse Event End Day: </p>'),
+      label = shiny::HTML('<p> Adverse Event End Day: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -2962,7 +2858,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_aeendy_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"> </i>
+                '<span> <i class="fa-solid fa-question"> </i>
                 Variables AEENDY or AENDY are not available or selected. </span>'
               )
             )
@@ -3004,7 +2900,6 @@ server <- shiny::shinyServer(function(input, output, session) {
     }
     choices <- c(unique(choices))
     if (!any(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)) {
-      #choices <- c("Nothing selected", choices)
       selected <- NULL
     } else {
       selected <- c("AESEVN", "AESEV", "ASEVN", "AESEV")[which(c("AESEVN", "AESEV", "ASEVN", "AESEV") %in% choices)[1]]
@@ -3012,7 +2907,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aesevn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Severity/Intensity/Grading: </p>'),
+      label = shiny::HTML('<p> Severity/Intensity/Grading: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -3053,7 +2948,7 @@ server <- shiny::shinyServer(function(input, output, session) {
         if (!input$sel_aesevn %in% c("AESEVN", "AESEV", "AESEV", "ASEVN") & (is.numeric(aesevn) | all(aesevn %in% c("MILD", "MODERATE", "SEVERE", NA, "NA", "")))) {
           aesevn_check_flag$val <- TRUE
           output$sel_aesevn_check <- shiny::renderUI({
-            shiny::HTML(paste0('<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>  Variable AESEVN is not available or selected. </span>'))
+            shiny::HTML(paste0('<span> <i class="fa-solid fa-question"></i>  Variable AESEVN is not available or selected. </span>'))
           })
         } else if (is.numeric(aesevn) & input$sel_aesevn %in% c("AESEVN","ASEVN")) {
           aesevn_check_flag$val <- TRUE
@@ -3086,16 +2981,6 @@ server <- shiny::shinyServer(function(input, output, session) {
     shiny::req(merged_adae_adsl_data())
     adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
-
-    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-    #
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-    #   choices <- sort(c(choices, choices2))
-    # }
-    #
-    # choices <- c(unique(choices))
     choices <- convertible_to_flag_variables()
 
      if (!any(c("AESERN", "AESER") %in% choices)) {
@@ -3106,7 +2991,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aesern",
-      label = shiny::HTML('<p style = "color:#ffffff"> Serious Event Flag: </p>'),
+      label = shiny::HTML('<p> Serious Event Flag: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -3150,7 +3035,7 @@ server <- shiny::shinyServer(function(input, output, session) {
           output$sel_aesern_check <- shiny::renderUI({
             shiny::HTML(
               paste0(
-                '<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>
+                '<span> <i class="fa-solid fa-question"></i>
                  Variable AESERN is not available or selected. </span>'
               )
             )
@@ -3177,16 +3062,6 @@ server <- shiny::shinyServer(function(input, output, session) {
    adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-    #
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-    #   choices <- sort(c(choices, choices2))
-    # }
-    #
-    # choices <- c(unique(choices))
-
     choices <- convertible_to_flag_variables()
 
      if (!any(c("AERELN", "AEREL") %in% choices)) {
@@ -3198,7 +3073,7 @@ server <- shiny::shinyServer(function(input, output, session) {
 
     shinyWidgets::pickerInput(
       inputId = "sel_aereln",
-      label = shiny::HTML('<p style = "color:#ffffff"> Causality Flag: </p>'),
+      label = shiny::HTML('<p> Causality Flag: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -3241,7 +3116,7 @@ server <- shiny::shinyServer(function(input, output, session) {
          !input$sel_aereln %in% c("AERELN", "AEREL")) {
          aereln_check_flag$val <- TRUE
           output$sel_aereln_check <- renderUI({
-         shiny::HTML(paste0('<span style = "color: #ffffff"> <i class="fa-solid fa-question"></i>
+         shiny::HTML(paste0('<span> <i class="fa-solid fa-question"></i>
                              Variable AERELN/AEREL is not available or selected. </span>'))
         })
      } else if (
@@ -3261,16 +3136,6 @@ output$sel_aerelprn <- shiny::renderUI({
      adae <- shiny::req(adae_data_reac())
     adsl <- adsl_data_reac()
 
-    # is.convertible.to.flag <- function(x) as.character(x) %in% c("Y","y","Yes","yes","YES","1","0","N","n","No","NO","",".")
-    #
-    # choices <- sort(c(names(which(apply(apply(adae,2,function(x){is.convertible.to.flag(x)}),2,all)))))
-    # if(!is.null(adsl)) {
-    #   choices2 <- names(which(apply(apply(adsl,2,function(x){is.convertible.to.flag(x)}),2,all)))
-    #   choices <- sort(c(choices, choices2))
-    # }
-    #
-    # choices <- c(unique(choices))
-
     choices <- convertible_to_flag_variables()
      if (!any(c("AERELPRN", "AERELPR") %in% choices)) {
       selected <- NULL
@@ -3280,7 +3145,7 @@ output$sel_aerelprn <- shiny::renderUI({
 
     shinyWidgets::pickerInput(
       inputId = "sel_aerelprn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Causality to Protocol Procedure: </p>'),
+      label = shiny::HTML('<p> Causality to Protocol Procedure: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -3316,7 +3181,7 @@ output$sel_aerelprn <- shiny::renderUI({
          !input$sel_aerelprn %in% c("AERELPRN", "AERELPR")) {
          aerelprn_check_flag$val <- TRUE
           output$sel_aerelprn_check <- renderUI({
-         shiny::HTML(paste0('<span style = "color: #ffffff"> <i class="fa-solid fa-question"> </i>
+         shiny::HTML(paste0('<span> <i class="fa-solid fa-question"> </i>
                             Variable AERELPRN/AERELPR is not available or selected. </span>'))
         })
      } else if(
@@ -3347,7 +3212,7 @@ output$sel_aeacnn <- shiny::renderUI({
 
     shinyWidgets::pickerInput(
       inputId = "sel_aeacnn",
-      label = shiny::HTML('<p style = "color:#ffffff"> Action Taken with Study Treatment: </p>'),
+      label = shiny::HTML('<p> Action Taken with Study Treatment: </p>'),
       choices = choices,
       selected = selected,
       multiple = TRUE,
@@ -3385,7 +3250,7 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
              !input$sel_aeacnn %in% c("AEACNN", "AEACN")) {
            aeacnn_check_flag$val <- TRUE
             output$sel_aeacnn_check <- renderUI({
-           shiny::HTML(paste0('<span style = "color: #ffffff"> <i class="fa-solid fa-question">
+           shiny::HTML(paste0('<span> <i class="fa-solid fa-question">
                               </i>Variable AEACNN/AEACN is not available or selected. </span>'))
           })
        } else if (
@@ -3429,10 +3294,10 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
   })
 
   output$cont1_text <- shiny::renderUI({
-    HTML(paste0("<b style='color: #e3e3e3; border-color: #858585'>
+    HTML(paste0("<p>
       Please upload adverse event data set!
       After the upload check all required variables and press 'Submit'.
-      For more information use the help buttons on top. </b>"))
+      For more information use the help buttons on top. </p>"))
   })
 
   output$text_imputations <- shiny::renderUI({
@@ -3451,7 +3316,6 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
       aedecod_check_flag$val,
       trt01a_check_flag$val,
       lvdt_check_flag$val,
-     #dthdt_check_flag$val,
       aesevn_check_flag$val,
       aestdy_check_flag$val,
       aeendy_check_flag$val,
@@ -3460,7 +3324,7 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
     ), {
     if (
       saffn_check_flag$val && subjidn_check_flag$val && aedecod_check_flag$val &&
-      trt01a_check_flag$val && lvdt_check_flag$val && #dthdt_check_flag$val &&
+      trt01a_check_flag$val && lvdt_check_flag$val &&
       aesevn_check_flag$val && aestdy_check_flag$val && aeendy_check_flag$val &&
       trtsdt_check_flag$val && aetrtemn_check_flag$val
     ) {

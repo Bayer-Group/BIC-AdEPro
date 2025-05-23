@@ -52,9 +52,9 @@ prepare_data_for_adepro(
 
 \item{AERELN}{Adverse Event Related Flag as numeric (optional)}
 
-\item{AERELPRN}{Adverse Event      Flag as numeric (optional)}
+\item{AERELPRN}{Adverse Event Flag as numeric (optional)}
 
-\item{AEACNN}{Adverse Event        Flag as numeric (optional)}
+\item{AEACNN}{Adverse Event Flag as numeric (optional)}
 }
 \description{
 Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application

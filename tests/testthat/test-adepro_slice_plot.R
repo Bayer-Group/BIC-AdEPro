@@ -1,4 +1,4 @@
-test_that("slice plot works", {
+test_that("slice plot works with imputed arrows", {
 
   adae_and_adsl <- join_adae_and_adsl(dat_adae = adae_data, dat_adsl = adsl_data, SUBJIDN = "SUBJIDN")
 
@@ -27,7 +27,7 @@ test_that("slice plot works", {
   p <- function() adepro_slice_plot(
     data = ae_data,
     patients = patients,
-    ae_list = c("Dizziness","Nausea","Pain","Headache","Cough","Diarrhea","Fatigue","Edema limbs","Anorexia","Alopecia"),#v
+    ae_list = c("Dizziness","Nausea","Pain","Headache","Cough","Diarrhea","Fatigue","Edema limbs","Anorexia","Alopecia"),
     global_params = globals,
     height = globals$height,
     width  = globals$width,
@@ -35,15 +35,14 @@ test_that("slice plot works", {
     ylines = globals$ylines,
     xval = c(0, cumsum(globals$plines[[1]])[-length(globals$plines[[1]])]) + globals$plines[[1]]/2,
     title = as.character(unique(patients$treat)),
-    subgroup = NULL,
-    subjidn = "SUBJIDN",
+    subgroup = "SEX",
     slider = 100,
     info = NULL,
     legend_ae = NULL,
     arrow_data = prepared$ae_data,
-    show_arrows = FALSE
+    show_arrows = TRUE,
+    color_theme = TRUE
   )
 
   vdiffr::expect_doppelganger("Slice plot", p)
-
 })

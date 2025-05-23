@@ -11,6 +11,7 @@ utils::globalVariables(c("ae", "day_slider", "vars", "day_mx", "count_mx", "ps",
 #' @param day_max Maximum Day
 #' @param count_max Maximum Counts
 #' @param cex.n Font size of the text in the bars
+#' @param color_theme logical value for dark/light theme
 #'
 #' @keywords internal
 
@@ -22,7 +23,8 @@ bar_chart <- function(
   day_max = day_mx,
   count_max = count_mx,
   treatments = treatments,
-  cex.n = 2
+  cex.n = 2,
+  color_theme = TRUE
 ){
 
   #app colors
@@ -32,6 +34,15 @@ bar_chart <- function(
     "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
   )
 
+  if(color_theme) {
+    bg_col <- "#424242"
+    fg_col <- "#383838"
+    text_col <- "white"
+  } else {
+    bg_col <- "#ffffff"
+    fg_col <- "#dedede"
+    text_col <- "black"
+  }
   # merge ae's and colors
   col_ae <- data.frame('ae' = variables,
                        'col' = colors[1:length(variables)])
@@ -67,7 +78,7 @@ bar_chart <- function(
     #create multiple plots
     on_ex <- par("mfrow", "mai")
     on.exit(par(on_ex))
-    par(mfrow = c(2, length(treatments)) , mai = c(1.12, 0.82, 0.62, 0.42))
+    par(mfrow = c(2, length(treatments)) , mai = c(1.12, 0.82, 0.62, 0.42),  bg = bg_col)
 
     #for every treatment group + Total draw a barplot
     for(i in 1:(length(treatments))){
@@ -87,7 +98,7 @@ bar_chart <- function(
       #draw barplot
       Barplot <- graphics::barplot(vec,
               cex.main = 1.4,
-              col.main = "#6b6b6b",
+              col.main = text_col,
               col = c(as.character(count_ev2 %>%
                                      dplyr::filter(treat == treatments[i]) %>%
                                      .$col)),
@@ -95,19 +106,19 @@ bar_chart <- function(
               ylab = "",
               las = 2,
               add = FALSE,
-              col.lab = "#6b6b6b",
+              col.lab = text_col,
               main = paste0(treatments[i], "\n", "AE Frequency on Day ", day),
               axisnames = FALSE,
               cex.lab = 1,
               axes = FALSE,
               border = NA,
               font.axis = 2,
-              col.axis ="#6b6b6b"
+              col.axis =text_col
               )
-      graphics::axis(2, col = "#6b6b6b", col.axis = ("#6b6b6b"), cex.axis = 1.7, las = 1)
-      graphics::axis(2, axpos, labels = FALSE, col = "#6b6b6b", col.axis = ("#6b6b6b"), cex.axis = 1.7, las = 1)
+      graphics::axis(2, col = text_col, col.axis = (text_col), cex.axis = 1.7, las = 1)
+      graphics::axis(2, axpos, labels = FALSE, col = text_col, col.axis = (text_col), cex.axis = 1.7, las = 1)
       #numbers over bars
-      text(Barplot, posi, paste0(round(vec,1)), cex = cex.n, col = "#6b6b6b")
+      text(Barplot, posi, paste0(round(vec,1)), cex = cex.n, col = text_col)
     }
 
 
@@ -190,20 +201,20 @@ bar_chart <- function(
         las = 2,
         ylim = c(0, res_max + (res_max/15)),
         add = FALSE,
-        col.lab = "#6b6b6b",
+        col.lab = text_col,
         main = paste0(treatments[i], "\n", "Patient Days with AE ", "\n"," until Day ", day),
-        col.main = "#6b6b6b",
+        col.main = text_col,
         cex.lab = 1,
         axes = FALSE,
         border = NA,
         axisnames = FALSE,
         font.axis = 2,
-        col.axis = "#6b6b6b",
-        col.sub = "#6b6b6b",
+        col.axis = text_col,
+        col.sub = text_col,
         cex.sub = 1.6
       )
-      graphics::axis(2, col = "#6b6b6b", col.axis = ("#6b6b6b"), cex.axis = 1.7, las = 1)
-      graphics::axis(2, axpos, labels = FALSE, col = "#6b6b6b", col.axis = ("#6b6b6b"), cex.axis = 1.7, las = 1)
-      text(Barplot, vec + res_max/30, paste0(round(vec, 1)), cex = cex.n, col = "#6b6b6b")
+      graphics::axis(2, col = text_col, col.axis = (text_col), cex.axis = 1.7, las = 1)
+      graphics::axis(2, axpos, labels = FALSE, col = text_col, col.axis = (text_col), cex.axis = 1.7, las = 1)
+      text(Barplot, vec + res_max/30, paste0(round(vec, 1)), cex = cex.n, col = text_col)
     }
 }

@@ -12,7 +12,8 @@ bar_chart(
   day_max = day_mx,
   count_max = count_mx,
   treatments = treatments,
-  cex.n = 2
+  cex.n = 2,
+  color_theme = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ bar_chart(
 \item{count_max}{Maximum Counts}
 
 \item{cex.n}{Font size of the text in the bars}
+
+\item{color_theme}{logical value for dark/light theme}
 }
 \description{
 Creates bar charts daily and total for all patients separately according to treatment (R Package required: 'dplyr')

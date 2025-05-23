@@ -108,7 +108,6 @@ Please ensure that your datasets contain all the **required variables**.
 | Date of First Exposure to Treatment | TRTSDT                              | char       |  Character Format: %Y-%m-%d                                                  |
 | Date of Last Visit                  | LVDT                                | char       |  Character Format: %Y-%m-%d                                                  |
 | Treatment Emergent Analysis Flag    | AETREMN; AETRTEM; TRTEMFLN; TRTEMFL | num / char | Expected values: '1', 'Y', 'Yes', 'YES', 'yes', 'y'                          |
-| Date of Death                       | DTHDT                               | char       | Character Format: %Y-%m-%d                                                   |
 | Safety Population Flag              | SAFFN; SAFFL                        | num / char | Expected values: '1', 'Y', 'Yes', 'YES', 'yes', 'y'                          |
 | Adverse Event Start Day             | AESTDY; ASTDY                       | num        |                                                                              |
 | Adverse Event End Day               | AEENDY; AENDY                       | num        |                                                                              |
@@ -118,6 +117,7 @@ Some variables which allow categorization of adverse events are '**Optional vari
 
 | Variable                          | Default           | Format     | Notes                                                |
 |:----------------------------------|:------------------|:-----------|:-----------------------------------------------------|
+| Date of Death                     | DTHDT             | char       | Character Format: %Y-%m-%d                           |
 | Serious Event Flag                | AESERN; AESER     | num / char | Expected values: '0', 'N', 'No', 'NO', 'no', 'n', '' |
 | Causality Flag                    | AERELN; AEREL     | num / char | Expected values: '1', 'Y', 'Yes', 'YES', 'yes', 'y'  |
 | Causality to Protocol Procedure   | AERELPRN; AERELPR | num / char | Expected values: '1', 'Y', 'Yes', 'YES', 'yes', 'y'  |

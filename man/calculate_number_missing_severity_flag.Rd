@@ -7,6 +7,7 @@
 calculate_number_missing_severity_flag(
   dat = adae_data,
   sel_aesevn = NULL,
+  sel_aedecod,
   severity_grading_flag
 )
 }

@@ -9,63 +9,65 @@
 ui <- shiny::shinyUI(
   shiny::fluidPage(
     shinyjs::useShinyjs(),
-    ## CSS code
-    shiny::tags$head(
-      shiny::tags$style(
-        shiny::HTML(
-          "#controls {background-color: #383838;}
-          .shiny-output-error-validation {color: #e43157;}
-          .form-group {margin-bottom: 0 !important;}
-          "
+      theme = bslib::bs_theme(
+        version = 3,
+        bg = "#383838",
+        fg = "#ffffff",
+        primary = "#377eb8"
+      ),
+      # CSS code
+      shiny::tags$head(
+        shiny::tags$style(
+          shiny::HTML(
+           #"#controls {background-color: #383838;}
+            ".shiny-output-error-validation {color: #e43157;}
+            .form-group {margin-bottom: 0 !important;}
+            "
+          )
         )
-      )
-    ),
-    shiny::tags$style(type = "text/css",# "body { overflow-y: scroll; }",
-      paste0(".recalculating {opacity: 1.0;}
-        .irs-bar {width: 100%; height: 25px; background: #377eb8; border-top: 1px solid #377eb8; border-bottom: 1px solid #377eb8;}
-        .irs-bar-edge {background: #377eb8; border: 1px solid #377eb8; height: 25px; border-radius: 5px; width: 20px;}
-        .irs-line {border: 1px solid #377eb8; height: 25px; border-radius: 5px;}
+      ),
+      shiny::tags$style(type = "text/css",# "body { overflow-y: scroll; }",
+        paste0(".recalculating {opacity: 1.0;}
+        .irs-bar {width: 100%; height: 25px; border-top: 1px solid; border-bottom: 1px solid;}
+        .irs-bar-edge {border: 1px solid; height: 25px; border-radius: 5px; width: 20px;}
+        .irs-line {border: 1px solid; height: 25px; border-radius: 5px;}
         #numberRows .irs-grid-text {display: none;}
         #heightSlider .irs-grid-text {display: none;}
         .irs-grid-pol {display: none;}
-        .irs-max {font-family: 'arial'; color: #ffffff; height:15px; font-size:15px}
-        .irs-min {font-family: 'arial'; color: #ffffff; height:15px; font-size:15px}
-        #numberRows .irs-single {color:#ffffff; height:20px; font-size:15px;}
-        #heightSlider .irs-single {color:#ffffff; height:20px; font-size:15px;}
-        #slider .irs-single {color:#ffffff; background:#e43157; height:20px; font-size:15px;}
+        .irs-max {font-family: 'arial'; height:15px; font-size:15px}
+        .irs-min {font-family: 'arial'; height:15px; font-size:15px}
+        #numberRows .irs-single { height:20px; font-size:15px;}
+        #heightSlider .irs-single {height:20px; font-size:15px;}
+        #slider .irs-single {height:20px; font-size:15px;}
         .irs-slider {width: 30px; height: 30px; top: 22px;}
         .panel-group.sbs-panel-group{position: absolute;width: 90%;}
-        .panel.panel-default{background-color:#383838; color:#ffffff;border-color:#6b6b6b}
-        .panel-heading{color:#ffffff;padding:0;}
-        .panel-title{background:#383838; color:#ffffff;margin-top:10px;margin-bottom:10px;padding-left:5px}
-        body {background-color: #424242; color: #6b6b6b;}
+        .panel-heading{padding:0;}
+        .panel-title{ margin-top:10px;margin-bottom:10px;padding-left:5px}
         .panel-group.sbs-panel-group {position: absolute; width: 100%;}
-        .panel.panel-default {background-color: #383838; color: #ffffff; border-color: #6b6b6b}
-        .panel-heading {color: #ffffff; padding: 0;}
-        .panel-title {background: #383838;color: #ffffff; margin-top: 10px; margin-bottom: 10px; padding-left: 5px}
-        .myRow1 {background-color: #383838; height: 150px; }
-        .myRow3 {background-color: #424242;}
-        #plot_hoverinfo {background-color: #424242; color: #ffffff; border-color: #383838; font-size: 14px;}
-        #overall_info{background-color: #424242; color: #ffffff; border-color: #383838; font-size: 14px;}
+        .panel-heading { padding: 0;}
+        .panel-title {margin-top: 10px; margin-bottom: 10px; padding-left: 5px}
+        .myRow1 {height: 150px; }
+        #plot_hoverinfo {  font-size: 14px;}
+        #overall_info{font-size: 14px;}
         "
-      )
-    ),
-    # Main panel
-    shiny::mainPanel(style = "padding-right: 0px; padding-left: 0px;", #class = "myRow1",
-      shiny::fluidRow(class = "myRow1",
-        shiny::column(2,
-          shiny::br(),
+        )
+      ),
+      # Main panel
+      shiny::mainPanel(style = "padding-right: 0px; padding-left: 0px;", #class = "myRow1",
+        shiny::fluidRow(class = "myRow1",
+          shiny::column(2,
+            shiny::br(),
             shiny::conditionalPanel(condition = "output.submitted == 1",
               shinyBS::bsCollapse(
                 shinyBS::bsCollapsePanel(
-                  shiny::HTML('<p style="color:white; font-size:100%;"> Modify data </p>'),
+                  shiny::HTML('<p> Modify data </p>'),
                   shiny::tags$style(".fa-robot {color:#E43157} "),
                   shiny::tags$style(".fa-refresh {color:#E43157} "),
                   shiny::conditionalPanel(condition = "input.view == 'pie'",
                     shinyWidgets::prettyToggle(
                       inputId = 'AI.AdEPro',
-                      label_off = HTML("<span style='color: white; font-size: 15px;'> Add AdEPro AI </span>"),
-                      label_on = HTML("<span style = 'color: white;font-size: 15px;'> Hide AdEPro AI </span>"),
+                      label_off = HTML("<span> Add AdEPro AI </span>"),
+                      label_on = HTML("<span> Hide AdEPro AI </span>"),
                       value = FALSE,
                       outline = TRUE,
                       status_on = "default",
@@ -143,7 +145,7 @@ ui <- shiny::shinyUI(
                   )
                 ),
                 shinyBS::bsCollapsePanel(
-                  shiny::HTML('<p style="color:white; font-size:100%;"> Adverse events for animation </p>'),
+                  shiny::HTML('<p> Adverse events for animation </p>'),
                   shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
                     shiny::radioButtons(
                       inputId = "ae_var_sorting",
@@ -156,7 +158,6 @@ ui <- shiny::shinyUI(
                     shiny::tags$head(
                       shiny::tags$style(
                         "#remove_all_aes {
-                          background-color: #424242;
                           color: #e43157;
                           border:none
                         }"
@@ -221,17 +222,18 @@ ui <- shiny::shinyUI(
                     label = "Mark adverse events with imputed start or/and end date",
                     value = FALSE
                   ),
+
                   shiny::uiOutput("text_imputations")
                 ),
                 shinyBS::bsCollapsePanel(
-                  shiny::HTML('<p style="color:white; font-size:100%;"> Subgroup setting </p>'),
+                  shiny::HTML('<p> Subgroup setting </p>'),
                   shiny::conditionalPanel(condition = "input.view == 'pie'",
                   uiOutput("subgroup")
                   )
                 ),
                 multiple = TRUE,
                 id = "collapse",
-                open = shiny::HTML('<p style="color:white; font-size:100%;"> Plot settings</p>')
+                open = shiny::HTML('<p> Plot settings</p>')
               )
             )
           ),
@@ -275,16 +277,6 @@ ui <- shiny::shinyUI(
                   )
                 ),
                 shiny::column(4,
-                  tags$head(
-                    tags$style(
-                      HTML('
-                      #step_size {
-                      font-family: "arial"; color: black;
-                      width: "100%";
-                      height: 20px;}
-                      ')
-                    )
-                  ),
                   shinyWidgets::currencyInput(
                     inputId ="step_size",
                     label = NULL,
@@ -343,7 +335,14 @@ ui <- shiny::shinyUI(
           shiny::column(2,
             adeproLogo(height = 120, width = 120, align = "right"),
             shiny::tags$div(style="text-align:center",
-              shiny::HTML(paste0("<span style='color: white'> v.",packageVersion("adepro"),"</span>"))
+              shiny::HTML(paste0("<span> v.",packageVersion("adepro"),"</span>"))
+            )
+          ),
+          shiny::column(2,
+            shinyWidgets::materialSwitch(
+              inputId = "bslib_theme",
+              label = "Change light/dark theme",
+              value = TRUE
             )
           )
         ),
@@ -362,7 +361,7 @@ ui <- shiny::shinyUI(
                     shiny::HTML(
                       paste(
                         shiny::tags$span(
-                          style = "font-size:110%; color:white;","
+                          style = "font-size:110%;","
                           AdEPro (Animation of Adverse Event Profiles) is a shiny application for the (audio-)visualization
                           of adverse events during clinical trials. AdEPro allows the user to upload the clinical trial data using
                           the typical Analysis Data Model (ADaM) in Clinical Data
@@ -425,7 +424,6 @@ ui <- shiny::shinyUI(
                       ")
                     ),
                     circle = TRUE,
-                    status = "custom",
                     icon = icon("book-open"),
                     width = "450px",
                     tooltip = shinyWidgets::tooltipOptions(title = "Description")
@@ -475,7 +473,6 @@ ui <- shiny::shinyUI(
                       ")
                     ),
                     circle = TRUE,
-                    status = "custom",
                     icon = icon("desktop"),
                     width = "450px",
                     tooltip = shinyWidgets::tooltipOptions(title = "Surface")
@@ -546,7 +543,6 @@ ui <- shiny::shinyUI(
                       ")
                     ),
                     circle = TRUE,
-                    status = "custom",
                     icon = icon("boxes"),
                     width = "450px",
                     tooltip = shinyWidgets::tooltipOptions(title = "Functionality")
@@ -595,7 +591,6 @@ ui <- shiny::shinyUI(
                       ")
                     ),
                     circle = TRUE,
-                    status = "custom",
                     icon = icon("file-import"),
                     width = "450px",
                     tooltip = shinyWidgets::tooltipOptions(title = "Input Data")
@@ -644,7 +639,6 @@ ui <- shiny::shinyUI(
                       ")
                     ),
                     circle = TRUE,
-                    status = "custom",
                     icon = icon("robot"),
                     width = "450px",
                     tooltip = shinyWidgets::tooltipOptions(title = "AdEPro AI")
@@ -674,7 +668,6 @@ ui <- shiny::shinyUI(
                       ")
                     ),
                     circle = TRUE,
-                    status = "custom",
                     icon = icon("info"),
                     width = "450px",
                     tooltip = shinyWidgets::tooltipOptions(title = "Additional information")
@@ -690,7 +683,7 @@ ui <- shiny::shinyUI(
               shiny::column(12,
                     shiny::radioButtons(
                     inputId ="radiobutton_data",
-                    label = HTML('<b style = "color: #ffffff"> Data type </b>'),
+                    label = HTML('<b> Data type </b>'),
                     choices = c("File upload"),
                     selected = "File upload",
                     inline = TRUE
@@ -702,7 +695,7 @@ ui <- shiny::shinyUI(
                   shiny::conditionalPanel("output.radio_data == 'File upload'",
                     shiny::fileInput(
                       inputId = 'tot_dat',
-                      label = shiny::HTML('<p style = "color: #ffffff"> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
+                      label = shiny::HTML('<p> Upload adverse event data <span style = "color:#E43157">(required)</span> </p>')
 
                     )
                   )
@@ -722,7 +715,7 @@ ui <- shiny::shinyUI(
                   conditionalPanel("output.radio_data == 'File upload'",
                   shiny::fileInput(
                     inputId = 'tot_dat2',
-                    label = shiny::HTML('<p style = "color: #ffffff"> Upload subject level data <span style = "color:#16de5f">(optional)</span> </p>')
+                    label = shiny::HTML('<p> Upload subject level data <span>(optional)</span> </p>')
                   )
                   )
                 ),
@@ -737,21 +730,6 @@ ui <- shiny::shinyUI(
                   )
 
               ),
-              # shiny::column(12,
-
-              #   conditionalPanel("output.demo_data_exists == true",
-              #     shiny::conditionalPanel("output.radio_data == 'Demo data'",
-              #     shinyWidgets::prettyCheckbox(
-              #       inputId ="use_demo_data",
-              #       label = HTML('<b style = "color: #ffffff"> Use demo data </b>'),
-              #       value = FALSE,
-              #       status = "success",
-              #       inline = TRUE,
-              #       icon = icon("check-square")
-              #     )
-              #     )
-              #   )
-              #),
               shiny::br(),
               shiny::column(12,
                 shiny::br(),
@@ -764,134 +742,116 @@ ui <- shiny::shinyUI(
               shiny::column(12,
                 shiny::uiOutput('cont1'),
                 shiny::uiOutput('cont1_text'),
-              ),
-              shiny::column(12,
-                shiny::tags$style(".btn-custom {background-color: #ffffff; color: #000000;}"),
               )
-              )
-            ),
-            shiny::conditionalPanel(condition = "output.load == 1",
-              shiny::column(8,
-                shinyBS::bsCollapse(
-                  shinyBS::bsCollapsePanel(
-                    shiny::HTML('<p style="color:white; font-size:100%;"> Required variables: </p>'),
-                    shiny::column(12,
-                      shiny::uiOutput("aes_in_visit_check"),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_subjidn"),
-                        shiny::uiOutput("sel_subjidn_check")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_aedecod"),
-                        shiny::uiOutput("sel_aedecod_check"),
-                        shiny::uiOutput("sel_aedecod_check2")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_trt01a"),
-                        shiny::uiOutput("sel_trt01a_check")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_trtsdt"),
-                        shiny::uiOutput("sel_trtsdt_check"),
-                        shiny::uiOutput("sel_trtstdt_check2")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_lvdt"),
-                        shiny::uiOutput("sel_lvdt_check"),
-                        shiny::uiOutput("sel_lvdt_check2")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_aetrtemn"),
-                        shiny::uiOutput("sel_aetrtemn_check")
-                      )
+            )
+          ),
+          shiny::conditionalPanel(condition = "output.load == 1",
+            shiny::column(8,
+              shinyBS::bsCollapse(
+                shinyBS::bsCollapsePanel(
+                  shiny::HTML('<p> Required variables: </p>'),
+                  shiny::column(12,
+                    shiny::uiOutput("aes_in_visit_check"),
+                    shiny::column(2,
+                      shiny::uiOutput("sel_subjidn"),
+                      shiny::uiOutput("sel_subjidn_check")
                     ),
-                    shiny::column(12,
-                      shiny::column(2,
-                        shiny::uiOutput("sel_saffn"),
-                        shiny::uiOutput("sel_saffn_check")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_aestdy"),
-                        shiny::uiOutput("sel_aestdy_check"),
-                        shiny::uiOutput("sel_aestdy_check2"),
-                        shiny::uiOutput("sel_aestdy_check3")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_aeendy"),
-                        shiny::uiOutput("sel_aeendy_check"),
-                        shiny::uiOutput("sel_aeendy_check2")
-                      ),
-                      shiny::column(2,
-                        shiny::uiOutput("sel_aesevn"),
-                        shiny::uiOutput("sel_aesevn_check"),
-                        shiny::uiOutput("sel_aesevn_check2")
-                      ),
-                      shiny::column(2,
-                        shiny::radioButtons(
-                          inputId = "severity_grading_flag",
-                          label = "Select Severity or Grading:",
-                          choices = c("Severity","Grading"),
-                          selected = "Severity"
-                        )
-                      )
+                    shiny::column(2,
+                      shiny::uiOutput("sel_aedecod"),
+                      shiny::uiOutput("sel_aedecod_check"),
+                      shiny::uiOutput("sel_aedecod_check2")
+                    ),
+                    shiny::column(2,
+                      shiny::uiOutput("sel_trt01a"),
+                      shiny::uiOutput("sel_trt01a_check")
+                    ),
+                    shiny::column(2,
+                      shiny::uiOutput("sel_trtsdt"),
+                      shiny::uiOutput("sel_trtsdt_check"),
+                      shiny::uiOutput("sel_trtstdt_check2")
+                    ),
+                    shiny::column(2,
+                      shiny::uiOutput("sel_lvdt"),
+                      shiny::uiOutput("sel_lvdt_check"),
+                      shiny::uiOutput("sel_lvdt_check2")
+                    ),
+                    shiny::column(2,
+                      shiny::uiOutput("sel_aetrtemn"),
+                      shiny::uiOutput("sel_aetrtemn_check")
                     )
                   ),
-                  shinyBS::bsCollapsePanel(
-                    shiny::HTML('<p style="color:white; font-size:100%;"> Optional variables: </p>'),
-                     shiny::column(2,
-                        shiny::uiOutput("sel_dthdt"),
-                        shiny::uiOutput("sel_dthdt_check")
-                      ),
+                  shiny::column(12,
                     shiny::column(2,
-                      shiny::uiOutput("sel_aesern"),
-                      shiny::uiOutput("sel_aesern_check")
+                      shiny::uiOutput("sel_saffn"),
+                      shiny::uiOutput("sel_saffn_check")
                     ),
                     shiny::column(2,
-                      shiny::uiOutput("sel_aereln"),
-                      shiny::uiOutput("sel_aereln_check")
+                      shiny::uiOutput("sel_aestdy"),
+                      shiny::uiOutput("sel_aestdy_check"),
+                      shiny::uiOutput("sel_aestdy_check2"),
+                      shiny::uiOutput("sel_aestdy_check3")
                     ),
                     shiny::column(2,
-                      shiny::uiOutput("sel_aerelprn"),
-                      shiny::uiOutput("sel_aerelprn_check")
+                      shiny::uiOutput("sel_aeendy"),
+                      shiny::uiOutput("sel_aeendy_check"),
+                      shiny::uiOutput("sel_aeendy_check2")
                     ),
                     shiny::column(2,
-                      shiny::uiOutput("sel_aeacnn"),
-                      shiny::uiOutput("sel_aeacnn_check")
+                      shiny::uiOutput("sel_aesevn"),
+                      shiny::uiOutput("sel_aesevn_check"),
+                      shiny::uiOutput("sel_aesevn_check2")
+                    ),
+                    shiny::column(2,
+                      shiny::radioButtons(
+                        inputId = "severity_grading_flag",
+                        label = "Select Severity or Grading:",
+                        choices = c("Severity","Grading"),
+                        selected = "Severity"
+                      )
                     )
+                  )
+                ),
+                shinyBS::bsCollapsePanel(
+                  shiny::HTML('<p> Optional variables: </p>'),
+                   shiny::column(2,
+                      shiny::uiOutput("sel_dthdt"),
+                      shiny::uiOutput("sel_dthdt_check")
+                    ),
+                  shiny::column(2,
+                    shiny::uiOutput("sel_aesern"),
+                    shiny::uiOutput("sel_aesern_check")
                   ),
-                  # shinyBS::bsCollapsePanel(
-                  #   shiny::HTML('<p style="color:white; font-size:100%;"> adae data (click to open/close table): </p>'),
-                  #   shiny::wellPanel(
-                  #     id = "table_ae_Panel",
-                  #     style = "color:black; overflow-y:scroll; max-height: 600px",
-                  #     shiny::dataTableOutput('table_ae')
-                  #   )
-                  # ),
-                  multiple = TRUE,
-                  id = "collapse_adae",
-                  open = shiny::HTML('<p style="color:white; font-size:100%;"> Plot settings</p>')#,
-                  # shinyBS::bsCollapsePanel(
-                  #   shiny::HTML('<p style="color:white; font-size:100%;"> adsl data (click to open/close table): </p>'),
-                  #   shiny::wellPanel(id = "table_ae_Panel",style = "color:black; overflow-y:scroll; max-height: 600px",
-                  #     shiny::dataTableOutput('table_pat')
-                  #   )
-                  # )
-                )
+                  shiny::column(2,
+                    shiny::uiOutput("sel_aereln"),
+                    shiny::uiOutput("sel_aereln_check")
+                  ),
+                  shiny::column(2,
+                    shiny::uiOutput("sel_aerelprn"),
+                    shiny::uiOutput("sel_aerelprn_check")
+                  ),
+                  shiny::column(2,
+                    shiny::uiOutput("sel_aeacnn"),
+                    shiny::uiOutput("sel_aeacnn_check")
+                  )
+                ),
+                multiple = TRUE,
+                id = "collapse_adae",
+                open = shiny::HTML('<p> Plot settings</p>')
               )
             )
           )
-        ),
-        shiny::conditionalPanel(condition = "output.submitted == 1",
-          conditionalPanel(condition = "input.sortTreatments.length > 0",
+        )
+      ),
+      shiny::conditionalPanel(condition = "output.submitted == 1",
+        conditionalPanel(condition = "input.sortTreatments.length > 0",
           shiny::uiOutput('ae_summary_box')
           ),
-          #shiny::plotOutput(outputId = "legend", width = "100%"),#, height = "45px"),
           shiny::conditionalPanel(condition = "input.view == 'pie'",
             shiny::uiOutput('patientpanel'),
 
             shiny::uiOutput('rowpanel'),
             shiny::conditionalPanel(condition = "input.sortTreatments.length == 0",
-              shiny::HTML('<p style="text-align:center;color:white;"> Please select at least one treatment in the "Modify data"-Panel! </p>')
+              shiny::HTML('<p> Please select at least one treatment in the "Modify data"-Panel! </p>')
             ),
             shiny::fluidRow(
               splitLayout(
@@ -907,30 +867,30 @@ ui <- shiny::shinyUI(
                 shiny::uiOutput("circle_legend2")
               )
             )
-          ),
-          shiny::conditionalPanel(condition = "input.view == 'chart'",
-            shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
-               shiny::fluidRow(
-                 splitLayout(
-                   cellArgs = list(style='white-space: normal; resize: horizontal;'),
-                   cellWidths = c("9%", "91%"),
-                   shiny::uiOutput("barchart_legend"),
-                   shiny::plotOutput(
-                     outputId = "barchart",
-                     height = "100%")
-                 )
+            ),
+            shiny::conditionalPanel(condition = "input.view == 'chart'",
+              shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
+                 shiny::fluidRow(
+                   splitLayout(
+                     cellArgs = list(style='white-space: normal; resize: horizontal;'),
+                     cellWidths = c("9%", "91%"),
+                     shiny::uiOutput("barchart_legend"),
+                     shiny::plotOutput(
+                       outputId = "barchart",
+                       height = "100%")
+                   )
+                )
+              ),
+              shiny::conditionalPanel(condition = "input.var.length == 0",
+                shiny::HTML('<p> To use the bar plot view, please select at least one adverse event in the "Adverse event for animation"-Panel! </p>')
+              ),
+              shiny::conditionalPanel(condition = "input.sortTreatments.length == 0",
+                shiny::HTML('<p> Please select at least one treatment in the "Modify data"-Panel! </p>')
               )
-            ),
-            shiny::conditionalPanel(condition = "input.var.length == 0",
-              shiny::HTML('<p style="text-align:center; color:white;"> To use the bar plot view, please select at least one adverse event in the "Adverse event for animation"-Panel! </p>')
-            ),
-            shiny::conditionalPanel(condition = "input.sortTreatments.length == 0",
-              shiny::HTML('<p style="text-align:center;color:white;"> Please select at least one treatment in the "Modify data"-Panel! </p>')
-            )
-         ),
-          shiny::uiOutput('zoompanel')
-       )
-    ), width = 12
+           ),
+            shiny::uiOutput('zoompanel')
+         )
+      ), width = 12
+    )
   )
-)
 )
