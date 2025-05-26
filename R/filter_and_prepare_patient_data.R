@@ -47,7 +47,7 @@ filter_and_prepare_patient_data <- function(data, SAFFN = SAFFN, LVDT = LVDT, TR
     # if death date and treatment start date is a character variable and is convertible to date use as.Date()
     # else use as.numeric()
     #
-    if (any(is.convertible.to.date(data[[LVDT]])) & any(is.convertible.to.date(data[[TRTSDT]]))) {
+    if (!any(is.numeric(data[[LVDT]])) & any(is.convertible.to.date(data[[LVDT]])) & any(is.convertible.to.date(data[[TRTSDT]]))) {
       pat_data <- pat_data  %>%
         dplyr::mutate(
           death = case_when(

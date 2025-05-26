@@ -2976,6 +2976,78 @@ server <- shiny::shinyServer(function(input, output, session) {
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
 
+  shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aesevn, input$severity_grading_flag), {
+
+    shiny::req(merged_adae_adsl_data())
+    shiny::req(input$sel_aesevn)
+    shiny::req(input$severity_grading_flag)
+
+    aesevn <- merged_adae_adsl_data()[[input$sel_aesevn]]
+
+    if (!is.null(input$sel_aesevn)){
+      if (!is.null(merged_adae_adsl_data())) {
+        if (!is.null(input$severity_grading_flag)) {
+
+          if (input$severity_grading_flag == "Severity") {
+              # Severity means 3 level grading
+              if (any(c(" 4", " 5","4","5","LIFE-THREATENING","DEATH",
+                      "life-threatening","death",
+                      "Life-threatening","Life-Threatening","Death"
+                                   ) %in% as.character(aesevn))){
+                output$sel_severity_check <- shiny::renderUI({
+                    shiny::HTML(
+                      paste0(
+                        '<p>
+                          <i class="fa-solid fa-question"></i>
+                            Severity grades "life-treatening" and/or "death" detected. Please consider using option "Grading".
+                        </p>'
+                      )
+                    )
+                })
+              } else {
+
+                output$sel_severity_check <- shiny::renderUI({
+                    shiny::HTML(
+                      paste0(
+                        '<span style = "color: #16de5f"> <i class="fa-solid fa-check"></i></span>'
+                      )
+                    )
+                })
+              }
+          }
+
+          if (input$severity_grading_flag == "Grading") {
+              if (!any(c(" 4", " 5","4","5","LIFE-THREATENING","DEATH",
+                      "life-threatening","death",
+                      "Life-threatening","Life-Threatening","Death"
+                                   ) %in% as.character(aesevn))) {
+
+                output$sel_severity_check <- shiny::renderUI({
+                    shiny::HTML(
+                      paste0(
+                        '<p>
+                          <i class="fa-solid fa-question"></i>
+                            Severity grades "life-treatening" and/or "death" are not detected. Please consider using option "Severity".
+                        </p>'
+                      )
+                    )
+                })
+              }else {
+
+                output$sel_severity_check <- shiny::renderUI({
+                    shiny::HTML(
+                      paste0(
+                        '<span style = "color: #16de5f"> <i class="fa-solid fa-check"></i></span>'
+                      )
+                    )
+                })
+              }
+          }
+        }
+      }
+    }
+  }, ignoreNULL = FALSE, ignoreInit = TRUE)
+
   #### ADVERSE EVENT SERIOUS FLAG - AESERN ####
   output$sel_aesern <- shiny::renderUI({
     shiny::req(merged_adae_adsl_data())
@@ -3344,7 +3416,7 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
     }
   })
 
-  # output$table_ae <- DT::renderDataTable(adae_data_reac(), options = list(autoWidth = FALSE))
+  output$table_ae <- DT::renderDataTable(merged_adae_adsl_data(), options = list(autoWidth = FALSE))
   # output$table_pat <- DT::renderDataTable(adsl_data_reac(), options = list(autoWidth = FALSE))
 
 })

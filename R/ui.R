@@ -807,7 +807,8 @@ ui <- shiny::shinyUI(
                         label = "Select Severity or Grading:",
                         choices = c("Severity","Grading"),
                         selected = "Severity"
-                      )
+                      ),
+                      shiny::uiOutput("sel_severity_check")
                     )
                   )
                 ),
@@ -832,6 +833,14 @@ ui <- shiny::shinyUI(
                   shiny::column(2,
                     shiny::uiOutput("sel_aeacnn"),
                     shiny::uiOutput("sel_aeacnn_check")
+                  )
+                ),
+                shinyBS::bsCollapsePanel(
+                  shiny::HTML('<p> Adverse event data: </p>'),
+                  shiny::wellPanel(
+                    id = "table_ae_Panel",
+                    style = " overflow-y:scroll;",
+                    DT::dataTableOutput("table_ae")
                   )
                 ),
                 multiple = TRUE,
