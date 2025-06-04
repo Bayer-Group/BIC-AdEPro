@@ -17,10 +17,10 @@ utils::globalVariables(c("ae","day_start","ps", "X", "Y","patient","r", "day_end
 #' @param title graph title
 #' @param subgroup selected subgroup
 #' @param slider day
-#' @param subjidn subjidn variable
 #' @param adepro_colors colors used in adepro (max 12)
 #' @param arrow_data data.frame with information which start/end date are imputed
 #' @param show_arrows logical value if arrows should be displayed for imputed data
+#' @param color_theme logical value for dark/light theme
 #'
 #' @importFrom stats end
 #' @keywords internal
@@ -38,7 +38,6 @@ adepro_slice_plot <- function(
   title,
   subgroup,
   slider,
-  subjidn,
   adepro_colors = c(
     "#e43157", "#377eb8", "#4daf4a", "#984ea3",
     "#ff7f00", "#ffff33", "#a65628", "#f781bf",
@@ -47,8 +46,25 @@ adepro_slice_plot <- function(
   info = NULL,
   legend_ae = NULL,
   arrow_data = NULL,
-  show_arrows = FALSE
+  show_arrows = FALSE,
+  color_theme = TRUE
 ) {
+
+  if(color_theme) {
+    bg_col <- "#424242"
+    fg_col <- "#383838"
+    dth_col <- "black"
+    text_col <- "white"
+    arrow_col <- "#bababa"
+    highlight_col <- "#ffffff10"
+  } else {
+    bg_col <- "#ffffff"
+    fg_col <- "#dedede"
+    dth_col <- "black"
+    text_col <- "black"
+    arrow_col <- "#383838"
+      highlight_col <- "#f5e44960"
+  }
 
   on_ex <- par("oma","mar","plt")
   on.exit(par(on_ex))
@@ -65,7 +81,8 @@ adepro_slice_plot <- function(
     mfrow = c(index, 1),
     oma = c(0, 0, 0, 0),
     mar = c(0, 0, 0, 0),
-    plt = c(0.1, 0.99, 0.01, 0.99)
+    plt = c(0.1, 0.99, 0.01, 0.99),
+    bg = bg_col
   )
 
   for (i in 1:index) {
@@ -76,7 +93,7 @@ adepro_slice_plot <- function(
       patients_tmp <- patients
     }
 
-    filtered_subjects <- patients_tmp[[subjidn]]
+    filtered_subjects <- patients_tmp[["ps"]]
 
     if (!is.null(patients_tmp$X) & !is.null(patients_tmp$Y)) {
 
@@ -90,14 +107,14 @@ adepro_slice_plot <- function(
         main = "",
         xlim = c(0, max(patients$X) + 1),
         ylim = c(min(patients$Y) - 1, 2),
-        col.lab = "white",
+        col.lab = text_col,
         type = "n"
       )
 
 
-      cont <- ifelse(slider > patients_tmp$end, "#424242", "#383838")
-      cont <- ifelse(slider >= patients_tmp$death, "black", cont)
-      cont_bg <- ifelse(slider >= patients_tmp$death, "black","#383838")
+      cont <- ifelse(slider > patients_tmp$end, bg_col, fg_col)
+      cont <- ifelse(slider >= patients_tmp$death, dth_col, cont)
+      cont_bg <- ifelse(slider >= patients_tmp$death, dth_col,fg_col)
       patients_tmp$cont <- cont
       patients_tmp$cont_bg <- cont_bg
 
@@ -131,7 +148,7 @@ adepro_slice_plot <- function(
           x = xval,
           y = rep(1, length(xval)),
           labels = title,
-          col = "white",
+          col = text_col,
           cex = 1.5
         )
       }
@@ -202,16 +219,16 @@ adepro_slice_plot <- function(
                   for(i in 1:dim(arrow_tmp)[1]) {
                     coord <- poly_t2(arrow_tmp[i,]$num,1,num_aes = length(ae_list))
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col ="black",cex=1.55)
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col ="#bababa",cex=1.5)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =text_col,cex=1.55)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =arrow_col,cex=1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col ="black",cex=1.55)
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col ="#bababa",cex =1.5)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col =text_col,cex=1.55)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col =arrow_col,cex =1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col ="black",cex=1.55)
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col ="#bababa",cex=1.5)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col =text_col,cex=1.55)
+                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col =arrow_col,cex=1.5)
                     }
                   }
                 }
@@ -233,16 +250,16 @@ adepro_slice_plot <- function(
                 if (!dim(arrow_tmp)[1] == 0) {
                   for(i in 1:dim(arrow_tmp)[1]){
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col ="black",cex=1.55)
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col ="#bababa",cex=1.5)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =text_col,cex=1.55)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =arrow_col,cex=1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col ="black",cex=1.55)
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col ="#bababa",cex=1.5)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col =text_col,cex=1.55)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col =arrow_col,cex=1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col ="black",cex=1.55)
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col ="#bababa",cex=1.5)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col =text_col,cex=1.55)
+                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col =arrow_col,cex=1.5)
                     }
                   }
                 }
@@ -261,8 +278,8 @@ adepro_slice_plot <- function(
             circles = cbind(rep(1, length(info$Y))),
             inches = FALSE,
             add = TRUE,
-            fg = "#ffffff10",
-            bg = "#ffffff10",
+            fg = highlight_col,
+            bg = highlight_col,
             lwd = 3,
             xlab = "",
             ylab = "",
@@ -281,8 +298,8 @@ adepro_slice_plot <- function(
               circles = cbind(rep(1, length(tmp_clicked$Y))),
               inches = FALSE,
               add = TRUE,
-              fg = "#ffffff10",
-              bg = "#ffffff10",
+              fg = highlight_col,
+              bg = highlight_col,
               lwd = 3,
               xlab = "",
               ylab = "",

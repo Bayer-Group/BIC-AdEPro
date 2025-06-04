@@ -5,6 +5,7 @@
 #'
 #' @param aes list of selected adverse events
 #' @param colors color vector for adverse events
+#' @param color_theme logical value for dark/light theme
 #'
 #' @keywords internal
 
@@ -17,11 +18,27 @@ pie_legend2 <- function(
       "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
     ),
     legend_click = NULL,
-    info
+    info,
+    color_theme = TRUE
 ) {
   on_ex <- par("oma", "mar", "font")
   on.exit(par(on_ex))
   par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
+  if(color_theme) {
+    bg_col <- "#424242"
+    fg_col <- "#383838"
+    dth_col <- "black"
+    text_col <- "white"
+    arrow_col <- "#bababa"
+    highlight_col <- "#ffffff10"
+  } else {
+    bg_col <- "#ffffff"
+    fg_col <- "#dedede"
+    dth_col <- "black"
+    text_col <- "black"
+    arrow_col <- "#383838"
+      highlight_col <- "#f5e44960"
+  }
 
   poly_t <- function(num, rad = 1, fg = par('fg'), bg = par('fg'),num_aes = length(aes),...) {
     x_tmp <- c(0, 0 + rad * 0.9 * cos(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 25)))
@@ -43,15 +60,15 @@ pie_legend2 <- function(
       y = NA,
       xlim = c(0.9, 1.1),
       ylim = c(0, (12 * 3) + 1),
-      col.lab = "white",
+      col.lab = text_col,
       axes = FALSE,
     )
 
-    graphics::rect(-100, -100, 100, 100, col = "#383838", border = "#383838")
+    graphics::rect(-100, -100, 100, 100, col = fg_col, border = fg_col)
 
     for(i in 1:length(aes)) {
-      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
-      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, tmp$ae[i], col = "white")
+      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = bg_col)
+      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, tmp$ae[i], col = text_col)
     }
 
     graphics::symbols(
@@ -97,8 +114,8 @@ pie_legend2 <- function(
           squares = cbind(rep(2, length(info$Y))),
           inches = FALSE,
           add = TRUE,
-          fg = "#ffffff10",
-          bg = "#ffffff10",
+          fg = highlight_col,
+          bg = highlight_col,
           lwd = 3,
           xlab = "",
           ylab = "",

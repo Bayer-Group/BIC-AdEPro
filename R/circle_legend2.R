@@ -5,6 +5,7 @@
 #'
 #' @param aes list of selected adverse events
 #' @param colors color vector for adverse events
+#' @param color_theme logical value for dark/light theme
 #'
 #' @keywords internal
 
@@ -15,12 +16,25 @@ circle_legend2 <- function(
       "#ff7f00", "#ffff33", "#a65628", "#f781bf",
       "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
     ),
-    grading=F
+    grading=F,
+    color_theme =TRUE
 ) {
   on_ex <- par("oma", "mar", "font")
   on.exit(par(on_ex))
   par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
-
+  if(color_theme) {
+    bg_col <- "#424242"
+    fg_col <- "#383838"
+    dth_col <- "black"
+    text_col <- "white"
+    arrow_col <- "#bababa"
+  } else {
+    bg_col <- "#ffffff"
+    fg_col <- "#dedede"
+    dth_col <- "black"
+    text_col <- "black"
+    arrow_col <- "#383838"
+  }
   if (grading==F){
     tmp <- data.frame(
       "day_start"=rep(1, 12),
@@ -32,11 +46,11 @@ circle_legend2 <- function(
       "d" = rep(NA, 12),
       "Y" = rev(seq(1, 12 * 3, by = 3)),
       "X" = rep(1, 12),
-      "cont" = c(c("#383838", "#383838", "#000000"),NA,rep("#383838",8)),
-      "cont_bg" = c(c("#383838", "#424242", "#000000"),NA,rep("#383838",8)),
+      "cont" = c(c(fg_col, fg_col, dth_col),NA,rep(fg_col,8)),
+      "cont_bg" = c(c(fg_col, bg_col, dth_col),NA,rep(fg_col,8)),
       "col" = rep(colors[1],12),
       "num" = c(rep(NA,4),rep(1,3),NA,1,rep(NA,3)),
-      "bg" = c(rep(colors[1],8),"#383838",rep(colors[1],3))
+      "bg" = c(rep(colors[1],8),fg_col,rep(colors[1],3))
     )
   } else {
     tmp <- data.frame(
@@ -49,11 +63,11 @@ circle_legend2 <- function(
       "d" = rep(NA, 12),
       "Y" = rev(seq(1, 12 * 3, by = 3)),
       "X" = rep(1, 12),
-      "cont" = c(c("#383838", "#383838", "#000000"),NA,rep("#383838",8)),
-      "cont_bg" = c(c("#383838", "#424242", "#000000"),NA,rep("#383838",8)),
+      "cont" = c(c(fg_col, fg_col, dth_col),NA,rep(fg_col,8)),
+      "cont_bg" = c(c(fg_col, bg_col, dth_col),NA,rep(fg_col,8)),
       "col" = rep(colors[1],12),
       "num" = c(rep(NA,4),rep(1,5),NA,1,rep(NA,1)),
-      "bg" = c(rep(colors[1],10),"#383838",rep(colors[1],1))
+      "bg" = c(rep(colors[1],10),fg_col,rep(colors[1],1))
     )
   }
 
@@ -69,21 +83,21 @@ circle_legend2 <- function(
     y = NA,
     xlim = c(0.9, 1.1),
     ylim = c(0, (12 * 3) + 1),
-    col.lab = "white",
+    col.lab = text_col,
     axes = FALSE,
   )
 
-  graphics::rect(-100, -100, 100, 100, col = "#383838", border = "#383838")
+  graphics::rect(-100, -100, 100, 100, col = fg_col, border = fg_col)
 
   if (grading==F){
     for(i in c(1,2,3,5,6,7,9)) {
-      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
-      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","Life-threatening","Leading to death","","Resolved")[i], col = "white")
+      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = bg_col)
+      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","","Resolved")[i], col = text_col)
     }
   } else {
     for(i in c(1,2,3,5,6,7,8,9,11)) {
-      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = "#424242")
-      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","Life-threatening","Leading to death","","Resolved")[i], col = "white")
+      rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = bg_col)
+      text(x=tmp$X[i] , y=tmp$Y[i]+1.5, c("Ongoing","Drop-out","Death","","Mild","Moderate","Severe","Life-threatening","Leading to death","","Resolved")[i], col = text_col)
     }
   }
 

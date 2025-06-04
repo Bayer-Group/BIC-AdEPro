@@ -5,7 +5,7 @@
 \alias{ui}
 \title{User Interface of the AdEPro application}
 \format{
-An object of class \code{shiny.tag.list} (inherits from \code{list}) of length 4.
+An object of class \code{shiny.tag.list} (inherits from \code{list}) of length 5.
 }
 \usage{
 ui
