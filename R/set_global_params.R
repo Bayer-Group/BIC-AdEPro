@@ -28,7 +28,9 @@ set_global_params <- function(
   check_data(ae_data, patients)
 
   ## Local variables
-  Q <- initQ(ae_data)     # classification matrix of AEs (treatment-emergent, serious etc.)
+  Q <- initQ(ae_data %>% dplyr::select(      # classification matrix of AEs (treatment-emergent, serious etc.)
+    -c(replace_ae_start, replace_ae_end)     # remove variables that creat character(0) in drop down menu
+  ))
   AE_options <- 1:ncol(Q) # descriptions of AE classifications
   type_names <- data.frame(
     short = c(
