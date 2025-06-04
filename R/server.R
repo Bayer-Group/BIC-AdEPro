@@ -1314,7 +1314,8 @@ server <- shiny::shinyServer(function(input, output, session) {
          !is.null(input$sel_trtsdt) &
          !is.null(input$sel_aedecod) &
          !is.null(input$sel_aetrtemn) &
-         !is.null(input$sel_aeendy)
+         !is.null(input$sel_aeendy) &
+         !is.null(input$sel_aesevn)
       ){
 
 

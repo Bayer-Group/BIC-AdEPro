@@ -73,6 +73,8 @@ prepare_data_for_adepro <- function(
       !!rlang::sym(AESEVN) == "MILD" ~ "1",
       !!rlang::sym(AESEVN) == "MODERATE" ~ "2",
       !!rlang::sym(AESEVN)== "SEVERE" ~"3",
+      !!rlang::sym(AESEVN)== "LIFE-THREATENING" ~"4",
+      !!rlang::sym(AESEVN)== "DEATH" ~"5",
       TRUE ~ as.character(!!rlang::sym(AESEVN))
     )
   )
