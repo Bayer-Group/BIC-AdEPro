@@ -1,0 +1,83 @@
+# BEGIN
+# Workflow Name: Automated Build and Deployment of Container Apps to Azure Web App
+name: Build and deploy container app to Azure Web App
+# Workflow triggers
+on:
+  # Trigger when a push occurs on the "api" branch or when any tag is created
+  push:
+    branches:
+      - main
+    tags:
+      - '*'  # Matches any tag
+  # Allows manual triggering of the workflow via the GitHub Actions interface
+  workflow_dispatch:
+  # Trigger when a release is published
+  release:
+    types: [published]
+# Define the jobs in the workflow
+jobs:
+  # Job 1: Build process
+  build:
+    # Runs on the latest Ubuntu host
+    runs-on: ubuntu-latest
+    steps:
+    # 1. Check out the repository code into the workflow
+    - uses: actions/checkout@v2
+    # 2. Set up Docker Buildx, a tool for advanced Docker image building
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    # 3. Log in to the Azure Container Registry (ACR)
+    # Requires credentials stored in GitHub Secrets
+    - name: Log in to registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY }} 
+        username: PushToken
+        password: ${{ secrets.DOCKER_REGISTRY_SERVER_PASSWORD }} 
+    # 4. Convert the repository name to lowercase
+    # Docker image names must be lowercase
+    - name: Convert repo name to lowercase
+      id: lowercase_repo_name
+      run: echo "repo_name=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+    # 5. Build the Docker image and push it to the Azure Container Registry
+    - name: Build and push container without tag
+      uses: docker/build-push-action@v4
+      if: ${{ github.sha }} != ""
+      with:
+        push: true
+        tags: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.sha }}  # Use Git commit SHA as the tag
+        context: ./  # The build context is the root of the repository
+          
+    - name: Build and push container with tag
+      uses: docker/build-push-action@v4
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        push: true
+        tags: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.ref_name }}
+        context: ./
+  # Job 2: Deploy to the development environment
+  deploy-prod:
+    # Runs on the latest Ubuntu host
+    runs-on: ubuntu-latest
+#    if: startsWith(github.ref, 'refs/tags/v')  # Only run this job for tags that start with 'v'
+    # This job depends on the "deploy-dev" job and will run after it completes successfully
+    needs: build
+    # Define the deployment environment as "production"
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+    # 1. Convert the repository name to lowercase (reuse logic for consistent naming)
+    - name: Convert repo name to lowercase
+      id: lowercase_repo_name
+      run: echo "repo_name=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+    # 2. Deploy the container image to the Azure Web App (Production Slot)
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.repo_name }}  # Use the lowercase repository name as the app name
+        slot-name: 'production'  # Specify the production slot
+        publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Publish profile for the production environment
+        images: ${{ secrets.DOCKER_REPO }}/${{ env.repo_name }}:${{ github.sha }}  # Use the image from the ACR with the Git commit SHA
+# END
