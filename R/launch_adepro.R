@@ -94,8 +94,12 @@ launch_adepro <- function(host = "127.0.0.1", port = NULL, browser = NULL) {
     ui = ui,
     server = server
   )
-  # adepro_app <- system.file("app", package = "adepro")
 
-  if (!is.null(browser)) options(browser = browser)
-  shiny::runApp(adepro_app, host = host, port = port)
+  if (interactive()) {
+    if (!is.null(browser)) options(browser = browser)
+    shiny::runApp(adepro_app, host = host, port = port)
+  } else {
+    # Für Shiny Server: einfach das App-Objekt zurückgeben!
+    adepro_app
+  }
 }
