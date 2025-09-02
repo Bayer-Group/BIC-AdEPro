@@ -1,31 +1,23 @@
 Package: adepro
-Type: Package
 Title: A 'shiny' Application for the (Audio-)Visualization of Adverse Event Profiles
 Version: 4.4.4
-Authors@R: c(person(given = "Nicole",
-                   family = "Rethemeier",
-                     role = "cre",
-                    email = "nicole.rethemeier@bayer.com"),
-             person(given = "Christoph",
-                   family = "Tasto",
-                     role = "aut"),
-             person(given = "Steffen",
-                   family = "Jeske",
-                     role = "aut"),
-             person(given = "Bodo",
-                   family = "Kirsch",
-                     role = "aut"))
+Authors@R: c(
+    person("Nicole", "Rethemeier", , "nicole.rethemeier@bayer.com", role = "cre"),
+    person("Christoph", "Tasto", role = "aut"),
+    person("Steffen", "Jeske", role = "aut"),
+    person("Bodo", "Kirsch", role = "aut")
+  )
 Description: Contains a 'shiny' application called AdEPro (Animation of Adverse Event Profiles) which (audio-)visualizes adverse events occurring in clinical trials. As this data is usually considered sensitive, this tool is provided as a stand-alone application that can be launched from any local machine on which the data is stored.
-Depends: R (>= 3.5.0), shinyBS, seriation (>= 1.2.9)
-License: GPL-3
-URL: https://github.com/Bayer-Group/BIC-AdEPro
+License: GPL (>= 3)
+Imports: 
+    config,
+    golem,
+    shiny
 Encoding: UTF-8
-RoxygenNote: 7.2.3
-Imports: graphics, MASS, V8, forcats, here, utils, bslib, shinyjs, shiny, audio, shape, Cairo, dplyr, readr, stringr, rlang, tidyr, haven, stats, shinyWidgets, DT, anytime
-Suggests: 
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
-VignetteBuilder: knitr
-Config/testthat/edition: 3
 LazyData: true
+RoxygenNote: 7.1.1
+URL: https://github.com/Bayer-Group/BIC-AdEPro
+BugReports: https://github.com/Bayer-Group/BIC-AdEPro/issues
+Suggests: 
+    spelling
+Language: en-US
