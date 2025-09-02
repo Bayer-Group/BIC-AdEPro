@@ -1,5 +1,6 @@
 Package: adepro
-Title: A 'shiny' Application for the (Audio-)Visualization of Adverse Event Profiles
+Title: A 'shiny' Application for the (Audio-)Visualization of Adverse
+    Event Profiles
 Version: 4.4.4
 Authors@R: c(
     person("Nicole", "Rethemeier", , "nicole.rethemeier@bayer.com", role = "cre"),
@@ -7,17 +8,47 @@ Authors@R: c(
     person("Steffen", "Jeske", role = "aut"),
     person("Bodo", "Kirsch", role = "aut")
   )
-Description: Contains a 'shiny' application called AdEPro (Animation of Adverse Event Profiles) which (audio-)visualizes adverse events occurring in clinical trials. As this data is usually considered sensitive, this tool is provided as a stand-alone application that can be launched from any local machine on which the data is stored.
+Description: Contains a 'shiny' application called AdEPro (Animation of
+    Adverse Event Profiles) which (audio-)visualizes adverse events
+    occurring in clinical trials. As this data is usually considered
+    sensitive, this tool is provided as a stand-alone application that can
+    be launched from any local machine on which the data is stored.
 License: GPL (>= 3)
-Imports: 
-    config,
-    golem,
-    shiny
-Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.1.1
 URL: https://github.com/Bayer-Group/BIC-AdEPro
 BugReports: https://github.com/Bayer-Group/BIC-AdEPro/issues
+Imports: 
+    anytime,
+    audio,
+    bslib,
+    Cairo,
+    config,
+    dplyr,
+    DT,
+    forcats,
+    golem,
+    graphics,
+    grDevices,
+    haven,
+    here,
+    MASS,
+    readr,
+    rlang,
+    seriation,
+    shape,
+    shiny,
+    shinyBS,
+    shinyjs,
+    shinyWidgets,
+    stats,
+    stringr,
+    tidyr,
+    utils,
+    V8
 Suggests: 
-    spelling
+    spelling,
+    testthat,
+    vdiffr
+Encoding: UTF-8
 Language: en-US
+LazyData: true
+RoxygenNote: 7.3.2
