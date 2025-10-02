@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# AdEPro <img src="www/adepro_logo.png" align="right" height="139"/>
+# AdEPro <img src="inst/app/www/adepro_logo.png" align="right" height="139"/>
 
 <!-- badges: start -->
 
@@ -84,12 +84,12 @@ information on how to upload data, see section
 
 ## Surface
 
-<img src="www/adepro_overview.png"/>
+<img src="inst/app/www/adepro_overview.png"/>
 
 Via the “Change View” button, the display can be switched from “circle
 view” to “barplot view” and back.
 
-<img src="www/adepro_change_view.png"/>
+<img src="inst/app/www/adepro_change_view.png"/>
 
 In the “circle view”, every circle represents one subject. Each
 **slice** inside a circle represents a different **adverse event**,
@@ -103,34 +103,34 @@ possible to highlight all subjects with a specific adverse events by
 selecting the event in the legend on the left side. To remove the
 selection simply click the adverse event or subject selected again.
 
-<img src="www/adepro_highlight.png"/>
+<img src="inst/app/www/adepro_highlight.png"/>
 
 The background color of the circles shows the subject’s status:
 
 | <!-- --> | <!-- --> |
 |:--:|:---|
-| <img src="www/Legend_Status_Ongoing_1.png" align="center" width=55/> | A circle with **dark grey** background represents an enrolled subject |
-| <img src="www/Legend_Status_Dropout_1.png" align="center" width=55/> | A circle with **light grey** background indicates discontinuation |
-| <img src="www/Legend_Status_Death_1.png" align="center" width=55/> | A circle with **black** background indicates death |
+| <img src="inst/app/www/Legend_Status_Ongoing_1.png" align="center" width=55/> | A circle with **dark grey** background represents an enrolled subject |
+| <img src="inst/app/www/Legend_Status_Dropout_1.png" align="center" width=55/> | A circle with **light grey** background indicates discontinuation |
+| <img src="inst/app/www/Legend_Status_Death_1.png" align="center" width=55/> | A circle with **black** background indicates death |
 | <!-- --> | <!-- --> |
 
 The ‘**barplot view**’ displays the aggregated numbers for the selected
 adverse events
 
-<img src="www/adepro_barplot.png"/>
+<img src="inst/app/www/adepro_barplot.png"/>
 
 The top bar of the app includes several other options which are further
 explained under [Functionality](#Functionality).
 
 ## Functionality
 
-<img src="www/adepro_upload_2.png"/>
+<img src="inst/app/www/adepro_upload_2.png"/>
 
 Select adverse event and subject level data on the left-hand side of the
 **Upload Data** page (start page) and ‘**submit**.’ For more information
 on the required data structure see [Input Data](#input-data).
 
-<img align="right" src="www/buttons_height_rows.png" width = 75/>
+<img align="right" src="inst/app/www/buttons_height_rows.png" width = 75/>
 
 Should the plot size of the app not fit the screen size, the appearance
 of the app can be altered. The plot height can be changed using the
@@ -154,7 +154,7 @@ button can be adjusted by changing the number in between. To the left of
 the timeline slider is a circular slider to set the ‘**Animation speed
 (sec.)**’.
 
-<img src="www/adepro_timeline.png" width="50%" align="center"/>
+<img src="inst/app/www/adepro_timeline.png" width="50%" align="center"/>
 
 The ‘**Adverse Events for animation**’ panel on the lower left offers
 additional setting options. Per default, the eight events with most
@@ -181,7 +181,7 @@ The ‘**Subgroup Setting**’ panel can be used to split the plot
 vertically by a subgroup variable in addition to the horizontal split by
 treatment.
 
-<img src="www/adepro_subgroups_2.png"/>
+<img src="inst/app/www/adepro_subgroups_2.png"/>
 
 ## Input Data
 
@@ -313,54 +313,73 @@ By contributing to this project, you agree to abide by its terms.
 
 ## About
 
-You are reading the doc about version : 4.4.4
+You are reading the doc about version : 4.4.1
 
 This README has been compiled on the
 
 ``` r
 Sys.time()
-#> [1] "2025-09-02 16:26:06 CEST"
+#> [1] "2025-10-02 14:10:06 CEST"
 ```
 
 Here are the tests results and package coverage:
 
 ``` r
 devtools::check(quiet = TRUE)
-#> ══ Documenting ═════════════════════════════════════════════════════════════════
-#> ℹ Installed roxygen2 version (7.3.2) doesn't match required (7.1.1)
-#> ✖ `check()` will not re-document this package
-#> ── R CMD check results ─────────────────────────────────────── adepro 4.4.4 ────
-#> Duration: 2.1s
+#> ℹ Loading adepro
+#> ── R CMD check results ─────────────────────────────────────── adepro 4.4.1 ────
+#> Duration: 41s
 #> 
-#> ❯ checking whether package ‘adepro’ can be installed ... ERROR
-#>   See below...
+#> ❯ checking dependencies in R code ... NOTE
+#>   Namespaces in Imports field not imported from:
+#>     ‘Cairo’ ‘V8’
+#>     All declared Imports should be used.
 #> 
-#> ── Install failure ─────────────────────────────────────────────────────────────
-#> 
-#> * installing *source* package ‘adepro’ ...
-#> ** this is package ‘adepro’ version ‘4.4.4’
-#> ** using staged installation
-#> ** R
-#> ** data
-#> *** moving datasets to lazyload DB
-#> ** inst
-#> ** byte-compile and prepare package for lazy loading
-#> Error in loadNamespace(x) : there is no package called ‘shinyjs’
-#> Error: unable to load R code in package ‘adepro’
-#> Execution halted
-#> ERROR: lazy loading failed for package ‘adepro’
-#> * removing ‘/tmp/RtmpoFw6qm/file33c5117fcb52/adepro.Rcheck/adepro’
-#> 
-#> 1 error ✖ | 0 warnings ✔ | 0 notes ✔
-#> Error: R CMD check found ERRORs
+#> 0 errors ✔ | 0 warnings ✔ | 1 note ✖
 ```
 
 ``` r
 covr::package_coverage()
-#> Error: Failure in `/tmp/RtmpoFw6qm/R_LIBS33c51b32a752/adepro/adepro-tests/testthat.Rout.fail`
-#>  WARN 0 | SKIP 0 | PASS 1 ]
-#> Deleting unused snapshots:
-#> • adepro_slice_plot/slice-plot.svg
-#> Error: Test failures
-#> Execution halted
+#> adepro Coverage: 36.14%
+#> R/app_server.R: 0.00%
+#> R/fct_ae_count.R: 0.00%
+#> R/fct_bar_chart.R: 0.00%
+#> R/fct_barchart_legend.R: 0.00%
+#> R/fct_calculate_number_aes_not_treatment_emergent.R: 0.00%
+#> R/fct_circle_legend.R: 0.00%
+#> R/fct_circle_legend2.R: 0.00%
+#> R/fct_count_event.R: 0.00%
+#> R/fct_get_number_of_unknown_aes.R: 0.00%
+#> R/fct_order_patient.R: 0.00%
+#> R/fct_pie_legend.R: 0.00%
+#> R/fct_pie_legend2.R: 0.00%
+#> R/fct_prepare_data.R: 0.00%
+#> R/fct_tone.R: 0.00%
+#> R/run_app.R: 0.00%
+#> R/fct_check_data.R: 8.33%
+#> R/fct_my.symbols.R: 59.77%
+#> R/fct_calculate_number_missing_severity_flag.R: 61.11%
+#> R/fct_adepro_slice_plot.R: 61.27%
+#> R/fct_initQ.R: 62.50%
+#> R/fct_filter_and_prepare_patient_data.R: 64.10%
+#> R/fct_calculate_and_impute_required_variables_missing_values.R: 65.00%
+#> R/fct_calculate_number_unknown_aes.R: 68.42%
+#> R/fct_calculate_number_ae_end_missing.R: 72.73%
+#> R/fct_calculate_number_ae_start_missing.R: 72.73%
+#> R/fct_calculate_number_ae_end_is_earlier_than_start.R: 73.33%
+#> R/fct_preproc_ae.R: 75.00%
+#> R/fct_calculate_number_missing_last_visit_dates.R: 76.92%
+#> R/fct_filter_for_safety_flag.R: 86.67%
+#> R/fct_join_adae_and_adsl.R: 90.00%
+#> R/fct_set_vector_layout.R: 91.67%
+#> R/fct_set_global_params.R: 94.44%
+#> R/utils_adeproLogo.R: 98.72%
+#> R/app_config.R: 100.00%
+#> R/app_ui.R: 100.00%
+#> R/fct_prepare_data_for_adepro.R: 100.00%
+#> R/fct_preproc_patients.R: 100.00%
+#> R/fct_set_group_lines.R: 100.00%
+#> R/fct_set_width.R: 100.00%
+#> R/golem_utils_server.R: 100.00%
+#> R/golem_utils_ui.R: 100.00%
 ```

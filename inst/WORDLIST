@@ -18,6 +18,7 @@ AESEVN
 AESTDY
 AETREMN
 AETRTEM
+AETRTEMN
 AEs
 ASTDY
 AdEPro
@@ -30,6 +31,7 @@ DTHDT
 GW
 Github
 Gruvaeus
+HD
 Hahsler
 Hornik
 LVDT
@@ -43,6 +45,7 @@ PN
 Preprocesses
 RACEN
 README
+SAF
 SAFFL
 SAFFN
 SEXN
@@ -72,11 +75,14 @@ colours
 coords
 csv
 dplyr
+dropdown
 et
 exe
 golem
 grey
 initQ
+lightgray
+menue
 no’
 num
 n’
