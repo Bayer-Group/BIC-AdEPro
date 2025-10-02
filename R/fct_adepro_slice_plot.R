@@ -22,7 +22,6 @@ utils::globalVariables(c("ae","day_start","ps", "X", "Y","patient","r", "day_end
 #' @param show_arrows logical value if arrows should be displayed for imputed data
 #' @param color_theme logical value for dark/light theme
 #'
-#' @importFrom stats end
 #' @keywords internal
 
 adepro_slice_plot <- function(

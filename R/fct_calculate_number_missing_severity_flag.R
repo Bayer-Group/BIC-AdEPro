@@ -2,12 +2,13 @@
 #'
 #' @param dat data frame with adverse event data
 #' @param sel_aesevn character with severity grade variable name
+#' @param sel_aedecod character with adverse event code variable name
 #' @param severity_grading_flag logical value if 3 or 5 step grading is used
 #'
 #' @return numeric value with the number missing grades
 #'
 
-calculate_number_missing_severity_flag <- function(dat = adae_data, sel_aesevn = NULL, sel_aedecod, severity_grading_flag)  {
+calculate_number_missing_severity_flag <- function(dat, sel_aesevn = NULL, sel_aedecod, severity_grading_flag)  {
 
   #check if parameter dat is data.frame
   if (!is.data.frame(dat)) {

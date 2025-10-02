@@ -2,8 +2,8 @@
 #'
 #' @param dat data frame with adverse event data
 #' @param sel_aedecod character with adverse event code variable name
-#' @param sel_aedecod character with adverse event start day variable name
-#' @param sel_aedecod character with adverse event end day variable name
+#' @param sel_aestdy character with adverse event start day variable name
+#' @param sel_aeendy character with adverse event end day variable name
 #'
 #' @return numeric value with the number empty adverse events ("")
 #'

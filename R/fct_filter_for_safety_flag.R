@@ -1,6 +1,6 @@
 #' Filter for Safety Flag and Create Required Variables
 #'
-#' @param data frame with adverse event data set
+#' @param dat frame with adverse event data set
 #' @param SAFFN Safety Flag as numeric (required)
 #'
 #' @return data frame with filtered adverse event data

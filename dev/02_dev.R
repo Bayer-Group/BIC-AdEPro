@@ -18,15 +18,30 @@
 ## install.packages('attachment') # if needed.
 attachment::att_amend_desc()
 
+## When in need for a new package, install it using renv:
+renv::install("package")
+## DON'T FORGET to add it back to the DESCRIPTION
+usethis::use_package("package")
+
+## We generally use functions as package::fun(), but if you prefer
+## to just use fun(), you will need to importFrom package using this:
+usethis::use_import_from("package", "fun")
+## this will load fun to be available in your R code. This can be useful
+## to load pipes, and special symbols from packages
+
 ## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
 golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
 
+# NOTE: Not adding modules to adepro
+
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct("helpers", with_test = TRUE)
 golem::add_utils("helpers", with_test = TRUE)
+
+# NOTE: renamed existing .R files into fct_ or utils_
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -36,15 +51,20 @@ golem::add_css_file("custom")
 golem::add_sass_file("custom")
 golem::add_any_file("file.json")
 
+# NOTE: in the future, move all CSS in UI to external file
+
 ## Add internal datasets ----
 ## If you have data in your package
 usethis::use_data_raw(name = "my_dataset", open = FALSE)
+
+# NOTE: already loaded
 
 ## Tests ----
 ## Add one line by test you want to create
 usethis::use_test("app")
 
 # Documentation
+devtools::build_readme()
 
 ## Vignette ----
 usethis::use_vignette("adepro")

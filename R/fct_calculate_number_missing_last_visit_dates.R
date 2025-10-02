@@ -2,6 +2,7 @@
 #'
 #' @param dat data frame with adverse event data
 #' @param sel_lvdt character with variable name of last visit date in data
+#' @param sel_subjidn character with variable name of subject id
 #'
 #' @return numeric value with the number missing last visit dates
 

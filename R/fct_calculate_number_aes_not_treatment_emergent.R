@@ -7,7 +7,7 @@
 #' @return numeric value with the number missing treatment emergency values
 #'
 
-calculate_number_aes_not_treatment_emergent <- function(dat = data, sel_aedecod, sel_aetrtemn){
+calculate_number_aes_not_treatment_emergent <- function(dat, sel_aedecod, sel_aetrtemn){
 
   #check if parameter dat is data.frame
   if (!is.data.frame(dat)) {

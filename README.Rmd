@@ -13,7 +13,7 @@ output: github_document
 )
 ```
 
-# AdEPro <img src="www/adepro_logo.png" align="right" height="139"/>
+# AdEPro <img src="inst/app/www/adepro_logo.png" align="right" height="139"/>
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/adepro)](https://cran.r-project.org/package=adepro) 
@@ -60,11 +60,11 @@ The application will start showing the data upload page. For detailed informatio
 
 ## Surface
 
-<img src="www/adepro_overview.png"/>
+<img src="inst/app/www/adepro_overview.png"/>
 
 Via the "Change View" button, the display can be switched from "circle view" to "barplot view" and back.
 
-<img src="www/adepro_change_view.png"/>
+<img src="inst/app/www/adepro_change_view.png"/>
 
 In the "circle view", every circle represents one subject. Each **slice** inside a circle represents a different **adverse event**, color-coded according to the legend on the hand side. As indicated in the legend on the right side, the **size of the slices indicates the intensity** of the respective adverse event. **Framed unfilled slices** indicate adverse events which the patient experienced at a previous time in the study, but are no longer ongoing.
 By clicking a single circle in the plot, the subject will be displayed as highlighted.
@@ -72,31 +72,31 @@ It is also possible to highlight all subjects with a specific adverse events by 
 in the legend on the left side.
 To remove the selection simply click the adverse event or subject selected again.
 
-<img src="www/adepro_highlight.png"/>
+<img src="inst/app/www/adepro_highlight.png"/>
 
 
 The background color of the circles shows the subject's status:  
 
 | <!-- --> |<!-- --> |
 |:------------------------------------:|:------------------------------------|
-| <img src="www/Legend_Status_Ongoing_1.png" align="center" width=55/> | A circle with **dark grey** background represents an enrolled subject |
-| <img src="www/Legend_Status_Dropout_1.png" align="center" width=55/> | A circle with **light grey** background indicates discontinuation |
-| <img src="www/Legend_Status_Death_1.png" align="center" width=55/> | A circle with **black** background indicates death |
+| <img src="inst/app/www/Legend_Status_Ongoing_1.png" align="center" width=55/> | A circle with **dark grey** background represents an enrolled subject |
+| <img src="inst/app/www/Legend_Status_Dropout_1.png" align="center" width=55/> | A circle with **light grey** background indicates discontinuation |
+| <img src="inst/app/www/Legend_Status_Death_1.png" align="center" width=55/> | A circle with **black** background indicates death |
 | <!-- --> |<!-- --> |
 
 The '**barplot view**' displays the aggregated numbers for the selected adverse events
 
-<img src="www/adepro_barplot.png"/>
+<img src="inst/app/www/adepro_barplot.png"/>
 
 The top bar of the app includes several other options which are further explained under [Functionality](#Functionality).
 
 ## Functionality
 
-<img src="www/adepro_upload_2.png"/>
+<img src="inst/app/www/adepro_upload_2.png"/>
 
 Select adverse event and subject level data on the left-hand side of the **Upload Data** page (start page) and '**submit**.' For more information on the required data structure see [Input Data](#input-data).
 
-<img align="right" src="www/buttons_height_rows.png" width = 75/>
+<img align="right" src="inst/app/www/buttons_height_rows.png" width = 75/>
 
 Should the plot size of the app not fit the screen size, the appearance of the app can be altered. The plot height can be changed using the '**Choose Plot height (in pixel)**'-option in the '**Modify data**' panel on the left-hand side or by clicking the '+' or '-' buttons of the '**Change Plot height**'-panel on the right-hand side. Similarly, the number of rows can be either changed in the '**Modify data**' panel ('**Number of Rows**') or using the '**Number of rows'-panel**. 
 The  '**Modify data**' panel also includes options to '**Select type of Adverse Event**' (such as serious or study drug-related), '**Sort patients by**' a variable of your choosing and '**Sort treatments**'.
@@ -104,7 +104,7 @@ If the button '**Add AdEPro AI**' is selected, additional intelligent sorting al
 
 The **timeline slider** in the top bar indicates the day of the study that is currently displayed. It can be moved manually or played automatically by using the navigation buttons underneath. The number of days by which the slider is moved by using the forward or backward button can be adjusted by changing the number in between. To the left of the timeline slider is a circular slider to set the '**Animation speed (sec.)**'.
 
-<img src="www/adepro_timeline.png" width="50%" align="center"/>
+<img src="inst/app/www/adepro_timeline.png" width="50%" align="center"/>
 
 The '**Adverse Events for animation**' panel on the lower left offers additional setting options. Per default, the eight events with most patient days are displayed. Other events can be selected using the '**Choose Adverse Events for display (max. 12)**' option or the '**frequency**' option can be used to display the eight most frequent events.
 
@@ -112,7 +112,7 @@ Via '**Choose Adverse Event for audio**' one specific adverse event can be selec
 
 The '**Subgroup Setting**' panel can be used to split the plot vertically by a subgroup variable in addition to the horizontal split by treatment.
 
-<img src="www/adepro_subgroups_2.png"/>
+<img src="inst/app/www/adepro_subgroups_2.png"/>
 
 ## Input Data
 

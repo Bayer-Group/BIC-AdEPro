@@ -1,6 +1,7 @@
 #' Impute missing values in adverse event data and return number of imputed data
 #'
 #' @param data frame with adverse event data set
+#' @param SUBJIDN Subject ID
 #' @param LVDT  Last Visit Date as numeric (required)
 #' @param DTHDT Death Date as numeric (required)
 #' @param TRTSDT Treatment Start Date as numeric (required)
@@ -231,7 +232,7 @@ calculate_and_impute_required_variables_missing_values <- function(
           end1 = as.numeric(as.numeric(as.Date(anytime::anydate(!!rlang::sym(LVDT))) - as.Date(anytime::anydate(!!rlang::sym(TRTSDT))))+ 1),
           end2 = as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))) - as.Date(anytime::anydate(!!rlang::sym(TRTSDT))) + 1),
           end3 = !!rlang::sym(AEENDY)) %>%
-        dplyr::mutate(end = max(end1,end2,end3,na.rm=TRUE)) %>%
+        dplyr::mutate(end = max(.data$end1, .data$end2, .data$end3, na.rm=TRUE)) %>%
         dplyr::pull(end) %>%
         unique()
 
@@ -263,7 +264,7 @@ calculate_and_impute_required_variables_missing_values <- function(
   if (number_missing_lvdt  > 0) {
 
 
-    last_date <- data %>% dplyr::mutate(LVDT_ = case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>% dplyr::pull(LVDT_) %>% sort() %>% tail() %>% unique()
+    last_date <- data %>% dplyr::mutate(LVDT_ = case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>% dplyr::pull("LVDT_") %>% sort() %>% tail() %>% unique()
     #last_date <- tail(sort(anytime::anydate(data[LVDT]),na.rm = TRUE), n = 1)
 
       data <- data %>%

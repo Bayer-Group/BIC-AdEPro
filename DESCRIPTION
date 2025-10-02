@@ -1,7 +1,7 @@
 Package: adepro
 Title: A 'shiny' Application for the (Audio-)Visualization of Adverse
     Event Profiles
-Version: 4.4.4
+Version: 4.4.1
 Authors@R: c(
     person("Nicole", "Rethemeier", , "nicole.rethemeier@bayer.com", role = "cre"),
     person("Christoph", "Tasto", role = "aut"),
@@ -13,7 +13,7 @@ Description: Contains a 'shiny' application called AdEPro (Animation of
     occurring in clinical trials. As this data is usually considered
     sensitive, this tool is provided as a stand-alone application that can
     be launched from any local machine on which the data is stored.
-License: GPL (>= 3)
+License: GPL (>= 3) + file LICENSE
 URL: https://github.com/Bayer-Group/BIC-AdEPro
 BugReports: https://github.com/Bayer-Group/BIC-AdEPro/issues
 Imports: 
@@ -42,13 +42,20 @@ Imports:
     stats,
     stringr,
     tidyr,
+    tidyselect,
     utils,
     V8
 Suggests: 
+    knitr,
+    rmarkdown,
     spelling,
     testthat,
     vdiffr
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 RoxygenNote: 7.3.2
+Depends: 
+    R (>= 3.5)
