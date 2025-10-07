@@ -53,7 +53,7 @@ After installation AdePro can be started using
 
 ```{r, eval = FALSE}
 library(adepro)
-launch_adepro()
+run_app()
 ```
 
 The application will start showing the data upload page. For detailed information on how to upload data, see section [Functionality](#Functionality).

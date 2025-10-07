@@ -75,7 +75,7 @@ After installation AdePro can be started using
 
 ``` r
 library(adepro)
-launch_adepro()
+run_app()
 ```
 
 The application will start showing the data upload page. For detailed
@@ -319,7 +319,7 @@ This README has been compiled on the
 
 ``` r
 Sys.time()
-#> [1] "2025-10-02 14:10:06 CEST"
+#> [1] "2025-10-07 09:31:15 UTC"
 ```
 
 Here are the tests results and package coverage:
@@ -328,19 +328,14 @@ Here are the tests results and package coverage:
 devtools::check(quiet = TRUE)
 #> ℹ Loading adepro
 #> ── R CMD check results ─────────────────────────────────────── adepro 4.4.1 ────
-#> Duration: 41s
+#> Duration: 1m 8.4s
 #> 
-#> ❯ checking dependencies in R code ... NOTE
-#>   Namespaces in Imports field not imported from:
-#>     ‘Cairo’ ‘V8’
-#>     All declared Imports should be used.
-#> 
-#> 0 errors ✔ | 0 warnings ✔ | 1 note ✖
+#> 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 ```
 
 ``` r
 covr::package_coverage()
-#> adepro Coverage: 36.14%
+#> adepro Coverage: 36.15%
 #> R/app_server.R: 0.00%
 #> R/fct_ae_count.R: 0.00%
 #> R/fct_bar_chart.R: 0.00%
