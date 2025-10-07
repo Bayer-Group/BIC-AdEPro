@@ -20,7 +20,6 @@ Imports:
     anytime,
     audio,
     bslib,
-    Cairo,
     config,
     dplyr,
     DT,
@@ -43,8 +42,7 @@ Imports:
     stringr,
     tidyr,
     tidyselect,
-    utils,
-    V8
+    utils
 Suggests: 
     knitr,
     rmarkdown,

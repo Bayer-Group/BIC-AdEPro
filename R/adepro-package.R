@@ -18,6 +18,7 @@
 #' @importFrom dplyr join_by
 #' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
+#' @importFrom dplyr n
 #' @importFrom dplyr rename
 #' @importFrom dplyr rename_with
 #' @importFrom dplyr select

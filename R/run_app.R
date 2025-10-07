@@ -1,8 +1,8 @@
 #' Launches the AdEPro application
-#' 
+#'
 #' @description
 #' Starts the AdEPro application in the client's browser.
-#' 
+#'
 #' @param host host link (defaults to the local machine "127.0.0.1")
 #' @param port port number (randomly chosen unless specified as a certain number)
 #' @param browser path to browser exe (defaults to standard browser)
@@ -63,14 +63,11 @@ run_app <- function(
   options = list(),
   enableBookmarking = NULL,
   uiPattern = "/",
-  host = "127.0.0.1", 
-  port = NULL, 
+  host = "127.0.0.1",
+  port = NULL,
   browser = NULL,
   ...
 ) {
-
-  #Shiny options to use graphical Cairo library
-  options(shiny.usecairo = TRUE)
 
   #Shiny options for maximal upload size
   options(shiny.maxRequestSize = 110*1024^2)
