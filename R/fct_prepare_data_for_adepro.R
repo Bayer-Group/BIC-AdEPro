@@ -191,7 +191,7 @@ prepare_data_for_adepro <- function(
   }
 
   ae_data <- ae_data  %>%
-    dplyr::select(all_of(c(var_list,"replace_ae_start","replace_ae_end"))) %>%
+    dplyr::select(tidyselect::all_of(c(var_list,"replace_ae_start","replace_ae_end"))) %>%
     dplyr::arrange(patient, day_start, day_end) %>%
     dplyr::distinct()
 

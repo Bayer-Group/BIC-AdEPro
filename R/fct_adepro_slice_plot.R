@@ -180,7 +180,7 @@ adepro_slice_plot <- function(
               slider > day_end ~ cont,
               slider <= day_end ~ col
             )
-          ) %>% dplyr::arrange(patient,desc(r))
+          ) %>% dplyr::arrange(patient, dplyr::desc(r))
 
 
         if (dim(tmp)[1] > 0) {

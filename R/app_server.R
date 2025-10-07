@@ -941,11 +941,11 @@ app_server <- function(input, output, session) {
         # Check if the filtered dataset is empty
         if (nrow(tmp2a) > 0) {
           tmp2a <- tmp2a %>%
-            mutate(Ongoing_AE = case_when(
+            mutate(Ongoing_AE = dplyr::case_when(
               day_end >= input$slider ~ 1,
               TRUE ~ 0
             ),
-            Resolved_AE = case_when(
+            Resolved_AE = dplyr::case_when(
               day_end <= input$slider ~ 1,
               TRUE ~ 0
             )) %>%
@@ -996,9 +996,9 @@ app_server <- function(input, output, session) {
         #5. create column 'text' with counts: total N (treatment1 N/ treatment2 N/...)
         tmp5 <- tmp4 %>%
           dplyr::mutate(
-            N_text = paste0(tmp4[["N"]], " (",apply(tmp4[, -c(1, 2)] %>% select(-contains(c("Ongoing","Resolved"))), 1, paste, collapse = "/"), ")"),
-            Ongoing_text = paste0(tmp4[["Ongoing"]], " (",apply(tmp4[, -c(1,3)] %>% select(contains(c("Ongoing"))), 1, paste, collapse = "/"), ")"),
-            Resolved_text = paste0(tmp4[["Resolved"]], " (",apply(tmp4[, -c(1,4)] %>% select(contains(c("Resolved"))), 1, paste, collapse = "/"), ")")
+            N_text = paste0(tmp4[["N"]], " (",apply(tmp4[, -c(1, 2)] %>% select(-tidyselect::contains(c("Ongoing","Resolved"))), 1, paste, collapse = "/"), ")"),
+            Ongoing_text = paste0(tmp4[["Ongoing"]], " (",apply(tmp4[, -c(1,3)] %>% select(tidyselect::contains(c("Ongoing"))), 1, paste, collapse = "/"), ")"),
+            Resolved_text = paste0(tmp4[["Resolved"]], " (",apply(tmp4[, -c(1,4)] %>% select(tidyselect::contains(c("Resolved"))), 1, paste, collapse = "/"), ")")
           )
 
         tmp5a  <- tmp5 %>% select("ae","N",starts_with("N_"))
@@ -1027,7 +1027,7 @@ app_server <- function(input, output, session) {
             rename("Ongoing"="N") %>%
             dplyr::mutate(
               Ongoing = NA_integer_,
-              across(starts_with("Ongoing"), ~ NA_integer_),
+              dplyr::across(starts_with("Ongoing"), ~ NA_integer_),
               Ongoing_text = "",
               ae = "Ongoing:"
             )
@@ -1036,7 +1036,7 @@ app_server <- function(input, output, session) {
             rename("Resolved"="N") %>%
             dplyr::mutate(
                 Resolved = NA_integer_,
-                across(starts_with("Resolved"), ~ NA_integer_),
+                dplyr::across(starts_with("Resolved"), ~ NA_integer_),
                 Resolved_text = "",
                 ae = "Resolved:"
               )
@@ -1059,7 +1059,7 @@ app_server <- function(input, output, session) {
             select(-c(ae, "Ongoing_text")) %>%
             {round(mapply('/', ., N_treat) * 100, 1)} %>%
             cbind(Ongoing %>% select(ae), .) %>%
-            mutate(Ongoing_text = case_when(
+            mutate(Ongoing_text = dplyr::case_when(
               !is.na(Ongoing) ~ paste0(Ongoing, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
               TRUE ~ "")
             )
@@ -1067,7 +1067,7 @@ app_server <- function(input, output, session) {
             select(-c(ae, "Resolved_text")) %>%
             {round(mapply('/', ., N_treat) * 100, 1)} %>%
             cbind(Resolved %>% select(ae), .) %>%
-            mutate(Resolved_text = case_when(
+            mutate(Resolved_text = dplyr::case_when(
               !is.na(Resolved) ~ paste0(Resolved, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
               TRUE ~ "")
             )

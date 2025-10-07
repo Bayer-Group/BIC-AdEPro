@@ -73,16 +73,16 @@ prepare_data <- function(
   #
   #     #deselect variables which are only included in one of the data sets
   #     pat_data <- pat_data %>%
-  #       dplyr::select(all_of(intersect(colnames(pat_data), colnames(pat_data2))))
+  #       dplyr::select(tidyselect::all_of(intersect(colnames(pat_data), colnames(pat_data2))))
   #     pat_data2 <- pat_data2 %>%
-  #       dplyr::select(all_of(intersect(colnames(pat_data), colnames(pat_data2))))
+  #       dplyr::select(tidyselect::all_of(intersect(colnames(pat_data), colnames(pat_data2))))
   #
   #     diff_subjid <- setdiff(
   #       pat_data2 %>%
-  #         select(all_of(!!rlang::sym(SUBJIDN))) %>%
+  #         select(tidyselect::all_of(!!rlang::sym(SUBJIDN))) %>%
   #         dplyr::pull() %>% as.vector(),
   #       pat_data %>%
-  #         dplyr::select(all_of(!!rlang::sym(SUBJIDN))) %>%
+  #         dplyr::select(tidyselect::all_of(!!rlang::sym(SUBJIDN))) %>%
   #         dplyr::pull() %>% as.vector()
   #     )
   #
@@ -91,9 +91,9 @@ prepare_data <- function(
   #     #merge adae and adsl data and inlude subjects from adsl which have no adverse events
   #     pat_data <- rbind(
   #       pat_data %>%
-  #             dplyr::select(all_of(jointly_vars)),
+  #             dplyr::select(tidyselect::all_of(jointly_vars)),
   #       pat_data2 %>%
-  #         dplyr::select(all_of(jointly_vars)) %>%
+  #         dplyr::select(tidyselect::all_of(jointly_vars)) %>%
   #         dplyr::filter(SUBJIDN %in% diff_subjid)
   #     )
   #   } else {
@@ -139,7 +139,7 @@ prepare_data <- function(
 
   # if (SUBJIDN %in% names(adsl_data) | is.null(adsl_data)) {
   #   pat_data <- pat_data %>%
-  #     dplyr::select(all_of(var_list)) %>%
+  #     dplyr::select(tidyselect::all_of(var_list)) %>%
   #     dplyr::arrange(treat, ps) %>%
   #     unique()
   # }

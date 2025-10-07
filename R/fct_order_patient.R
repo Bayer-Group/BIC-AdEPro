@@ -73,7 +73,7 @@ order_patient <- function(
   # reduce data set to the selected variables
 
   tmp4 <- tmp4 %>%
-    dplyr::select(all_of(c("patient", variables)))
+    dplyr::select(tidyselect::all_of(c("patient", variables)))
 
   # calculate distance matrix
   dd <- stats::dist(tmp4[, -1], method = method_dist)

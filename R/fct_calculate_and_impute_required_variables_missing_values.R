@@ -264,13 +264,13 @@ calculate_and_impute_required_variables_missing_values <- function(
   if (number_missing_lvdt  > 0) {
 
 
-    last_date <- data %>% dplyr::mutate(LVDT_ = case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>% dplyr::pull("LVDT_") %>% sort() %>% tail() %>% unique()
+    last_date <- data %>% dplyr::mutate(LVDT_ = dplyr::case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>% dplyr::pull("LVDT_") %>% sort() %>% tail() %>% unique()
     #last_date <- tail(sort(anytime::anydate(data[LVDT]),na.rm = TRUE), n = 1)
 
       data <- data %>%
-        dplyr::mutate(!!rlang::sym(paste0(LVDT,"_raw")):= case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(LVDT) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>%
+        dplyr::mutate(!!rlang::sym(paste0(LVDT,"_raw")):= dplyr::case_when(is.na(!!rlang::sym(LVDT)) ~ NA, !is.na(LVDT) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>%
         dplyr::mutate(!!rlang::sym(LVDT):=
-                        case_when(is.na(!!rlang::sym(LVDT)) ~ last_date, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>%
+                        dplyr::case_when(is.na(!!rlang::sym(LVDT)) ~ last_date, !is.na(!!rlang::sym(LVDT)) ~ anytime::anydate(!!rlang::sym(LVDT)))) %>%
         dplyr::mutate(!!rlang::sym(paste0(LVDT,"_imputed_flag")):= dplyr::case_when(
           is.na(!!rlang::sym(paste0(LVDT,"_raw"))) & !is.na(!!rlang::sym(LVDT)) ~ 1,
           !is.na(!!rlang::sym(paste0(LVDT,"_raw"))) & is.na(!!rlang::sym(LVDT)) ~ 1,

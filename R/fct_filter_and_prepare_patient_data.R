@@ -50,7 +50,7 @@ filter_and_prepare_patient_data <- function(data, SAFFN = SAFFN, LVDT = LVDT, TR
     if (!any(is.numeric(data[[LVDT]])) & any(is.convertible.to.date(data[[LVDT]])) & any(is.convertible.to.date(data[[TRTSDT]]))) {
       pat_data <- pat_data  %>%
         dplyr::mutate(
-          death = case_when(
+          death = dplyr::case_when(
             is.na(as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))))) ~ 99999,
             !is.na(as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))))) ~ as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT)))) - as.numeric(as.Date(anytime::anydate(!!rlang::sym(TRTSDT)))) + 1,
           ),
@@ -59,7 +59,7 @@ filter_and_prepare_patient_data <- function(data, SAFFN = SAFFN, LVDT = LVDT, TR
     } else {
       pat_data <- pat_data  %>%
         dplyr::mutate(
-          death = case_when(
+          death = dplyr::case_when(
             is.na(as.numeric((!!rlang::sym(DTHDT)))) ~ 99999,
             !is.na(as.numeric((!!rlang::sym(DTHDT)))) ~ as.numeric(!!rlang::sym(DTHDT)) - as.numeric(!!rlang::sym(TRTSDT)) + 1,
           ),
