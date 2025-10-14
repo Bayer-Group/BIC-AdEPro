@@ -1,6 +1,3 @@
-utils::globalVariables(c("patient_d", "input", "day_end", "day_start", "sev", "patient", "ae", "val", "death", "ps", "end", "ae_frequency"))
-
-
 #' order_patient - Arranges patients by sequencing technique
 #' @description
 #' Arranges patients by sequencing technique (R Package required: 'dplyr', 'reshape2, 'seriation')

@@ -1,5 +1,3 @@
-utils::globalVariables(c("ae","day_start","ps", "X", "Y","patient","r", "day_end", "replace_ae_start", "replace_ae_end"))
-
 #' adepro_slice_plot - function to create pie chart graph
 #'
 #' @description
@@ -163,14 +161,14 @@ adepro_slice_plot <- function(
         tmp <- tmp_start %>%
           #insert arrow data
           dplyr::left_join(arrow_data %>%
-            dplyr::select(patient,ae,day_start,day_end,replace_ae_start,replace_ae_end),
+            dplyr::select("patient","ae","day_start","day_end","replace_ae_start","replace_ae_end"),
             by = c("patient","ae","day_start","day_end")) %>%
-          dplyr::filter(ae %in% ae_list) %>%
-          dplyr::filter(day_start <= slider) %>%
+          dplyr::filter(.data$ae %in% ae_list) %>%
+          dplyr::filter(.data$day_start <= slider) %>%
           dplyr::left_join(
             patients_tmp %>%
-              dplyr::select(ps,X,Y,cont,cont_bg) %>%
-              dplyr::rename(patient = ps),
+              dplyr::select("ps","X","Y",cont,cont_bg) %>%
+              dplyr::rename(patient = "ps"),
             by = "patient"
           ) %>% dplyr::left_join(
              data.frame(ae = ae_list, col = adepro_colors[1:length(ae_list)], num = 1:length(ae_list)),
@@ -180,7 +178,7 @@ adepro_slice_plot <- function(
               slider > day_end ~ cont,
               slider <= day_end ~ col
             )
-          ) %>% dplyr::arrange(patient, dplyr::desc(r))
+          ) %>% dplyr::arrange(.data$patient, dplyr::desc(.data$r))
 
 
         if (dim(tmp)[1] > 0) {
@@ -198,7 +196,7 @@ adepro_slice_plot <- function(
 
           #filter for imputed data
           arrow_tmp <- tmp %>%
-            dplyr::filter(replace_ae_start + replace_ae_end != 0 )
+            dplyr::filter(.data$replace_ae_start + .data$replace_ae_end != 0 )
 
           if (length(ae_list) > 1) {
           my_symbols(
@@ -289,7 +287,7 @@ adepro_slice_plot <- function(
       if (!is.null(legend_ae)) {
         if (length(legend_ae) != 0) {
           tmp_clicked <- tmp %>%
-            dplyr::filter(ae == legend_ae)
+            dplyr::filter(.data$ae == legend_ae)
           if (dim(tmp_clicked)[1] > 0) {
             graphics::symbols(
               tmp_clicked$X,

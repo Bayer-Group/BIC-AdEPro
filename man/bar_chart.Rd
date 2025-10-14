@@ -5,13 +5,13 @@
 \title{bar_chart - creates barchart of AEs for all patient}
 \usage{
 bar_chart(
-  ae_data = ae,
-  patients = patient,
-  day = day_slider,
-  variables = vars,
-  day_max = day_mx,
-  count_max = count_mx,
-  treatments = treatments,
+  ae_data = "ae",
+  patients = "patient",
+  day = "day_slider",
+  variables = "vars",
+  day_max = "day_mx",
+  count_max = "count_mx",
+  treatments = "treatments",
   cex.n = 2,
   color_theme = TRUE
 )

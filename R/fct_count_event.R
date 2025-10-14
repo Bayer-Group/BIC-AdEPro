@@ -1,5 +1,3 @@
-utils::globalVariables(c("day_start", "ae", "treat", "tot", "day_end", "flag"))
-
 #' count_event  Count the event number for every AE at specified timepoint
 #'
 #' @description  Count the event number for every AE at specified timepoint

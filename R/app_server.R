@@ -1,5 +1,3 @@
-utils::globalVariables(c("day_end", "day_start", "r", "ps", "treat", "N", ".", "end", "death", "SEQUENCING"))
-
 #' The application server-side
 #'
 #' @param input,output,session Internal parameters for {shiny}.
@@ -919,8 +917,8 @@ app_server <- function(input, output, session) {
         ae_data() %>%
           dplyr::filter(!!rlang::sym(flag_name) == 1),
         patient_data() %>%
-          dplyr::mutate(patient = ps) %>%
-          dplyr::select(treat, patient),
+          dplyr::mutate(patient = "ps") %>%
+          dplyr::select("treat", "patient"),
         by = "patient"
       )
 
@@ -936,7 +934,7 @@ app_server <- function(input, output, session) {
         #2. get number of events until slider day grouped by treatement and events
         tmp2a <- tmp %>%
           dplyr::filter(ae %in% input_var()) %>%
-          dplyr::filter(day_start <= input$slider)
+          dplyr::filter(.data$day_start <= input$slider)
 
         # Check if the filtered dataset is empty
         if (nrow(tmp2a) > 0) {
@@ -951,7 +949,7 @@ app_server <- function(input, output, session) {
             )) %>%
             dplyr::group_by(patient, ae) %>%
             dplyr::summarise(
-              treat = dplyr::first(treat),
+              treat = dplyr::first(.data$treat),
               Ongoing_AE = max(.data$Ongoing_AE, na.rm = TRUE),  # Use na.rm = TRUE to avoid warnings
               Resolved_AE = max(.data$Resolved_AE, na.rm = TRUE)
             )
@@ -960,7 +958,7 @@ app_server <- function(input, output, session) {
         }
 
         tmp2 <- tmp2a %>%
-          dplyr::group_by(treat,ae) %>%
+          dplyr::group_by(.data$treat,.data$ae) %>%
           dplyr::summarize(
             N = dplyr::n(),  # Count the total number of rows per treat-ae combination
             Ongoing = sum(.data$Ongoing_AE == 1),  # Count of Ongoing == 1
@@ -987,7 +985,7 @@ app_server <- function(input, output, session) {
         tmp4 <- dplyr::full_join(
           tmp3,
           tmp2 %>%
-            tidyr::pivot_wider(names_from = treat, values_from = c(N, Ongoing, Resolved)),
+            tidyr::pivot_wider(names_from = "treat", values_from = c("N", "Ongoing", "Resolved")),
           by = "ae"
         )
 
@@ -1012,11 +1010,11 @@ app_server <- function(input, output, session) {
 
         patients_ <- patients()[order(match(patients()$treat, input$sortTreatments)),]
          N_treat <- patients_ %>%
-            dplyr::group_by(treat) %>%
+            dplyr::group_by(.data$treat) %>%
             dplyr::summarise(N = dplyr::n()) %>%
-            tidyr::pivot_wider(names_from = treat, values_from = N, names_prefix = "N_") %>%
-            dplyr::mutate(N = rowSums(.)) %>%
-            dplyr::select(N, dplyr::everything())
+            tidyr::pivot_wider(names_from = "treat", values_from = "N", names_prefix = "N_") %>%
+            dplyr::mutate(N = rowSums()) %>%
+            dplyr::select("N", dplyr::everything())
 
           Big_N <- N_treat %>% dplyr::mutate(
             N_text = paste0(N_treat[,1],"(",apply(N_treat[, -1], 1, paste, collapse = "/"),")"),
@@ -1054,13 +1052,13 @@ app_server <- function(input, output, session) {
             dplyr::select(-c(ae, "N_text")) %>%
             {round(mapply('/', ., N_treat) * 100, 1)} %>%
             cbind(tmp5b %>% dplyr::select(ae), .) %>%
-            dplyr::mutate(N_text = paste0(N, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"))
+            dplyr::mutate(N_text = paste0(.data$N, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"))
           Ongoing <- Ongoing %>%
             dplyr::select(-c(ae, "Ongoing_text")) %>%
             {round(mapply('/', ., N_treat) * 100, 1)} %>%
             cbind(Ongoing %>% dplyr::select(ae), .) %>%
             dplyr::mutate(Ongoing_text = dplyr::case_when(
-              !is.na(Ongoing) ~ paste0(Ongoing, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
+              !is.na(Ongoing) ~ paste0(.data$Ongoing, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
               TRUE ~ "")
             )
           Resolved <- Resolved %>%
@@ -1068,7 +1066,7 @@ app_server <- function(input, output, session) {
             {round(mapply('/', ., N_treat) * 100, 1)} %>%
             cbind(Resolved %>% dplyr::select(ae), .) %>%
             dplyr::mutate(Resolved_text = dplyr::case_when(
-              !is.na(Resolved) ~ paste0(Resolved, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
+              !is.na(Resolved) ~ paste0(.data$Resolved, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
               TRUE ~ "")
             )
           text2 <- c("Percent",input_var())
@@ -1510,9 +1508,9 @@ app_server <- function(input, output, session) {
         if(!all(is.null(input$sortTreatments))) {
           sortTreatments <- input$sortTreatments
            tot_dat$pat_data <- tot_dat$pat_data %>%
-             dplyr::filter(treat %in% sortTreatments)
+             dplyr::filter(.data$treat %in% sortTreatments)
           tot_dat$ae_data <- tot_dat$ae_data %>%
-            dplyr::filter(patient %in% tot_dat$pat_data$ps)
+            dplyr::filter(.data$patient %in% tot_dat$pat_data$ps)
 
           tot_dat$pat_data$treat <- forcats::fct_relevel(tot_dat$pat_data$treat, sortTreatments)
         }
@@ -1666,13 +1664,13 @@ app_server <- function(input, output, session) {
       tst <- ae %>%
         dplyr::filter(ae %in% all_aes) %>%
         dplyr::right_join((patient %>%
-                             dplyr::rename(patient = ps)), by = "patient")
+                             dplyr::rename(patient = "ps")), by = "patient")
       tst <- tst %>%
-        dplyr::select(day_start, day_end, treat, ae) %>%
+        dplyr::select("day_start", "day_end", "treat", "ae") %>%
         stats::na.omit()
 
       tst <- tst%>%
-        dplyr::group_by(ae, treat) %>%
+        dplyr::group_by(.data$ae, .data$treat) %>%
         tidyr::nest()
       max_count <- numeric(dim(tst)[1])
       for (i in 1:dim(tst)[1]) {
@@ -1731,7 +1729,7 @@ app_server <- function(input, output, session) {
       if (is.null(dim(patient_data[, colindex]))){
       patient_data <- patient_data[order(trt, patient_data[, colindex]), ]
       patient_data <- patient_data %>%
-        dplyr::arrange(treat)
+        dplyr::arrange(.data$treat)
       } else {
         NULL
       }
@@ -1740,9 +1738,9 @@ app_server <- function(input, output, session) {
         dplyr::right_join(seq_matrix() %>%
                             dplyr::rename(ps = patient), by = 'ps')
       patient_data <- patient_data %>%
-        dplyr::filter(!is.na(treat))
+        dplyr::filter(!is.na(.data$treat))
       patient_data <- patient_data %>%
-        dplyr::arrange(treat, SEQUENCING)
+        dplyr::arrange(.data$treat, .data$SEQUENCING)
     }
 
 

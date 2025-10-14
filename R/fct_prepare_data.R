@@ -1,5 +1,3 @@
- utils::globalVariables(c("death", "cols", "treat", "ps", "new_AESEVN", "patient", "day_start", "day_end", "output", "message"))
-
 #' prepare_data - read SAS or CSV raw data and prepare the data sets
 #' @description
 #' Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application
