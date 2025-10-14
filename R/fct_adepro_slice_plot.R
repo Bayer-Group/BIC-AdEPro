@@ -65,8 +65,8 @@ adepro_slice_plot <- function(
       highlight_col <- "#f5e44960"
   }
 
-  on_ex <- par("oma","mar","plt")
-  on.exit(par(on_ex))
+  on_ex <- graphics::par("oma","mar","plt")
+  on.exit(graphics::par(on_ex))
 
   if (!is.null(subgroup)) {
     index <- length(unique(patients[[subgroup]]))
@@ -76,7 +76,7 @@ adepro_slice_plot <- function(
     names <- NULL
   }
 
-  par(
+  graphics::par(
     mfrow = c(index, 1),
     oma = c(0, 0, 0, 0),
     mar = c(0, 0, 0, 0),
@@ -162,7 +162,7 @@ adepro_slice_plot <- function(
       if (length(ae_list) > 0) {
         tmp <- tmp_start %>%
           #insert arrow data
-          left_join(arrow_data %>%
+          dplyr::left_join(arrow_data %>%
             dplyr::select(patient,ae,day_start,day_end,replace_ae_start,replace_ae_end),
             by = c("patient","ae","day_start","day_end")) %>%
           dplyr::filter(ae %in% ae_list) %>%
@@ -184,13 +184,13 @@ adepro_slice_plot <- function(
 
 
         if (dim(tmp)[1] > 0) {
-          poly_t <- function(num, rad = 1, fg = par('fg'), bg = par('fg'),num_aes = length(ae_list),...) {
+          poly_t <- function(num, rad = 1, fg = graphics::par('fg'), bg = graphics::par('fg'),num_aes = length(ae_list),...) {
             x_tmp <- c(0, 0 + rad * 0.9 * cos(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 25)))
             y_tmp <- c(0, 0 + rad * 0.9 * sin(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 25)))
-            polygon(c(x_tmp, x_tmp[1]), c(y_tmp, y_tmp[1]), col = bg, border = fg, ...)
+            graphics::polygon(c(x_tmp, x_tmp[1]), c(y_tmp, y_tmp[1]), col = bg, border = fg, ...)
             NULL
           }
-          poly_t2 <- function(num, rad = 1, fg = par('fg'), bg = par('fg'),num_aes = length(ae_list),...) {
+          poly_t2 <- function(num, rad = 1, fg = graphics::par('fg'), bg = graphics::par('fg'),num_aes = length(ae_list),...) {
             x_tmp <- c(0, 0 + rad * 0.9 * cos(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 2)))
             y_tmp <- c(0, 0 + rad * 0.9 * sin(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 2)))
             return(c(mean(x_tmp, x_tmp[1]), mean(y_tmp, y_tmp[1])))
@@ -201,7 +201,7 @@ adepro_slice_plot <- function(
             dplyr::filter(replace_ae_start + replace_ae_end != 0 )
 
           if (length(ae_list) > 1) {
-          my.symbols(
+          my_symbols(
             x = tmp$X,
             y = tmp$Y,
             symb = poly_t,
@@ -218,16 +218,16 @@ adepro_slice_plot <- function(
                   for(i in 1:dim(arrow_tmp)[1]) {
                     coord <- poly_t2(arrow_tmp[i,]$num,1,num_aes = length(ae_list))
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =text_col,cex=1.55)
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =arrow_col,cex=1.5)
+                      graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =text_col,cex=1.55)
+                      graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =arrow_col,cex=1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col =text_col,cex=1.55)
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col =arrow_col,cex =1.5)
+                      graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col =text_col,cex=1.55)
+                      graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\336")),col =arrow_col,cex =1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col =text_col,cex=1.55)
-                      text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col =arrow_col,cex=1.5)
+                      graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col =text_col,cex=1.55)
+                      graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\333")),col =arrow_col,cex=1.5)
                     }
                   }
                 }
@@ -249,16 +249,16 @@ adepro_slice_plot <- function(
                 if (!dim(arrow_tmp)[1] == 0) {
                   for(i in 1:dim(arrow_tmp)[1]){
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =text_col,cex=1.55)
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =arrow_col,cex=1.5)
+                      graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =text_col,cex=1.55)
+                      graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =arrow_col,cex=1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 0 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col =text_col,cex=1.55)
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col =arrow_col,cex=1.5)
+                      graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col =text_col,cex=1.55)
+                      graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\336")),col =arrow_col,cex=1.5)
                     }
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 1){
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col =text_col,cex=1.55)
-                      text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col =arrow_col,cex=1.5)
+                      graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col =text_col,cex=1.55)
+                      graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\333")),col =arrow_col,cex=1.5)
                     }
                   }
                 }

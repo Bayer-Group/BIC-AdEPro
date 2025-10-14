@@ -5,7 +5,7 @@
 #' @noRd
 #' @keywords internal
 app_ui <- function(request) {
-  tagList(
+  shiny::tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
@@ -68,15 +68,15 @@ app_ui <- function(request) {
                     shiny::conditionalPanel(condition = "input.view == 'pie'",
                       shinyWidgets::prettyToggle(
                         inputId = 'AI.AdEPro',
-                        label_off = HTML("<span> Add AdEPro AI </span>"),
-                        label_on = HTML("<span> Hide AdEPro AI </span>"),
+                        label_off = shiny::HTML("<span> Add AdEPro AI </span>"),
+                        label_on = shiny::HTML("<span> Hide AdEPro AI </span>"),
                         value = FALSE,
                         outline = TRUE,
                         status_on = "default",
                         status_off = "default",
                         plain = TRUE,
-                        icon_off = icon("robot"),
-                        icon_on = icon ("robot")
+                        icon_off = shiny::icon("robot"),
+                        icon_on = shiny::icon("robot")
                       )
                     ),
                     shiny::conditionalPanel(condition = "output.flag > 0",
@@ -121,7 +121,7 @@ app_ui <- function(request) {
                         shiny::actionButton(
                           inputId = "AI.Update",
                           label = "Update!",
-                          icon = icon("refresh"),
+                          icon = shiny::icon("refresh"),
                           style = paste0("color:#FFFFFF ; background-color: #377EB8;")
                         ),
                         shiny::tags$br()
@@ -168,11 +168,11 @@ app_ui <- function(request) {
                       shiny::actionButton(
                         inputId = "remove_all_aes",
                         label = "Remove all events",
-                        icon = icon("times")
+                        icon = shiny::icon("times")
                       ),
                       shiny::br(),
                       shiny::tags$head(
-                      tags$style("
+                      shiny::tags$style("
                         #var ~ .selectize-control .item:nth-child(1) {
                           background-color: #e43157;
                         }
@@ -230,7 +230,7 @@ app_ui <- function(request) {
                   shinyBS::bsCollapsePanel(
                     shiny::HTML('<p> Subgroup setting </p>'),
                     shiny::conditionalPanel(condition = "input.view == 'pie'",
-                    uiOutput("subgroup")
+                    shiny::uiOutput("subgroup")
                     )
                   ),
                   multiple = TRUE,
@@ -245,7 +245,7 @@ app_ui <- function(request) {
             shiny::column(3,
               shiny::br(),
               shiny::conditionalPanel(condition = "output.submitted == 1",
-                column(12,
+                shiny::column(12,
                   shiny::uiOutput("slider")
                 ),
                 shiny::conditionalPanel(condition = "output.submitted == 1",
@@ -253,7 +253,7 @@ app_ui <- function(request) {
                     shinyWidgets::circleButton(
                       inputId = "play",
                       label = NULL,
-                      icon = icon("play"),
+                      icon = shiny::icon("play"),
                       status = "primary",
                       size = "xs"
                     )
@@ -262,7 +262,7 @@ app_ui <- function(request) {
                     shinyWidgets::circleButton(
                       inputId = "pause",
                       label = "",
-                      icon = icon("pause"),
+                      icon = shiny::icon("pause"),
                       no_outline = FALSE,
                       status = "primary",
                       size = "xs"
@@ -272,7 +272,7 @@ app_ui <- function(request) {
                     shinyWidgets::circleButton(
                       inputId = "backward",
                       label = "",
-                      icon = icon("backward"),
+                      icon = shiny::icon("backward"),
                       no_outline = FALSE,
                       status = "primary",
                       size = "xs"
@@ -290,7 +290,7 @@ app_ui <- function(request) {
                     shinyWidgets::circleButton(
                       inputId = "forward",
                       label = "",
-                      icon = icon("forward"),
+                      icon = shiny::icon("forward"),
                       no_outline = FALSE,
                       status = "primary",
                       size = "xs"
@@ -329,15 +329,15 @@ app_ui <- function(request) {
                 shiny::actionButton(
                   inputId = "return_upload",
                   label ="Upload",
-                  icon = icon("step-backward"),
+                  icon = shiny::icon("step-backward"),
                   style = paste0("color:#FFFFFF ; background-color: #377EB8;")
                 )
               )
             ),
             shiny::column(2,
               adeproLogo(height = 120, width = 120, align = "right"),
-              shiny::tags$div(style="text-align:center",
-                shiny::HTML(paste0("<span> v.",packageVersion("adepro"),"</span>"))
+              shiny::div(style="text-align:center",
+                shiny::HTML(paste0("<span> v.",utils::packageVersion("adepro"),"</span>"))
               )
             ),
             shiny::column(2,
@@ -352,14 +352,14 @@ app_ui <- function(request) {
           shiny::conditionalPanel(condition = "output.submitted == 0",
             shiny::fluidRow(
               shiny::column(2,
-                shiny::tags$div(style="text-align:center",
+                shiny::div(style="text-align:center",
                   adeproLogo(height = 150, width = 150, align = "right")
                 )
               ),
               shiny::column(9,
                 shiny::column(12,
-                  shiny::tags$div(style="text-align:left",
-                    shiny::tags$div(
+                  shiny::div(style="text-align:left",
+                    shiny::div(
                       shiny::HTML(
                         paste(
                           shiny::tags$span(
@@ -426,7 +426,7 @@ app_ui <- function(request) {
                         ")
                       ),
                       circle = TRUE,
-                      icon = icon("book-open"),
+                      icon = shiny::icon("book-open"),
                       width = "450px",
                       tooltip = shinyWidgets::tooltipOptions(title = "Description")
                     )
@@ -475,7 +475,7 @@ app_ui <- function(request) {
                         ")
                       ),
                       circle = TRUE,
-                      icon = icon("desktop"),
+                      icon = shiny::icon("desktop"),
                       width = "450px",
                       tooltip = shinyWidgets::tooltipOptions(title = "Surface")
                     )
@@ -545,7 +545,7 @@ app_ui <- function(request) {
                         ")
                       ),
                       circle = TRUE,
-                      icon = icon("boxes"),
+                      icon = shiny::icon("boxes"),
                       width = "450px",
                       tooltip = shinyWidgets::tooltipOptions(title = "Functionality")
                     )
@@ -593,7 +593,7 @@ app_ui <- function(request) {
                         ")
                       ),
                       circle = TRUE,
-                      icon = icon("file-import"),
+                      icon = shiny::icon("file-import"),
                       width = "450px",
                       tooltip = shinyWidgets::tooltipOptions(title = "Input Data")
                     )
@@ -641,7 +641,7 @@ app_ui <- function(request) {
                         ")
                       ),
                       circle = TRUE,
-                      icon = icon("robot"),
+                      icon = shiny::icon("robot"),
                       width = "450px",
                       tooltip = shinyWidgets::tooltipOptions(title = "AdEPro AI")
                     )
@@ -670,7 +670,7 @@ app_ui <- function(request) {
                         ")
                       ),
                       circle = TRUE,
-                      icon = icon("info"),
+                      icon = shiny::icon("info"),
                       width = "450px",
                       tooltip = shinyWidgets::tooltipOptions(title = "Additional information")
                     )
@@ -685,7 +685,7 @@ app_ui <- function(request) {
                 shiny::column(12,
                       shiny::radioButtons(
                       inputId ="radiobutton_data",
-                      label = HTML('<b> Data type </b>'),
+                      label = shiny::HTML('<b> Data type </b>'),
                       choices = c("File upload"),
                       selected = "File upload",
                       inline = TRUE
@@ -704,7 +704,7 @@ app_ui <- function(request) {
                   ),
                   shiny::column(1,
                       shiny::conditionalPanel("output.radio_data == 'File upload'",
-                        shiny::actionButton(inputId = "reset_fileinput_adae", label = "", icon =icon("times"))
+                        shiny::actionButton(inputId = "reset_fileinput_adae", label = "", icon =shiny::icon("times"))
                       )
                   ),
                     shiny::column(12,
@@ -714,7 +714,7 @@ app_ui <- function(request) {
                     )
                   ),
                   shiny::column(8,
-                    conditionalPanel("output.radio_data == 'File upload'",
+                    shiny::conditionalPanel("output.radio_data == 'File upload'",
                     shiny::fileInput(
                       inputId = 'tot_dat2',
                       label = shiny::HTML('<p> Upload subject level data <span>(optional)</span> </p>')
@@ -723,7 +723,7 @@ app_ui <- function(request) {
                   ),
                   shiny::column(1,
                       shiny::conditionalPanel("output.radio_data == 'File upload'",
-                        shiny::actionButton(inputId = "reset_fileinput_adsl", label = "", icon =icon("times"))
+                        shiny::actionButton(inputId = "reset_fileinput_adsl", label = "", icon =shiny::icon("times"))
                       )
                   ),
                   shiny::column(12,
@@ -738,7 +738,7 @@ app_ui <- function(request) {
                   shiny::actionButton(
                     inputId = "submit",
                     label = paste0('Submit'),
-                    icon = icon("step-forward")
+                    icon = shiny::icon("step-forward")
                   )
                 ),
                 shiny::column(12,
@@ -854,7 +854,7 @@ app_ui <- function(request) {
           )
         ),
         shiny::conditionalPanel(condition = "output.submitted == 1",
-          conditionalPanel(condition = "input.sortTreatments.length > 0",
+          shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
             shiny::uiOutput('ae_summary_box')
             ),
             shiny::conditionalPanel(condition = "input.view == 'pie'",
@@ -865,14 +865,14 @@ app_ui <- function(request) {
                 shiny::HTML('<p> Please select at least one treatment in the "Modify data"-Panel! </p>')
               ),
               shiny::fluidRow(
-                splitLayout(
+                shiny::splitLayout(
                   cellArgs = list(style='white-space: normal; resize: horizontal;'),
                   cellWidths = c("9%", "82%","9%"),
                   shiny::uiOutput("circle_legend"),
                   shiny::plotOutput(
                     outputId = "slicePlots",
-                    hover = hoverOpts(id ="plot_hover"),
-                    click = clickOpts(id = "plot_click"),
+                    hover = shiny::hoverOpts(id ="plot_hover"),
+                    click = shiny::clickOpts(id = "plot_click"),
                     height = "100%"
                   ),
                   shiny::uiOutput("circle_legend2")
@@ -882,7 +882,7 @@ app_ui <- function(request) {
               shiny::conditionalPanel(condition = "input.view == 'chart'",
                 shiny::conditionalPanel(condition = "input.sortTreatments.length > 0",
                   shiny::fluidRow(
-                    splitLayout(
+                    shiny::splitLayout(
                       cellArgs = list(style='white-space: normal; resize: horizontal;'),
                       cellWidths = c("9%", "91%"),
                       shiny::uiOutput("barchart_legend"),
@@ -919,7 +919,7 @@ golem_add_external_resources <- function() {
     app_sys("app/www")
   )
 
-  tags$head(
+  shiny::tags$head(
     golem::favicon(),
     golem::bundle_resources(
       path = app_sys("app/www"),

@@ -4,13 +4,13 @@
 #' that it plots symbols defined by the user rather than a prespecified set of symbols.
 #'
 #' @usage
-#' my.symbols(x, y=NULL, symb, inches=1, xsize, ysize,
+#' my_symbols(x, y=NULL, symb, inches=1, xsize, ysize,
 #' add=TRUE,
 #' vadj=0.5, hadj=0.5,
 #' symb.plots=FALSE,
 #' xlab=deparse(substitute(x)),
 #' ylab=deparse(substitute(y)), main=NULL,
-#' xlim=NULL, ylim=NULL, linesfun=lines,
+#' xlim=NULL, ylim=NULL, linesfun=graphics::lines,
 #'..., MoreArgs)
 #'
 #' @param x,y The x and y coordinates for the position of the symbols to be plotted. These can be specified in any way which is accepted by xy.coords.
@@ -79,13 +79,13 @@
 #' @keywords internal
 
 
-my.symbols <- function(x, y=NULL, symb, inches=1, xsize, ysize,
+my_symbols <- function(x, y=NULL, symb, inches=1, xsize, ysize,
                        add=TRUE,
                        vadj=0.5, hadj=0.5,
                        symb.plots=FALSE,
                        xlab=deparse(substitute(x)),
                        ylab=deparse(substitute(y)), main=NULL,
-                       xlim=NULL, ylim=NULL, linesfun=lines,
+                       xlim=NULL, ylim=NULL, linesfun=graphics::lines,
                        ..., MoreArgs ) {
 
   if(!add){
@@ -93,10 +93,10 @@ my.symbols <- function(x, y=NULL, symb, inches=1, xsize, ysize,
              xlim=xlim,ylim=ylim,main=main)
   }
 
-  xy <- xy.coords(x,y,recycle=TRUE)
+  xy <- grDevices::xy.coords(x,y,recycle=TRUE)
 
-  pin <- par('pin')
-  usr <- par('usr')
+  pin <- graphics::par('pin')
+  usr <- graphics::par('usr')
   usr.x <- usr[2] - usr[1]
   usr.y <- usr[4] - usr[3]
 
@@ -159,20 +159,20 @@ my.symbols <- function(x, y=NULL, symb, inches=1, xsize, ysize,
   plotfun <- if( is.function(symb) ) {
     if(symb.plots) {
       function(xlow,xhigh,ylow,yhigh,symb, ...) {
-        op <- par(c('plt','usr','xpd'))
-        on.exit(par(op))
-        par(xpd=TRUE)
-        par(plt=c(xlow,xhigh,ylow,yhigh), new=TRUE)
-        par(usr=c(-1,1,-1,1))
+        op <- graphics::par(c('plt','usr','xpd'))
+        on.exit(graphics::par(op))
+        graphics::par(xpd=TRUE)
+        graphics::par(plt=c(xlow,xhigh,ylow,yhigh), new=TRUE)
+        graphics::par(usr=c(-1,1,-1,1))
         symb(...)
       }
     } else {
       function(xlow,xhigh,ylow,yhigh,symb, ...) {
-        op <- par(c('plt','usr','xpd'))
-        on.exit(par(op))
-        par(xpd=TRUE)
-        par(plt=c(xlow,xhigh,ylow,yhigh))
-        par(usr=c(-1,1,-1,1))
+        op <- graphics::par(c('plt','usr','xpd'))
+        on.exit(graphics::par(op))
+        graphics::par(xpd=TRUE)
+        graphics::par(plt=c(xlow,xhigh,ylow,yhigh))
+        graphics::par(usr=c(-1,1,-1,1))
         suppressWarnings(
             linesfun( symb(...), ... )
                        )
@@ -180,11 +180,11 @@ my.symbols <- function(x, y=NULL, symb, inches=1, xsize, ysize,
     }
   } else {
     function(xlow,xhigh,ylow,yhigh,symb, ...) {
-      op <- par(c('plt','usr','xpd'))
-      on.exit(par(op))
-      par(xpd=TRUE)
-      par(plt=c(xlow,xhigh,ylow,yhigh))
-      par(usr=c(-1,1,-1,1))
+      op <- graphics::par(c('plt','usr','xpd'))
+      on.exit(graphics::par(op))
+      graphics::par(xpd=TRUE)
+      graphics::par(plt=c(xlow,xhigh,ylow,yhigh))
+      graphics::par(usr=c(-1,1,-1,1))
       linesfun(symb, ...)
     }
   }

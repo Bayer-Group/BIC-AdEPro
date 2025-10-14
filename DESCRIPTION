@@ -33,7 +33,6 @@ Imports:
     readr,
     rlang,
     seriation,
-    shape,
     shiny,
     shinyBS,
     shinyjs,

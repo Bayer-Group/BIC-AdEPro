@@ -201,8 +201,8 @@ prepare_data_for_adepro <- function(
   # order columns and rows, deselect not needed columns and remove duplicated rows
   pat_data <- prepared_data %>%
     dplyr::relocate(c(ps,treat,end,death)) %>%
-    dplyr::select(-one_of(available_cols)) %>%
-    distinct_at(c("ps", "treat", "end", "death"), .keep_all = TRUE) %>%
+    dplyr::select(-tidyselect::one_of(available_cols)) %>%
+   dplyr::distinct_at(c("ps", "treat", "end", "death"), .keep_all = TRUE) %>%
     dplyr::arrange(ps)
 
   #return data as list

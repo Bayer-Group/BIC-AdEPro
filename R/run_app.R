@@ -8,9 +8,8 @@
 #' @param browser path to browser exe (defaults to standard browser)
 #' @param ... arguments to pass to golem_opts.
 #' See `?golem::get_golem_options` for more details.
-#' @inheritParams shiny::shinyApp
 #' @keywords adepro
-#'
+#' @inheritParams shiny::shinyApp
 #' @details Further information on how to use this application can be found in the vignette of this package.
 #'
 #' @examples

@@ -16,10 +16,10 @@ pie_legend <- function(
       "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
     )
 ) {
-  on_ex <- par("oma", "mar", "font")
-  on.exit(par(on_ex))
-  par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
-  u <- par("usr")
+  on_ex <- graphics::par("oma", "mar", "font")
+  on.exit(graphics::par(on_ex))
+  graphics::par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
+  u <- graphics::par("usr")
   graphics::rect(u[1], u[3], u[2], u[4], col = "#424242", border = "#424242")
   if (length(aes) > 0) {
     graphics::legend(

@@ -34,7 +34,7 @@ join_adae_and_adsl <- function(dat_adae, dat_adsl, SUBJIDN) {
 
   # get vector with subject identifier available in adae and adsl
   subject_id_index <- dplyr::intersect(dat_adae[,SUBJIDN],dat_adsl[,SUBJIDN]) %>%
-    na.omit()
+    stats::na.omit()
 
   #compare if the variable for merging have the same values e.g. a subject has the same treatment in adae and adsl
   #compare object 1
@@ -66,7 +66,7 @@ join_adae_and_adsl <- function(dat_adae, dat_adsl, SUBJIDN) {
   # if a non required variables differs between adae and adsl, it is duplicated in the join and given the extention .x, .y
   # (e.g. ADSNAME with entries "ADSL" and "ADAE")
   if(length(joint_vars_match) > 0) {
-    pat_dat <- dplyr::full_join(dat_adsl,dat_adae, by = join_by(!!!rlang::syms(joint_vars_match)))
+    pat_dat <- dplyr::full_join(dat_adsl,dat_adae, by = dplyr::join_by(!!!rlang::syms(joint_vars_match)))
   } else {
     stop("Error: no variables with matching entries")
   }

@@ -38,7 +38,7 @@ adeproLogo <- function(height = 230, width = 160, align = "right"){
     stop("Alignment need to be one of the following options: center, left, right")
   }
 
-tags$div(HTML(paste0("<?xml version='1.0' encoding='utf-8'?>
+shiny::div(shiny::HTML(paste0("<?xml version='1.0' encoding='utf-8'?>
                                     <!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
               <svg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px'
               viewBox='0 0 900 990' style='enable-background:new 0 0 800 800; width:", height, "px; height:", width, "px;' align=", align, " xml:space='preserve'>

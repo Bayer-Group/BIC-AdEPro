@@ -206,7 +206,7 @@ test_that("check function prepare_data_for_adepro:", {
 
   # expect subject 07
   testthat::expect_equal(imputed$number_missing_lvdt,1)
-  testthat::expect_equal(sum(imputed$data %>% dplyr::select(SUBJIDN,LVDT_imputed_flag) %>% distinct() %>% dplyr::pull(LVDT_imputed_flag) == 1),1)
+  testthat::expect_equal(sum(imputed$data %>% dplyr::select(SUBJIDN,LVDT_imputed_flag) %>% dplyr::distinct() %>% dplyr::pull(LVDT_imputed_flag) == 1),1)
 
   # two for subject 09 and one fo 17
   testthat::expect_equal(imputed$number_ae_start_missing,3)
@@ -315,7 +315,7 @@ test_that("check function prepare_data_for_adepro:", {
 
   # expect subject 07
   testthat::expect_equal(imputed$number_missing_lvdt,1)
-  testthat::expect_equal(sum(imputed$data %>% dplyr::select(SUBJIDN,LVDT_imputed_flag) %>% distinct() %>% dplyr::pull(LVDT_imputed_flag) == 1),1)
+  testthat::expect_equal(sum(imputed$data %>% dplyr::select(SUBJIDN,LVDT_imputed_flag) %>% dplyr::distinct() %>% dplyr::pull(LVDT_imputed_flag) == 1),1)
 
   # two for subject 09 and one fo 17
   testthat::expect_equal(imputed$number_ae_start_missing,3)

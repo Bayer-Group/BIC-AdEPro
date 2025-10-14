@@ -21,7 +21,7 @@ count_event <- function(total = tot, day = 1){
   tmp2 <- tmp %>%
     dplyr::group_by(ae, treat, .drop = FALSE) %>%
     dplyr::filter(flag == TRUE) %>%
-    dplyr::summarise(n = n())
+    dplyr::summarise(n = dplyr::n())
   tmp2$treat <- as.character(tmp2$treat)
 
   tmp2$treat <- as.factor(tmp2$treat)

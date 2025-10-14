@@ -178,7 +178,7 @@ test_that("Test columns wrappers works", {
 })
 
 test_that("Test make_action_button works", {
-  tmp_tag <- a(href = "#", "My super link", style = "color: lightblue;")
+  tmp_tag <- shiny::a(href = "#", "My super link", style = "color: lightblue;")
   button <- make_action_button(
     tmp_tag,
     inputId = "mylink"

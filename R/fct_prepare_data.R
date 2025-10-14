@@ -79,7 +79,7 @@ prepare_data <- function(
   #
   #     diff_subjid <- setdiff(
   #       pat_data2 %>%
-  #         select(tidyselect::all_of(!!rlang::sym(SUBJIDN))) %>%
+  #         dplyr::select(tidyselect::all_of(!!rlang::sym(SUBJIDN))) %>%
   #         dplyr::pull() %>% as.vector(),
   #       pat_data %>%
   #         dplyr::select(tidyselect::all_of(!!rlang::sym(SUBJIDN))) %>%
