@@ -1048,25 +1048,33 @@ app_server <- function(input, output, session) {
 
         #calculate percentages when selected (input$percentage == TRUE):S
         if (input$percentage) {
-          tmp5b <- tmp5b %>%
+          tmp5b_temp <- tmp5b %>%
             dplyr::select(-c(ae, "N_text")) %>%
-            {round(mapply('/', ., N_treat) * 100, 1)} %>%
-            cbind(tmp5b %>% dplyr::select(ae), .) %>%
-            dplyr::mutate(N_text = paste0(.data$N, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"))
-          Ongoing <- Ongoing %>%
+            {function(x) round(mapply('/', x, N_treat) * 100, 1)} %>%
+            cbind(tmp5b %>% dplyr::select(ae)) %>%
+            dplyr::relocate("ae")
+          tmp5b <- tmp5b_temp %>%
+            dplyr::mutate(N_text = paste0(.data$N, " (", paste(!!!rlang::syms(colnames(tmp5b_temp)[-c(1, 2)]), sep = "/"), ")"))
+
+          Ongoing_temp <- Ongoing %>%
             dplyr::select(-c(ae, "Ongoing_text")) %>%
-            {round(mapply('/', ., N_treat) * 100, 1)} %>%
-            cbind(Ongoing %>% dplyr::select(ae), .) %>%
+            {function(x) round(mapply('/', x, N_treat) * 100, 1)} %>%
+            cbind(Ongoing %>% dplyr::select("ae")) %>%
+            dplyr::relocate("ae")
+          Ongoing <- Ongoing_temp %>%
             dplyr::mutate(Ongoing_text = dplyr::case_when(
-              !is.na(Ongoing) ~ paste0(.data$Ongoing, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
+              !is.na(.data$Ongoing) ~ paste0(.data$Ongoing, " (", paste(!!!rlang::syms(colnames(Ongoing_temp)[-c(1, 2)]), sep = "/"), ")"),
               TRUE ~ "")
             )
-          Resolved <- Resolved %>%
+
+          Resolved_temp <- Resolved %>%
             dplyr::select(-c(ae, "Resolved_text")) %>%
-            {round(mapply('/', ., N_treat) * 100, 1)} %>%
-            cbind(Resolved %>% dplyr::select(ae), .) %>%
+            {function(x) round(mapply('/', x, N_treat) * 100, 1)} %>%
+            cbind(Resolved %>% dplyr::select("ae")) %>%
+            dplyr::relocate("ae")
+          Resolved <- Resolved_temp %>%
             dplyr::mutate(Resolved_text = dplyr::case_when(
-              !is.na(Resolved) ~ paste0(.data$Resolved, " (", paste(!!!rlang::syms(colnames(.)[-c(1, 2)]), sep = "/"), ")"),
+              !is.na(.data$Resolved) ~ paste0(.data$Resolved, " (", paste(!!!rlang::syms(colnames(Resolved_temp)[-c(1, 2)]), sep = "/"), ")"),
               TRUE ~ "")
             )
           text2 <- c("Percent",input_var())
