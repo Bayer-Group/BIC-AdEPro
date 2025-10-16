@@ -34,16 +34,14 @@ bar_chart <- function(
 
   if(color_theme) {
     bg_col <- "#424242"
-    fg_col <- "#383838"
     text_col <- "white"
   } else {
     bg_col <- "#ffffff"
-    fg_col <- "#dedede"
     text_col <- "black"
   }
   # merge ae's and colors
   col_ae <- data.frame('ae' = variables,
-                       'col' = colors[1:length(variables)])
+                       'col' = colors[seq_along(variables)])
   col_ae$ae <- factor(col_ae$ae, levels = col_ae$ae)
   #rename variable ps from patient data set for merging
   patient <- patients %>%
@@ -79,7 +77,7 @@ bar_chart <- function(
     graphics::par(mfrow = c(2, length(treatments)) , mai = c(1.12, 0.82, 0.62, 0.42),  bg = bg_col)
 
     #for every treatment group + Total draw a barplot
-    for(i in 1:(length(treatments))){
+    for(i in seq_along(treatments)){
 
       vec <- count_ev2 %>%
         dplyr::filter(.data$treat == treatments[i]) %>%
@@ -119,23 +117,9 @@ bar_chart <- function(
       graphics::text(Barplot, posi, paste0(round(vec,1)), cex = cex.n, col = text_col)
     }
 
-
-    y_max <- as.numeric(table(rep((tot %>%
-                                     tidyr::drop_na() %>%
-                                     dplyr::pull("ae")),
-                                  ifelse((pmin(day,(tot %>%
-                                                      tidyr::drop_na() %>%
-                                                      dplyr::pull("day_end"))) - (tot %>%
-                                                                       tidyr::drop_na() %>%
-                                                                       dplyr::pull("day_start")) + 1) < 1 ,
-                                         0, pmin(day,(tot %>%
-                                                        tidyr::drop_na() %>%
-                                                        dplyr::pull("day_end")) - (tot %>%
-                                                                        tidyr::drop_na() %>%
-                                                                        dplyr::pull("day_start")) + 1))))[1])
     #create an empty matrix for the total values
     res_max <- matrix(NA, length(treatments), length(variables))
-    for (i in 1:(length(treatments))) {
+    for (i in seq_along(treatments)) {
     vec <- table(rep((tot %>%
                         tidyr::drop_na() %>%
                         dplyr::filter(.data$treat == treatments[i])%>%
@@ -163,7 +147,7 @@ bar_chart <- function(
 
       axpos <- c(0, 2 * res_max)
 
-    for(i in 1:(length(treatments))){
+    for(i in seq_along(treatments)){
       vec <- table(
         rep(
           (tot %>%
@@ -183,7 +167,7 @@ bar_chart <- function(
                               0, pmin(day,(tot %>%
                                              tidyr::drop_na() %>%
                                              dplyr::filter(.data$treat == treatments[i])) %>%
-                                        pull("day_end")) - (tot %>%
+                                        dplyr::pull("day_end")) - (tot %>%
                                                         tidyr::drop_na() %>%
                                                         dplyr::filter(.data$treat == treatments[i]) %>%
                                                         dplyr::pull("day_start")) + 1)))
