@@ -1,0 +1,123 @@
+---
+title: "adepro Package Manual"
+author: "Nicole Mentenich, Christoph Tasto, Bastian Becker, Steffen Jeske"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{adepro Package Manual}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+AdEPro (Animation of Adverse Event Profiles) is a Shiny application for the (audio-)visualization of adverse events during clinical trials. Typically, Shiny applications are hosted on a dedicated Shiny server, but due to the sensitivity of patient data in clinical trials, which are protected by informed consents, the upload of this data to an external server is prohibited. Therefore, we provide our tool as a stand-alone application that can be launched from any local machine on which the data is stored. In order to work with this application simply call the function `launch_adepro()`.
+
+## Description
+
+The database in a clinical trial contains vast information on adverse events, involving hundreds of different adverse event terms with varying severity grades and different start and end dates. Despite this plethora of information, insight into the adverse events in a clinical study is usually limited to simple summary tables of absolute and relative numbers of adverse event occurrences. AdEPro, an innovation of Bayer's Biostatistics Innovation Center, is an unparalleled approach to audio-visualize the safety profile of both the individual patient and of the entire study cohort, which enables every study team member to experience the study and empathize with the patients. 
+
+The AdEPro Shiny app depicts the temporal progress of all adverse events in every study subject and enables the user to give profound answers to complex questions surrounding adverse events such as the frequency, duration and correlation of adverse events of interest. The incorporated sound component stresses changes in the adverse event profile of the study.
+
+Additionally, in order to keep a good overview of even large trials (>500 patients), intelligent sorting algorithms under the name of "AdEPro AI" (based on the seriation techniques from the `seriation` package by Hahsler) allow to sort the patients in such a way that patients with similar adverse event profiles are close to one another and relevant differences between the treatment groups regarding the displayed adverse event remain recognizable at first sight. 
+
+As a complete alternative to the patient-by-patient "circle view", an aggregated "barplot view" is implemented which displays the aggregated numbers of subjects with adverse events, which can be especially helpful in case the numbers are too great to be easily counted.
+
+
+## Surface
+
+In the "circle view", every subject in the safety analysis set is represented by a dark grey circle containing differently colored slices.
+Each of these slices represents a different adverse event, color-coded according to the legend in the top bar. Only eight different adverse events can be shown at the same time to keep an easy overview. The size of the slices indicates the intensity of the respective adverse event.
+
+Framed unfilled slices hint at the adverse event history of the patient as these belong to adverse events which the patient experienced at a previous time in the study, but which are no longer ongoing.
+
+Circles turn black when the patients die or take a lightgray shade when they discontinue the study or study treatment (depending what serves as input for the last visit date, see `Input data`). 
+
+If the display is switched to the "barplot view" by means of the `Change view` option, the aggregated numbers for the selected adverse events are shown which follow the same color code and refer to the same day in the study as in the "circle view".
+
+The top bar of the app includes several other options which are further explained under `Functionality`.
+
+
+## Functionality
+
+Upload your adverse event data and patient data in the `Upload data` panel. For more information on the required data structure see `Input data`. As the default setting of the AdEPro app presumes a display in Full HD quality, the appearing graphic might not fill the screen perfectly if this criterion is not met. In this case, the plot height and number of rows can be easily adapted in the `Upload data` panel or in the movable boxes on the right-hand side of the logo in the top bar.
+
+In the `Modify data` panel, you can select a certain category of adverse events (such as serious or study drug-related) by clicking on the `Type of Adverse Event` option. Moreover, the patients can be sorted by other variables than the randomization number (default) such as the patients' overall adverse event frequency or other input variables additionally included in the input data set. If the button `Use AdEPro AI` is selected, additional intelligent sorting algorithms are offered for use. For more information on this, please see `AdEPro AI`. 
+
+To choose other adverse events than the eight most frequent ones (default), the drop-down menu `Adverse Events for Animation` and the option `Choose Adverse Events for display` can be used.
+
+Apart from the functionality to select other adverse events for display, the `Adverse Events for Animation` panel also offers the opportunity to follow the progress of one specific adverse event via an audio component. For this, an adverse event can be chosen with the `Choose Adverse Events for audio` option. Furthermore, it can be decided for which treatment group a sound should be heard with the option `Choose Treatment Group for first sound`. In order to be able to compare the sound profile with another group, a second treatment group can be selected with the option `Choose Treatment Group for second sound`.
+The sound you will hear represents a categorized and normalized frequency grade of the chosen adverse event given the size of the treatment group and the overall frequency of this adverse event. Four different sounds exist, the lowest meaning that no such adverse event has occurred in the selected group and the other three symbolizing equidistant increases in frequency the higher the sound gets. If you select a treatment group for the first sound and for the second sound, two such sounds will be played after one another so that they can be compared directly. You will only be able to hear a sound if there is a change in the frequency grading in any of the treatment groups of the study. 
+The audio component can be switched off completely by choosing `- none -` in both cases (default).
+
+The slider in the top bar of the app allows to view another day of the study. It can either be moved day by day or played automatically (or paused) by clicking the "Play" (or "Pause") button underneath. Besides, the speed of the animation can be set in the circular slider on the left of it. 
+
+
+## Input Data
+
+AdEPro allows the user to upload the clinical trial data using the typical Analysis Data Model (ADaM) in Clinical Data Interchange Standards (CDISC).
+For this, just upload the adverse event dataset (ADAE) to AdEPro by means of the `Upload Data` panel, either as a sas7bdat file or as comma-separated values (csv).
+In case the ADAE dataset does not contain the whole safety analysis set (SAF) to be presented (i.e., if patients without any adverse events are excluded), there is also an option to upload the subject level dataset (ADSL) with the complete subject information for all patients in the SAF. The same formats (csv and sas7bdat) can be uploaded as for ADAE.
+
+Please ensure that your ADAE dataset contains all the required variables. If not directly available in ADAE, other variables can be
+selected via dropdown menue. Otherwise it is possible to merge the required (or optional) variables to ADAE from
+other datasets (e.g., ADSL) or rename them accordingly before upload to AdEPro.
+Required variables are:
+* Subject Identifier (e.g. SUBJIDN
+* Adverse Event Term (e.g AEDECOD) 
+* Actual treatment (e.g. TRT01A)
+* Treatment start date = Reference Date (TRTSDT) 
+* Last Visit date (e.g. LVDT) 
+* Death date (e.g. DTHDT) 
+* Safety analysis set flag (e.g. SAFFN) 
+* Adverse event start day relative to reference date (e.g. AESTDY) 
+* Adverse event end day relative to reference date (e.g. AEENDY)
+* Adverse event severity: 1-mild, 2-moderate, 3-severe (e.g. AESEVN)
+
+If the ADSL dataset is uploaded as well, all required variables
+for ADAE but not related to adverse events (AEs)
+(variable name not starting with AE) need to be included in ADAE, too.
+Optional variables which allow categorization of adverse
+events include the following: 
+* Treatment-emergent flag (e.g. AETRTEMN) 
+* Seriousness flag (e.g. AESERN) 
+* Related to study drug flag (e.g. AERELN) 
+* Related to protocol procedures flag (e.g. AERELPRN)
+* Action taken with study treatment (e.g. AEACNN, where AEACNN = 1 means 'DRUG WITHDRAWN' ) 
+
+Further optional variables can be attached to ADAE
+(if not yet included) to enable sorting of the patients
+in the 'circle view'. These have to be included in ADSL
+as well, if the decision is made to upload this dataset.
+The following variables just serve as some examples:
+* Sex (e.g. SEXN) 
+* Race (e.g. RACEN)
+* Region (e.g. CNTYGR1N)
+* (other baseline variables)
+
+## AdEPro AI
+
+Animation of Adverse Event Profiles with Artificial Intelligence (in short AdEPro AI) is a recently added feature of AdEPro which allows a column-wise sorting of patients (displayed as circles) according to similarities in their adverse event patterns to facilitate an easier and more harmonious overview of the complete adverse event data. 
+
+As distance measure the Euclidean distance is used. Distances between subjects are calculated accordingly based on the patient days under specific adverse events. Per default, eight variables are selected which correspond to the patient days under the eight most frequent adverse events, where each variable is associated with one type of adverse event. These variables can also be further differentiated by severity grade (i.e., as patient days under a specific adverse event with a specific severity). Corresponding variables for other adverse events can be selected as well.
+
+The sequence and allocation of the patients in the graphic results from the following seriation techniques available in the seriation package by Hahsler:
+
+* Optimal Leaf Ordering with single linkage (OLO_single)
+* Optimal Leaf Ordering with complete linkage (OLO_complete)
+* Optimal Leaf Ordering with average linkage (OLO_average)
+* Optimal Leaf Ordering with with Ward linkage (OLO_ward)
+* Gruvaeus Wainer heuristic with single linkage (GW_single)
+* Gruvaeus Wainer heuristic with complete linkage (GW_complete)
+* Gruvaeus Wainer heuristic with average linkage (GW_average)
+* Gruvaeus Wainer heuristic with Ward linkage (GW_ward)
+* Traveling Salesperson Problem (TSP)
+* Visual Assessment of Tendency (VAT)
+
+
+## Additional information
+
+Please make sure to use a platform with an audio player in order to make full use of all functionalities of AdEPro.
+
+A publication with complete details on AdEPro can be found in Mentenich et al. (2020): `AdEPro: Animation of Adverse Event Profiles—Presentation of an Easy-to-Use App for Visually Exploring Individual Study Data`, Therapeutic Innovation & Regulatory Science volume 54, pages 1512–1521 (https://link.springer.com/article/10.1007/s43441-020-00178-4).
+
+A video for a quick introduction into AdEPro is available under: https://youtu.be/SumXdcOOrjA
+
