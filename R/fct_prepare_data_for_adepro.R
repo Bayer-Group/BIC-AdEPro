@@ -57,9 +57,9 @@ prepare_data_for_adepro <- function(
   }
 
   #create variables ps, treat, end, death and filter for safety flag
-  prepared_data <- filter_and_prepare_patient_data(
-    data = dat, SAFFN = saffn, LVDT = lvdt, TRTSDT = trtsdt, TRT01A = trt01a,
-    SUBJIDN = subjidn, DTHDT = dthdt
+  prepared_data <- filter_prepare_patient_data(
+    data = dat, saffn = saffn, lvdt = lvdt, trtsdt = trtsdt, trt01a = trt01a,
+    subjidn = subjidn, dthdt = dthdt
   )
 
   #filter for adverse event data set

@@ -319,7 +319,7 @@ This README has been compiled on the
 
 ``` r
 Sys.time()
-#> [1] "2025-10-17 13:56:05 UTC"
+#> [1] "2025-10-17 15:08:29 UTC"
 ```
 
 Here are the tests results and package coverage:
@@ -328,7 +328,7 @@ Here are the tests results and package coverage:
 devtools::check(quiet = TRUE)
 #> ℹ Loading adepro
 #> ── R CMD check results ─────────────────────────────────────── adepro 4.4.1 ────
-#> Duration: 1m 1.7s
+#> Duration: 48.6s
 #> 
 #> ❯ checking R/sysdata.rda ... OK
 #>    WARNING
@@ -340,7 +340,7 @@ devtools::check(quiet = TRUE)
 
 ``` r
 covr::package_coverage()
-#> adepro Coverage: 36.94%
+#> adepro Coverage: 37.07%
 #> R/app_server.R: 0.00%
 #> R/fct_ae_count.R: 0.00%
 #> R/fct_bar_chart.R: 0.00%
@@ -360,12 +360,12 @@ covr::package_coverage()
 #> R/fct_calculate_number_missing_severity_flag.R: 61.11%
 #> R/fct_adepro_slice_plot.R: 61.27%
 #> R/fct_initQ.R: 62.50%
-#> R/fct_filter_and_prepare_patient_data.R: 64.10%
 #> R/fct_calculate_and_impute_required_variables_missing_values.R: 65.00%
 #> R/fct_calculate_number_unknown_aes.R: 68.42%
 #> R/fct_calculate_number_ae_end_missing.R: 72.73%
 #> R/fct_calculate_number_ae_start_missing.R: 72.73%
 #> R/fct_calculate_number_ae_end_is_earlier_than_start.R: 73.33%
+#> R/fct_filter_and_prepare_patient_data.R: 74.00%
 #> R/fct_preproc_ae.R: 75.00%
 #> R/fct_calculate_number_missing_last_visit_dates.R: 76.92%
 #> R/fct_filter_for_safety_flag.R: 86.67%
