@@ -14,7 +14,7 @@ count_event <- function(total, day = 1) {
     tidyr::drop_na() %>%
     dplyr::rowwise() %>%
     dplyr::mutate(
-      flag = any(dplyr::between(.data$day, .data$day_start, .data$day_end))
+      flag = any(dplyr::between(day, .data$day_start, .data$day_end))
     ) %>%
     dplyr::ungroup()
 
