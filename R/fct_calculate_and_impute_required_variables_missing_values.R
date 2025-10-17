@@ -59,7 +59,7 @@ calculate_and_impute_required_variables_missing_values <- function(
 
   ## check for missing values in required variables:
   #1. Get the number of unknown Adverse Events:
-  if (!is.null(AEDECOD) & !is.null(AESTDY)  & !is.null(AEENDY)) {
+  if (!is.null(AEDECOD) && !is.null(AESTDY) && !is.null(AEENDY)) {
       number_unknown_aes <- calculate_number_unknown_aes(dat = data, sel_aedecod = AEDECOD, sel_aestdy = AESTDY, sel_aeendy = AEENDY)
   } else {
     number_unknown_aes <- 0
@@ -215,15 +215,15 @@ calculate_and_impute_required_variables_missing_values <- function(
   }
 
   #5.Get the number of adverse events end day missing
-    if (!is.null(AEENDY) & !is.null(AESTDY) & !is.null(AEDECOD) ) {
+    if (!is.null(AEENDY) && !is.null(AESTDY) && !is.null(AEDECOD) ) {
        #number_ae_end_missing <- calculate_number_ae_end_missing(dat = adae_data, sel_aeendy = AEENDY)
        number_ae_end_missing <- calculate_number_ae_end_missing(dat = data, sel_aeendy = AEENDY, sel_aedecod = AEDECOD, sel_aestdy = AESTDY)
     } else {
       number_ae_end_missing <- 0
     }
   if (number_ae_end_missing > 0) {
-    if(!is.null(AESTDY) & !is.null(LVDT) & !is.null(AEENDY) & !is.null(TRTSDT) & !is.null(DTHDT)){
-     if (AESTDY %in% colnames(data) & LVDT %in% colnames(data) & AEENDY %in% colnames(data) & TRTSDT %in% colnames(data)) {
+    if(!is.null(AESTDY) && !is.null(LVDT) && !is.null(AEENDY) && !is.null(TRTSDT) && !is.null(DTHDT)){
+     if (AESTDY %in% colnames(data) && LVDT %in% colnames(data) && AEENDY %in% colnames(data) && TRTSDT %in% colnames(data)) {
 
       #calculate last study day
        ## as.Date
@@ -233,7 +233,7 @@ calculate_and_impute_required_variables_missing_values <- function(
           end2 = as.numeric(as.Date(anytime::anydate(!!rlang::sym(DTHDT))) - as.Date(anytime::anydate(!!rlang::sym(TRTSDT))) + 1),
           end3 = !!rlang::sym(AEENDY)) %>%
         dplyr::mutate(end = max(.data$end1, .data$end2, .data$end3, na.rm=TRUE)) %>%
-        dplyr::pull(end) %>%
+        dplyr::pull("end") %>%
         unique()
 
       # data <- data %>%
@@ -282,8 +282,8 @@ calculate_and_impute_required_variables_missing_values <- function(
   }
 
   #7.Get the number of cases when adverse event start day is after the adverse event end day
-  if (!is.null(AESTDY) & !is.null(AEENDY)) {
-    if (AESTDY %in% colnames(data) & AEENDY %in% colnames(data)) {
+  if (!is.null(AESTDY) && !is.null(AEENDY)) {
+    if (AESTDY %in% colnames(data) && AEENDY %in% colnames(data)) {
       number_days_removed <- calculate_number_ae_end_is_earlier_than_start(dat = data, sel_aestdy = AESTDY, sel_aeendy = AEENDY)
     } else {
       number_days_removed <- 0

@@ -1472,27 +1472,27 @@ app_server <- function(input, output, session) {
       aestdy_check_flag$val &&
       aetrtemn_check_flag$val &&
       aeendy_check_flag$val &&
-      aesevn_check_flag$val &
+      aesevn_check_flag$val &&
       !is.null(missing_replaced_data)
     ) {
       if(!is.null(missing_replaced_data)){
       prepared_data_result_object <- prepare_data_for_adepro(
         dat = missing_replaced_data$data,
-        SUBJIDN = input$sel_subjidn,
-        TRT01A = input$sel_trt01a,
-        SAFFN = input$sel_saffn,
-        LVDT = input$sel_lvdt,
-        DTHDT = dthdt,
-        TRTSDT = input$sel_trtsdt,
-        AEDECOD = input$sel_aedecod,
-        AESTDY = input$sel_aestdy,
-        AETRTEMN = input$sel_aetrtemn,
-        AEENDY = input$sel_aeendy,
-        AESEVN = input$sel_aesevn,
-        AESERN = input$sel_aesern,
-        AERELN = input$sel_aereln,
-        AERELPRN = input$sel_aerelprn,
-        AEACNN = input$sel_aeacnn
+        subjidn = input$sel_subjidn,
+        trt01a = input$sel_trt01a,
+        saffn = input$sel_saffn,
+        lvdt = input$sel_lvdt,
+        dthdt = dthdt,
+        trtsdt = input$sel_trtsdt,
+        aedecod = input$sel_aedecod,
+        aestdy = input$sel_aestdy,
+        aetrtemn = input$sel_aetrtemn,
+        aeendy = input$sel_aeendy,
+        aesevn = input$sel_aesevn,
+        aesern = input$sel_aesern,
+        aereln = input$sel_aereln,
+        aerelprn = input$sel_aerelprn,
+        aeacnn = input$sel_aeacnn
       )
       if (dim(prepared_data_result_object$ae_data)[1] == 0) {
         return(NULL)

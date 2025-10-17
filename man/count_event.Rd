@@ -4,7 +4,7 @@
 \alias{count_event}
 \title{count_event  Count the event number for every AE at specified timepoint}
 \usage{
-count_event(total = tot, day = 1)
+count_event(total, day = 1)
 }
 \arguments{
 \item{total}{data set with ae data and patient data merged}

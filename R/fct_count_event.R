@@ -8,17 +8,19 @@
 #' @keywords internal
 
 
-count_event <- function(total = tot, day = 1){
+count_event <- function(total, day = 1) {
 
   tmp <- total %>%
     tidyr::drop_na() %>%
     dplyr::rowwise() %>%
-    dplyr::mutate(flag = any(dplyr::between(day, day_start, day_end))) %>%
+    dplyr::mutate(
+      flag = any(dplyr::between(.data$day, .data$day_start, .data$day_end))
+    ) %>%
     dplyr::ungroup()
 
   tmp2 <- tmp %>%
-    dplyr::group_by(ae, treat, .drop = FALSE) %>%
-    dplyr::filter(flag == TRUE) %>%
+    dplyr::group_by(.data$ae, .data$treat, .drop = FALSE) %>%
+    dplyr::filter(.data$flag == TRUE) %>%
     dplyr::summarise(n = dplyr::n())
   tmp2$treat <- as.character(tmp2$treat)
 

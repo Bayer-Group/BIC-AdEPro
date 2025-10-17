@@ -6,57 +6,58 @@
 \usage{
 prepare_data_for_adepro(
   dat,
-  SUBJIDN = "SUBJIDN",
-  TRT01A = "TRT01A",
-  SAFFN = "SAFFN",
-  LVDT = "LVDT",
-  DTHDT = "DTHDT",
-  TRTSDT = "TRTSDT",
-  AEDECOD = "AEDECOD",
-  AESTDY = "AESTDY",
-  AETRTEMN = "AETRTEMN",
-  AEENDY = "AEENDY",
-  AESEVN = "AESEVN",
-  AESERN = "AESERN",
-  AERELN = "AERELN",
-  AERELPRN = "AERELPRN",
-  AEACNN = "AEACNN"
+  subjidn = "SUBJIDN",
+  trt01a = "TRT01A",
+  saffn = "SAFFN",
+  lvdt = "LVDT",
+  dthdt = "DTHDT",
+  trtsdt = "TRTSDT",
+  aedecod = "AEDECOD",
+  aestdy = "AESTDY",
+  aetrtemn = "AETRTEMN",
+  aeendy = "AEENDY",
+  aesevn = "AESEVN",
+  aesern = "AESERN",
+  aereln = "AERELN",
+  aerelprn = "AERELPRN",
+  aeacnn = "AEACNN"
 )
 }
 \arguments{
 \item{dat}{adae data set.}
 
-\item{SUBJIDN}{Subject Id as numeric (required)}
+\item{subjidn}{Subject Id as numeric (required)}
 
-\item{TRT01A}{Treatment Group as character (required)}
+\item{trt01a}{Treatment Group as character (required)}
 
-\item{SAFFN}{Safety Flag as numeric (required)}
+\item{saffn}{Safety Flag as numeric (required)}
 
-\item{LVDT}{Last Visit Date as numeric (required)}
+\item{lvdt}{Last Visit Date as numeric (required)}
 
-\item{DTHDT}{Death Date as numeric (required)}
+\item{dthdt}{Death Date as numeric (required)}
 
-\item{TRTSDT}{Treatment Start Date as numeric (required)}
+\item{trtsdt}{Treatment Start Date as numeric (required)}
 
-\item{AEDECOD}{Adverse Event Code as character (required)}
+\item{aedecod}{Adverse Event Code as character (required)}
 
-\item{AESTDY}{Adverse Event Start Date as numeric (required)}
+\item{aestdy}{Adverse Event Start Date as numeric (required)}
 
-\item{AETRTEMN}{Adverse Event Treatment Emergency Flag as numeric (required)}
+\item{aetrtemn}{Adverse Event Treatment Emergency Flag as numeric (required)}
 
-\item{AEENDY}{Adverse Event End date as numeric (required)}
+\item{aeendy}{Adverse Event End date as numeric (required)}
 
-\item{AESEVN}{Adverse Event Severity Grade Flag as numeric (required)}
+\item{aesevn}{Adverse Event Severity Grade Flag as numeric (required)}
 
-\item{AESERN}{Adverse Event Serious Flag as numeric (optional)}
+\item{aesern}{Adverse Event Serious Flag as numeric (optional)}
 
-\item{AERELN}{Adverse Event Related Flag as numeric (optional)}
+\item{aereln}{Adverse Event Related Flag as numeric (optional)}
 
-\item{AERELPRN}{Adverse Event Flag as numeric (optional)}
+\item{aerelprn}{Adverse Event Flag as numeric (optional)}
 
-\item{AEACNN}{Adverse Event Flag as numeric (optional)}
+\item{aeacnn}{Adverse Event Flag as numeric (optional)}
 }
 \description{
-Creates a list with two data sets 'pat_data' and 'ae_data' in format which is used in the AdEPro Application
+Creates a list with two data sets 'pat_data' and 'ae_data' in format which is
+used in the AdEPro Application
 }
 \keyword{internal}

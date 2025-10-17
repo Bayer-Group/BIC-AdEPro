@@ -5,11 +5,11 @@
 \title{order_patient - Arranges patients by sequencing technique}
 \usage{
 order_patient(
-  ae_data = ae_data,
-  patients = patient_d,
-  variables = input$varSeq,
+  ae_data,
+  patients,
+  variables,
   method_dist = "euclidean",
-  method_seriate = input$methSeq
+  method_seriate
 )
 }
 \arguments{
@@ -19,11 +19,13 @@ order_patient(
 
 \item{variables}{Vector with Variable Names used to seriate}
 
-\item{method_dist}{Character string with the name of the method to calculate the distance matrix}
+\item{method_dist}{Character string with the name of the method to calculate
+the distance matrix}
 
 \item{method_seriate}{Character string with the name of the method to seriate}
 }
 \description{
-Arranges patients by sequencing technique (R Package required: 'dplyr', 'reshape2, 'seriation')
+Arranges patients by sequencing technique (R Package required: 'dplyr',
+'reshape2, 'seriation')
 }
 \keyword{internal}
