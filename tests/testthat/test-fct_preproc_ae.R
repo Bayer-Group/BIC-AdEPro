@@ -7,7 +7,7 @@ test_that("preproc_ae works", {
 
   prepared <- prepare_data_for_adepro(dat = imputed$data)
 
-  Q <- initQ(prepared$ae_data)
+  q <- init_q(prepared$ae_data)
 
   ae_data <- preproc_ae(prepared$ae_data,grading=FALSE)
 

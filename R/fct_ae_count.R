@@ -13,7 +13,7 @@
 ae_count <- function(ae_data, patient) {
   #max.day <- max(patient$end) # number of days
   max.day <- max(ae_data$day_end)
-  ae_data$treat <- sapply(1:nrow(ae_data), function(x) patient$treat[which(patient$ps == ae_data$patient[x])])
+  ae_data$treat <- sapply(seq_len(nrow(ae_data)), function(x) patient$treat[which(patient$ps == ae_data$patient[x])])
   all_trt <- unique(patient$treat)
   K <- length(all_trt) # (number of) unique treatment group identifiers
 

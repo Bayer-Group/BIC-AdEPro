@@ -18,7 +18,7 @@ set_global_params <- function(
   treatment = NULL
 ) {
   ## Consistency checks
-  if(is.null(title)) {
+  if (is.null(title)) {
     title <- rep("", length(unique(patients$treat)))
   }
   if (is.null(height)) {
@@ -28,22 +28,29 @@ set_global_params <- function(
   check_data(ae_data, patients)
 
   ## Local variables
-  Q <- initQ(ae_data %>% dplyr::select(      # classification matrix of AEs (treatment-emergent, serious etc.)
-    -c(replace_ae_start, replace_ae_end)     # remove variables that creat character(0) in drop down menu
+  # classification matrix of AEs (treatment-emergent, serious etc.)
+  # remove variables that creat character(0) in drop down menu
+  q <- init_q(ae_data %>% dplyr::select(
+    -c("replace_ae_start", "replace_ae_end")
   ))
-  AE_options <- 1:ncol(Q) # descriptions of AE classifications
+  ae_options <- seq_len(ncol(q)) # descriptions of AE classifications
   type_names <- data.frame(
     short = c(
-      "trtem", "ser", "nonser", "studrel", "studrelser", "relprot", "resdisc", "studrelresdisc"
+      "trtem", "ser", "nonser", "studrel", "studrelser", "relprot", "resdisc",
+      "studrelresdisc"
     ),
     long = c(
-      "all treatment-emergent", "serious ", "non-serious ", "study drug-related ",
-      "study-drug related and serious", "related to procedures required by the protocol",
+      "all treatment-emergent", "serious", "non-serious", "study drug-related",
+      "study-drug related and serious",
+      "related to procedures required by the protocol",
       "resulting in discontinuation of study drug",
       "study drug-related and resulting in discontinuation of study drug"
     )
   )
-  names(AE_options) <- sapply(1:ncol(Q), function(x) type_names$long[which(type_names$short == colnames(Q)[x])])
+  names(ae_options) <- sapply(
+    seq_len(ncol(q)),
+    function(x) type_names$long[which(type_names$short == colnames(q)[x])]
+  )
 
   xylines <- set_group_lines(patients, height, treatment)
   xlines  <- xylines[1]
@@ -53,12 +60,13 @@ set_global_params <- function(
   globals <- list(
     titles = title,
     footnote = paste("SAF (N=", nrow(patients), ")", sep = ""),
-    Q = Q,
-    AE_options = AE_options,
+    q = q,
+    ae_options = ae_options,
     width = set_width(patients, height),
     height = height,
     xlines = xlines,
     ylines = ylines,
-    plines = plines)
+    plines = plines
+  )
   return(globals)
 }

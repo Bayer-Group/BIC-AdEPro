@@ -8,13 +8,6 @@ app_server <- function(input, output, session) {
   #Shiny options for maximal upload size
   options(shiny.maxRequestSize = 110*1024^2)
 
-  #define adverse event colors
-  adepro_colors <- c(
-    "#e43157", "#377eb8", "#4daf4a", "#984ea3",
-    "#ff7f00", "#ffff33", "#a65628", "#f781bf",
-    "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
-  )
-
   shiny::observeEvent(input$bslib_theme, {
     if (input$bslib_theme) {
       session$setCurrentTheme(
@@ -191,9 +184,9 @@ app_server <- function(input, output, session) {
           "X" = rep(1, 12),
            "cont" =  bg_col,
           "cont_bg" = c(rep(fg_col, length(input_var())), rep(fg_col, 12 - length(input_var()))),
-          "col" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var()))),
-          "num" = c(1:length(input_var()), rep(NA, 12 - length(input_var()))),
-          "bg" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var())))
+          "col" = c(colors[seq_along(input_var())], rep(NA, 12 - length(input_var()))),
+          "num" = c(seq_along(input_var()), rep(NA, 12 - length(input_var()))),
+          "bg" = c(colors[seq_along(input_var())], rep(NA, 12 - length(input_var())))
         )
         #get information about nearest ae clicked
         info <- shiny::nearPoints(
@@ -292,9 +285,9 @@ app_server <- function(input, output, session) {
           "X" = rep(1, 12),
           "cont" = "#424242",
           "cont_bg" = c(rep("#383838", length(input_var())), rep("#383838", 12 - length(input_var()))),
-          "col" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var()))),
-          "num" = c(1:length(input_var()), rep(NA, 12 - length(input_var()))),
-          "bg" = c(colors[1:length(input_var())], rep(NA, 12 - length(input_var())))
+          "col" = c(colors[seq_along(input_var())], rep(NA, 12 - length(input_var()))),
+          "num" = c(seq_along(input_var()), rep(NA, 12 - length(input_var()))),
+          "bg" = c(colors[seq_along(input_var())], rep(NA, 12 - length(input_var())))
         )
         #get information about nearest ae clicked
         info <- shiny::nearPoints(
@@ -409,7 +402,7 @@ app_server <- function(input, output, session) {
   output$ae_type <- shiny::renderUI({
     global_params <- shiny::isolate(global_params())
 
-    choices <- global_params$AE_options
+    choices <- global_params$ae_options
     choices <- choices[names(choices) != "character(0)"]
 
     shiny::selectizeInput(
@@ -681,7 +674,7 @@ app_server <- function(input, output, session) {
         variables = vari,
         day_max = day_mx,
         count_max = count_mx,
-        treatments = levels(patient$treat)[1:length(unique(patient$treat))],
+        treatments = levels(patient$treat)[seq_along(unique(patient$treat))],
         cex.n = (((2.5 - 1.5) * heightSlider$val + (1.5 * 1600 - 3 * 400)) / (1600 - 400)),
         color_theme = input$bslib_theme
       )
@@ -816,7 +809,7 @@ app_server <- function(input, output, session) {
       pr <- paste("Subject ID:", info[1])
       if (ncol(info) != 2) {
         pr2 <- sapply(2:(ncol(info) - 1), function(x) paste(colnames(info)[x], ": ", info[, x], sep = ""))
-        for (i in 1:length(pr2)) {
+        for (i in seq_along(pr2)) {
           pr <- paste(pr, pr2[i], sep = "\n")
         }
       }
@@ -909,8 +902,8 @@ app_server <- function(input, output, session) {
       return(NULL)
     } else {
       ae_data0 <- prepared_merged_data_reac2()$ae_data
-      Q <- initQ(ae_data0)
-      flag_name <- colnames(Q)[as.numeric(input$type)]
+      q <- init_q(ae_data0)
+      flag_name <- colnames(q)[as.numeric(input$type)]
       #1. join treatment variable to adverse event data for grouping
 
       tmp <- dplyr::left_join(
@@ -1090,7 +1083,7 @@ app_server <- function(input, output, session) {
                 c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
                                      "#ff7f00", "#ffff33", "#a65628", "#f781bf",
                                      "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
-                )[1:length(input_var())]),";'>",
+                )[seq_along(input_var())]),";'>",
                 text2,": ",tmp5b$N_text,"
                 </p>", collapse = ""
               )
@@ -1100,7 +1093,7 @@ app_server <- function(input, output, session) {
                 c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
                                      "#ff7f00", "#ffff33", "#a65628", "#f781bf",
                                      "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
-                )[1:length(input_var())]),";'>",
+                )[seq_along(input_var())]),";'>",
                 text3,": ",Ongoing$Ongoing_text,"
                 </p>", collapse = ""
               )
@@ -1110,7 +1103,7 @@ app_server <- function(input, output, session) {
                 c("white",c("#e43157", "#377eb8", "#4daf4a", "#984ea3",
                                      "#ff7f00", "#ffff33", "#a65628", "#f781bf",
                                      "#21d4de", "#91d95b", "#b8805f", "#cbbeeb"
-                )[1:length(input_var())]),";'>",
+                )[seq_along(input_var())]),";'>",
                 text4,": ",Resolved$Resolved_text,"
                   </p>", collapse = ""
               )
@@ -1118,7 +1111,7 @@ app_server <- function(input, output, session) {
         shiny::HTML(
           paste(
             paste(
-              "<p> Subjects with adverse event (",names(global_params()$AE_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
+              "<p> Subjects with adverse event (",names(global_params()$ae_options)[as.numeric(input$type)],") occurrence until day ",input$slider,": Total (", paste(input$sortTreatments, collapse = "/"), ") </p>"
             ),
             summary_text
           , collapse = ""
@@ -1541,7 +1534,7 @@ app_server <- function(input, output, session) {
     ae_data <- ae_data()
     # add column in patient_data: ae_frequency - AE frequency
     tmp$ae_frequency <- numeric(nrow(tmp))
-    for (i in 1:nrow(tmp)) {
+    for (i in seq_len(nrow(tmp))) {
       indices <- which(ae_data$patient == tmp$ps[i])
       tmp$ae_frequency[i] <- sum(ae_data$day_end[indices] - ae_data$day_start[indices] + rep(1, length(indices)))
     }
@@ -1557,9 +1550,9 @@ app_server <- function(input, output, session) {
     shiny::req(input$type)
     shiny::req(prepared_merged_data_reac2())
     ae_data0 <- prepared_merged_data_reac2()$ae_data
-    Q <- initQ(ae_data0)
+    q <- init_q(ae_data0)
 
-    ae_data <- ae_data0[which(Q[,as.numeric(input$type)]),]
+    ae_data <- ae_data0[which(q[,as.numeric(input$type)]),]
     ae_data
   })
 
@@ -1569,9 +1562,9 @@ app_server <- function(input, output, session) {
     shiny::req(input$type)
     shiny::req(input$severity_grading_flag)
     ae_data <- ae_data()
-    Q <- initQ(ae_data)
+    q <- init_q(ae_data)
     ae_data <- preproc_ae(ae_data,grading=ifelse(input$severity_grading_flag=="Severity",FALSE,TRUE))
-    ae_data <- ae_data[which(Q[, as.numeric(input$type)]), ]
+    ae_data <- ae_data[which(q[, as.numeric(input$type)]), ]
     ae_data
   })
 
@@ -1586,8 +1579,8 @@ app_server <- function(input, output, session) {
     shiny::req(prepared_merged_data_reac())
     shiny::req(input$type)
     dat <- prepared_merged_data_reac()$ae_data
-    Q <- initQ(dat)
-    flag_name <- colnames(Q)[as.numeric(shiny::isolate(input$type))]
+    q <- init_q(dat)
+    flag_name <- colnames(q)[as.numeric(shiny::isolate(input$type))]
     dat <- dat %>%
       dplyr::filter(!!rlang::sym(flag_name) == 1)
     if (input$ae_var_sorting == "frequency") {
@@ -1600,8 +1593,6 @@ app_server <- function(input, output, session) {
     ae_table <- ae_table[ae_table > 0]
     ae_table2 <- ae_table2[ae_table2 > 0]
 
-    aes <- names(ae_table)
-    aes2 <- names(ae_table2)
     if(input$ae_var_sorting == "days") {
       ae_table_labels
     } else if (input$ae_var_sorting == "frequency") {
@@ -1681,7 +1672,7 @@ app_server <- function(input, output, session) {
         dplyr::group_by(.data$ae, .data$treat) %>%
         tidyr::nest()
       max_count <- numeric(dim(tst)[1])
-      for (i in 1:dim(tst)[1]) {
+      for (i in seq_len(dim(tst)[1])) {
         max_count[i] <- apply(tst$data[[i]], 1, function(x){x[1]:x[2]}) %>%
           unlist() %>%
           table() %>%
@@ -2065,7 +2056,6 @@ app_server <- function(input, output, session) {
         })
         subjidn_check_flag$val <- FALSE
       } else {
-        subjidn <- merged_adae_adsl_data()[[input$sel_subjidn]]
         if (!input$sel_subjidn %in% c("SUBJIDN", "SUBJID", "USUBJID", "USUBJIDN")) {
           subjidn_check_flag$val <- TRUE
           output$sel_subjidn_check <- shiny::renderUI({
@@ -2229,9 +2219,6 @@ app_server <- function(input, output, session) {
       })
       trt01a_check_flag$val <- FALSE
     } else {
-
-        trt01a <- merged_adae_adsl_data()[[input$sel_trt01a]]
-
         if (!any(input$sel_trt01a %in% c("TRT01A", "TRT01AN", "TRT01P", "TRT01PN"))) {
           trt01a_check_flag$val <- TRUE
           output$sel_trt01a_check <- shiny::renderUI({
@@ -2494,8 +2481,6 @@ app_server <- function(input, output, session) {
           )
         })
       } else {
-        aetrtemn <- merged_adae_adsl_data()[[input$sel_aetrtemn]]
-
        if (!input$sel_aetrtemn %in% c("AETRTEMN", "AETRTEM", "TRTEMFLN", "TRTEMFL")) {
          aetrtemn_check_flag$val <- TRUE
           output$sel_aetrtemn_check <- shiny::renderUI({
@@ -2674,8 +2659,6 @@ app_server <- function(input, output, session) {
           )
         })
       } else {
-        saffn <- merged_adae_adsl_data()[[input$sel_saffn]]
-
         if (!any(input$sel_saffn %in% c("SAFFN", "SAFFL"))) {
           saffn_check_flag$val <- TRUE
           output$sel_saffn_check <- shiny::renderUI({
@@ -3103,8 +3086,6 @@ app_server <- function(input, output, session) {
           )
         })
       } else {
-        aesern <- merged_adae_adsl_data()[[input$sel_aesern]]
-
         if (
           !input$sel_aesern %in% c("AESERN", "AESER")) {
           aesern_check_flag$val <- TRUE
@@ -3187,7 +3168,6 @@ app_server <- function(input, output, session) {
         )
       })
    } else {
-     aereln <- merged_adae_adsl_data()[[input$sel_aereln]]
        if (
          !input$sel_aereln %in% c("AERELN", "AEREL")) {
          aereln_check_flag$val <- TRUE
@@ -3252,7 +3232,6 @@ output$sel_aerelprn <- shiny::renderUI({
                           Optional variable AERELPRN/AERELPR is not available. Please select another variable to use the functionality </span>'))
       })
    } else {
-     aerelprn <- merged_adae_adsl_data()[[input$sel_aerelprn]]
        if (
          !input$sel_aerelprn %in% c("AERELPRN", "AERELPR")) {
          aerelprn_check_flag$val <- TRUE
@@ -3321,7 +3300,6 @@ shiny::observeEvent(c(merged_adae_adsl_data(), input$sel_aeacnn), {
                             Variable AEACNN is not available. Please select another variable or use the functionality. </span>'))
         })
      } else {
-       aeacnn <- merged_adae_adsl_data()[[input$sel_aeacnn]]
          if (
              !input$sel_aeacnn %in% c("AEACNN", "AEACN")) {
            aeacnn_check_flag$val <- TRUE

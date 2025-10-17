@@ -27,13 +27,11 @@ circle_legend2 <- function(
     fg_col <- "#383838"
     dth_col <- "black"
     text_col <- "white"
-    arrow_col <- "#bababa"
   } else {
     bg_col <- "#ffffff"
     fg_col <- "#dedede"
     dth_col <- "black"
     text_col <- "black"
-    arrow_col <- "#383838"
   }
   if (grading==F){
     tmp <- data.frame(

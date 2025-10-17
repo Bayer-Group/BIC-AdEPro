@@ -14,7 +14,7 @@ set_vector_layout <- function(patients, height) {
   l_trt1 <- treatment[1]
   vec_lay <- c(1:l_trt1, rep(0, ifelse(l_trt1 %% height == 0, 0, height - l_trt1 %% height)))
   if (length(l_trt) > 0) {
-    for (z in 1:length(l_trt)) {
+    for (z in seq_along(l_trt)) {
       if (l_trt[z] %% height == 0) {
         diff <- 0
       } else {

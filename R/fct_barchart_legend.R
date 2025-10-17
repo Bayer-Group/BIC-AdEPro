@@ -35,13 +35,6 @@ barchart_legend <- function(
   on.exit(graphics::par(on_ex))
   graphics::par(oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), font = 1)
 
-  poly_t <- function(num, rad = 1, fg = graphics::par('fg'), bg = graphics::par('fg'),num_aes = length(aes),...) {
-    x_tmp <- c(0, 0 + rad * 0.9 * cos(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 25)))
-    y_tmp <- c(0, 0 + rad * 0.9 * sin(seq(pi / 2 - 2 * pi / num_aes * (num - 1), pi / 2 - 2 * pi / num_aes * num, length = 25)))
-    graphics::polygon(c(x_tmp, x_tmp[1]), c(y_tmp, y_tmp[1]), col = bg, border = fg, ...)
-    NULL
-  }
-
   if (length(aes) > 0) {
 
     tmp <- tmp %>%
@@ -61,19 +54,19 @@ barchart_legend <- function(
 
     graphics::rect(-100, -100, 100, 100, col = fg_col, border = fg_col)
 
-    for(i in 1:length(aes)) {
+    for(i in seq_along(aes)) {
       graphics::rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = bg_col)
       graphics::text(x=tmp$X[i] , y=tmp$Y[i]+1.5, tmp$ae[i], col = text_col)
     }
 
     graphics::symbols(
-      tmp$X[1:length(aes)],
-      tmp$Y[1:length(aes)],
-      squares = 2*tmp$r[1:length(aes)],
+      tmp$X[seq_along(aes)],
+      tmp$Y[seq_along(aes)],
+      squares = 2*tmp$r[seq_along(aes)],
       inches = FALSE,
       add = TRUE,
-      fg = tmp$col[1:length(aes)],
-      bg = tmp$bg[1:length(aes)],
+      fg = tmp$col[seq_along(aes)],
+      bg = tmp$bg[seq_along(aes)],
       lwd = 1
     )
 

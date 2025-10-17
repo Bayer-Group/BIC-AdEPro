@@ -27,17 +27,13 @@ pie_legend2 <- function(
   if(color_theme) {
     bg_col <- "#424242"
     fg_col <- "#383838"
-    dth_col <- "black"
     text_col <- "white"
-    arrow_col <- "#bababa"
     highlight_col <- "#ffffff10"
   } else {
     bg_col <- "#ffffff"
     fg_col <- "#dedede"
-    dth_col <- "black"
     text_col <- "black"
-    arrow_col <- "#383838"
-      highlight_col <- "#f5e44960"
+    highlight_col <- "#f5e44960"
   }
 
   poly_t <- function(num, rad = 1, fg = graphics::par('fg'), bg = graphics::par('fg'),num_aes = length(aes),...) {
@@ -66,7 +62,7 @@ pie_legend2 <- function(
 
     graphics::rect(-100, -100, 100, 100, col = fg_col, border = fg_col)
 
-    for(i in 1:length(aes)) {
+    for(i in seq_along(aes)) {
       graphics::rect(tmp$X[i]-1,tmp$Y[i]-1, tmp$X[i]+1, tmp$Y[i]+1, col = bg_col)
       graphics::text(x=tmp$X[i] , y=tmp$Y[i]+1.5, tmp$ae[i], col = text_col)
     }
@@ -83,25 +79,25 @@ pie_legend2 <- function(
 
     if (length(aes) > 1) {
       my_symbols(
-        x = tmp$X[1:length(aes)],
-        y = tmp$Y[1:length(aes)],
+        x = tmp$X[seq_along(aes)],
+        y = tmp$Y[seq_along(aes)],
         symb = poly_t,
-        num = tmp$num[1:length(aes)],
-        rad = tmp$r[1:length(aes)],
-        bg = tmp$bg[1:length(aes)],
-        fg = tmp$col[1:length(aes)],
+        num = tmp$num[seq_along(aes)],
+        rad = tmp$r[seq_along(aes)],
+        bg = tmp$bg[seq_along(aes)],
+        fg = tmp$col[seq_along(aes)],
         xsize = 2,
         add = TRUE
       )
     } else {
       graphics::symbols(
-        tmp$X[1:length(aes)],
-        tmp$Y[1:length(aes)],
-        circles = 0.85*tmp$r[1:length(aes)],
+        tmp$X[seq_along(aes)],
+        tmp$Y[seq_along(aes)],
+        circles = 0.85*tmp$r[seq_along(aes)],
         inches = FALSE,
         add = TRUE,
-        fg = tmp$col[1:length(aes)],
-        bg = tmp$bg[1:length(aes)],
+        fg = tmp$col[seq_along(aes)],
+        bg = tmp$bg[seq_along(aes)],
         lwd = 1
       )
     }

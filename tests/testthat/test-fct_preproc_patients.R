@@ -7,11 +7,11 @@ test_that("multiplication works", {
 
   prepared <- prepare_data_for_adepro(dat = imputed$data)
 
-  Q <- initQ(prepared$ae_data)
+  q <- init_q(prepared$ae_data)
 
   ae_data <- preproc_ae(prepared$ae_data,grading=FALSE)
 
-  ae_data <- ae_data[which(Q[, 1]), ]
+  ae_data <- ae_data[which(q[, 1]), ]
 
   patients <- preproc_patients(prepared$pat_data, 18)
 

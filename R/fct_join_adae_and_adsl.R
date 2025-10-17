@@ -61,7 +61,6 @@ join_adae_and_adsl <- function(dat_adae, dat_adsl, SUBJIDN) {
 
   #get joint variables which match
   joint_vars_match <- joint_vars[which(index_match)]
-  joint_vars_no_match <- joint_vars[which(!index_match)]
 
   # if a non required variables differs between adae and adsl, it is duplicated in the join and given the extention .x, .y
   # (e.g. ADSNAME with entries "ADSL" and "ADAE")

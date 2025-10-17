@@ -171,7 +171,7 @@ adepro_slice_plot <- function(
               dplyr::rename(patient = "ps"),
             by = "patient"
           ) %>% dplyr::left_join(
-             data.frame(ae = ae_list, col = adepro_colors[1:length(ae_list)], num = 1:length(ae_list)),
+             data.frame(ae = ae_list, col = adepro_colors[seq_along(ae_list)], num = seq_along(ae_list)),
              by = "ae"
           ) %>% dplyr::mutate(
             bg = dplyr::case_when(
@@ -213,7 +213,7 @@ adepro_slice_plot <- function(
             if (show_arrows) {
               if(!is.null(arrow_tmp)) {
                 if(!dim(arrow_tmp)[1] == 0) {
-                  for(i in 1:dim(arrow_tmp)[1]) {
+                  for(i in seq_len(dim(arrow_tmp)[1])) {
                     coord <- poly_t2(arrow_tmp[i,]$num,1,num_aes = length(ae_list))
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
                       graphics::text(arrow_tmp[i,]$X+coord[1], arrow_tmp[i,]$Y+coord[2],expression(symbol("\334")),col =text_col,cex=1.55)
@@ -245,7 +245,7 @@ adepro_slice_plot <- function(
             if (show_arrows){
               if (!is.null(arrow_tmp)){
                 if (!dim(arrow_tmp)[1] == 0) {
-                  for(i in 1:dim(arrow_tmp)[1]){
+                  for(i in seq_len(dim(arrow_tmp)[1])){
                     if(arrow_tmp[i,]$replace_ae_start == 1 & arrow_tmp[i,]$replace_ae_end == 0){
                       graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =text_col,cex=1.55)
                       graphics::text(arrow_tmp[i,]$X, arrow_tmp[i,]$Y,expression(symbol("\334")),col =arrow_col,cex=1.5)

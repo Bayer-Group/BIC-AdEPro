@@ -25,7 +25,7 @@ pie_legend <- function(
     graphics::legend(
       "topleft",
       legend = aes,
-      col = colors[1:length(aes)],
+      col = colors[seq_along(aes)],
       lwd = 15,
       cex = 1,
       bty = "n",
