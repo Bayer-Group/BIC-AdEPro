@@ -1193,7 +1193,7 @@ app_server <- function(input, output, session) {
             adae <- NULL
           }
       } else if (input$radiobutton_data == "Demo data") {
-        adae <- adepro::adae_data
+        adae <- adae_data
          output$wrong_adae_format_text <- shiny::renderUI({
               shiny::HTML(paste0(""))
          })
@@ -1238,7 +1238,7 @@ app_server <- function(input, output, session) {
           adsl <- NULL
       }
     } else if (input$radiobutton_data == "Demo data") {
-      adsl <- adepro::adsl_data
+      adsl <- adsl_data
       output$wrong_adsl_format_text <- shiny::renderUI({
             shiny::HTML(paste0(""))
       })
