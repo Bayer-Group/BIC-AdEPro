@@ -1,26 +1,21 @@
 #' Launches the AdEPro application
 #'
-#' @description
-#' Starts the AdEPro application in the client's browser.
-#'
-#' @param host host link (defaults to the local machine "127.0.0.1")
-#' @param port port number (randomly chosen unless specified as a certain number)
-#' @param browser path to browser exe (defaults to standard browser)
-#' @param ... arguments to pass to golem_opts.
+#' @param ... arguments to pass to golem_opts. 
 #' See `?golem::get_golem_options` for more details.
 #' @keywords adepro
 #' @inheritParams shiny::shinyApp
-#' @details Further information on how to use this application can be found in the vignette of this package.
+#' @details Further information on how to use this application can be found 
+#' in the vignette of this package.
 #'
 #' @examples
 #' \dontrun{
 #' ## Launch application on localhost (127.0.0.1)
 #' ## -------------------------------------------
-#' ## By default launch_adepro starts the application on localhost
+#' ## By default run_app starts the application on localhost
 #' ## and a randomly selected port (e.g. 9876), in which case you can connect
 #' ## to the running application by navigating your browser to
 #' ## http://localhost:9876.
-#' launch_adepro()
+#' run_app()
 #'
 #' ## Launch application on a different host
 #' ## --------------------------------------
@@ -29,7 +24,8 @@
 #' ## use an open port on your machine. Here "open" means
 #' ## that the port should not be used by another service
 #' ## and the port is opened by your firewall.
-#' launch_adepro(host="your-hostname", port=8888)
+#' options(shiny.port = 8888, shiny.host = "your-hostname")
+#' run_app(host="your-hostname", port=8888)
 #'
 #'
 #' ## Make the application available to your coworkers
@@ -42,14 +38,15 @@
 #' ## Your colleagues can use your app by inserting in the address
 #' ## bar of their browser 192.168.1.70:8888, i.e. your IP followed
 #' ## by : and the port number you selected.
-#' launch_adepro(host="0.0.0.0", port=8888)
+#' options(shiny.port = 8888, shiny.host = "0.0.0.0")
+#' run_app()
 #'
 #' ## Launch application on a different browser
 #' ## ----------------------------------------
 #' ## To run the shiny app on a different browser than your standard browser
 #' ## use the "browser" argument to set the path to the respective .exe file.
-#' launch_adepro(browser = "C:/Program Files/Mozilla Firefox/firefox.exe")
-#'
+#' option(browser = "C:/Program Files/Mozilla Firefox/firefox.exe")
+#' run_app()
 #'
 #' ## launching the application.
 #' }
@@ -62,18 +59,9 @@ run_app <- function(
   options = list(),
   enableBookmarking = NULL,
   uiPattern = "/",
-  host = "127.0.0.1",
-  port = NULL,
-  browser = NULL,
   ...
 ) {
-
-  #Shiny options for maximal upload size
-  options(shiny.maxRequestSize = 110*1024^2)
-
-  #shiny::addResourcePath("sbs", system.file("www", package = "shinyBS"))
-
-  adepro_app <- golem::with_golem_options(
+  golem::with_golem_options(
     app = shiny::shinyApp(
       ui = app_ui,
       server = app_server,
@@ -84,7 +72,4 @@ run_app <- function(
     ),
     golem_opts = list(...)
   )
-
-  if (!is.null(browser)) options(browser = browser)
-  shiny::runApp(adepro_app, host = host, port = port)
 }
