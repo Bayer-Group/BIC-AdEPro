@@ -67,4 +67,4 @@ jobs:
           access-type: logged_in
           namespace: DIG
           dir: |
-            .:/bic-adepro-${{(startsWith(github.event.ref, 'refs/tags/v') || github.event.inputs.deploy-to == 'prod') && 'prod' || 'dev'}}
+            .:/${{ github.event.repository.name }}-${{(startsWith(github.event.ref, 'refs/tags/v') || github.event.inputs.deploy-to == 'prod') && 'prod' || 'dev'}}
