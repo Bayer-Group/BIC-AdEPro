@@ -58,10 +58,6 @@ jobs:
         shell: Rscript {0}
         run: |
           rsconnect::writeManifest()
-
-      - name: downcase REPO
-        run: |
-          echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
           
       - name: Publish Connect content
         uses: rstudio/actions/connect-publish@8c14b2c9102ab5f108afa49927cb4edbc84dac21
@@ -71,4 +67,4 @@ jobs:
           access-type: logged_in
           namespace: DIG
           dir: |
-            .:/${{ env.REPO }}-${{(startsWith(github.event.ref, 'refs/tags/v') || github.event.inputs.deploy-to == 'prod') && 'prod' || 'dev'}}
+            .:/bic-adepro-${{(startsWith(github.event.ref, 'refs/tags/v') || github.event.inputs.deploy-to == 'prod') && 'prod' || 'dev'}}
